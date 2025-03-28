@@ -1,6 +1,9 @@
 #include "classfile_parser.h"
 
 
+void function_for_debug(){
+
+}
 
 int parse_const_pool(struct class_file* class, Loader* loader) {
   uint16_t pool_count = class->constant_pool_count;
@@ -25,66 +28,88 @@ int parse_const_pool(struct class_file* class, Loader* loader) {
     return ENOMEM;
   }
 
+  printf("CONSTANT POOL:\n");
+
+
   for (i = 0; i < pool_count-1; i++) {
     tag = loader_u1(loader);
     class->constant_pool[i].tag = tag;
-    printf("I: %hu, tag is - %hhu\n", i, tag);
+    printf("I: %hu, tag is - %hhu, type - ", i, tag);
+    if(i == 11){
+      function_for_debug();
+    }
 
     switch (tag) {
-      
       case UTF8:
-
+        printf("UTF8\n");
+        read_utf8_info(loader, &(class->constant_pool[i].utf8_info));
         break;
       case INTEGER:
-        /* code */
+        printf("INTEGER\n");
+        read_primitive_info(loader, &(class->constant_pool[i].integer_info.info));
         break;
       case FLOAT:
-        /* code */
+        printf("FLOAT\n");
+        read_primitive_info(loader, &(class->constant_pool[i].float_info.info));     
         break;
       case LONG:
-        /* code */
+        printf("LONG\n");
+        read_big_primitive_info(loader, &(class->constant_pool[i].long_info.info));
         break;
       case DOUBLE:
-        /* code */
+        printf("DOUBLE\n");
+        read_big_primitive_info(loader, &(class->constant_pool[i].double_info.info));
         break;
       case CLASS:
-        /* code */
+        printf("CLASS\n");
+        read_class_info(loader, &(class->constant_pool[i].class_info));
         break;
       case STRING:
-        /* code */
+        printf("STRING\n");
+        read_string_info(loader, &(class->constant_pool[i].string_info));
         break;
       case FIELD_REF:
-        /* code */
+        printf("FIELD_RED\n");
+        read_ref_type_info(loader, &(class->constant_pool[i].fieldref_info.info));
         break;
       case METHOD_REF:
-        /* code */
+        printf("METHOD_REF\n");
+        read_ref_type_info(loader, &(class->constant_pool[i].methodref_info.info));
         break;
       case INTERF_METHOD_REF:
-        /* code */
+        printf("INTEGER_METHOD\n");
+        read_ref_type_info(loader, &(class->constant_pool[i].interface_meth_ref_info.info));
         break;
       case NAME_AND_TYPE:
-        /* code */
+        printf("NAME_AND_TYPE\n");
+        read_name_and_type_info(loader, &(class->constant_pool[i].name_and_type_info));
         break;
       case METHOD_HANDLE:
-        /* code */
+        printf("METHOD_HANDLE\n");
+        read_method_handle_info(loader, &(class->constant_pool[i].method_handle_info));
         break;
       case METHOD_TYPE:
-        /* code */
+        printf("METHOD_TYPE\n");
+        read_method_type_info(loader, &(class->constant_pool[i].method_type_info));
         break;
       case DYNAMIC:
-        /* code */
+        printf("DYNAMIC\n");
+        read_dynamic_info(loader, &(class->constant_pool[i].dynamic_info.info));
         break;
       case INVOKE_METHOD:
-        /* code */
+        printf("INVOKE_METHOD\n");
+        read_dynamic_info(loader, &(class->constant_pool[i].invoke_dynamic_info.info));
         break;
       case MODULE:
-        /* code */
+        printf("MODULE\n");
+        read_module_info(loader, &(class->constant_pool[i].module_info));
         break;
       case PACKAGE:
-          /* code */
+        printf("PACKAGE\n");
+        read_package_info(loader, &(class->constant_pool[i].package_info));
         break;
       default:
-        printf("ERROR: unsupported tag: %hhu on iteration: %hu\n", tag, i);
+        printf("unknown\n, ERROR: unsupported tag: %hhu on iteration: %hu\n", tag, i);
         error = EINVAL;
         goto exit;
     }

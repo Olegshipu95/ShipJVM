@@ -4,85 +4,77 @@ int read_utf8_info(Loader* loader, struct UTF8_info* utf8){
     uint16_t i;
 
     utf8->lenght = loader_u2(loader);
-    utf8->string = malloc(utf8->lenght);
-    if(utf8->string != NULL){
-        put("ERROR: Can't allocate memory for string\n");
+    utf8->bytes = (uint8_t*) malloc((size_t) utf8->lenght);
+
+    if(utf8->bytes == NULL){
+        printf("ERROR: Can't allocate memory for string\n");
         return EINVAL;
     }
 
     for (i = 0; i < utf8->lenght; i++)
     {
-        utf8->string[i] = loader_u1(loader);
+        utf8->bytes[i] = loader_u1(loader);
     }
+    
     return 0;
 }
 
-int read_integer_info(Loader* loader, struct integer_info* int_info){
-    int_info->bytes = loader_u4(loader);
+int read_primitive_info(Loader* loader, struct abstract_primitive* info){
+    info->bytes = loader_u4(loader);
     return 0;
 }
 
-int read_float_info(Loader* loader, struct float_info* float_info){
-    float_info->bytes = loader_u4(loader);
+int read_big_primitive_info(Loader* loader, struct abstract_big_primitive* info){
+    info->high_bytes = loader_u4(loader);
+    info->low_bytes = loader_u4(loader);
     return 0;
 }
 
-int read_long_info(Loader* loader, struct long_info* long_info){
-    long_info->high_bytes = loader_u4;
-    long_info->low_bytes = loader_u4;
+int read_class_info(Loader* loader, struct class_info* info){
+    info->name_index = loader_u2(loader);
     return 0;
 }
 
-int read_double_info(Loader* loader, struct double_info* double_info){
-    double_info->high_bytes = loader_u4;
-    double_info->low_bytes = loader_u4;
+int read_string_info(Loader* loader, struct string_info* info){
+    info->string_index = loader_u2(loader);
     return 0;
 }
 
-int read_class_info(Loader* loader, struct class_info* class_info){
-
+int read_ref_type_info(Loader* loader, struct abstract_ref_type* info){
+    info->class_index = loader_u2(loader);
+    info->name_and_type_index = loader_u2(loader);
+    return 0;
 }
 
-int read_string_info(Loader* loader, struct string_info* string_info){
-
+int read_name_and_type_info(Loader* loader, struct name_and_type_info* info){
+    info->name_index=loader_u2(loader);
+    info->descripror_index=loader_u2(loader);
+    return 0;
 }
 
-int read_fieldref_info(Loader* loader, struct fieldref_info* fieldref_info){
-
+int read_method_handle_info(Loader* loader, struct method_handle_info* info){
+    info->reference_kind = loader_u1(loader);
+    info->reference_index = loader_u2(loader);
+    return 0;
 }
 
-int read_methodref_info(Loader* loader, struct methodref_info* methodref_info){
-
+int read_method_type_info(Loader* loader, struct method_type_info* info){
+    info->descriptor_index= loader_u2(loader);
+    return 0;
 }
 
-int read_interface_meth_ref_info(Loader* loader, struct interface_meth_ref_info* interf){
-    
+int read_dynamic_info(Loader* loader, struct absract_dynamic_info* info){
+    info->bootstrap_method_attr_index = loader_u2(loader);
+    info->name_and_type_index = loader_u2(loader);
+    return 0;
 }
 
-int read_name_and_type_info(Loader* loader, struct string_info* string_info){
-    
+int read_module_info(Loader* loader, struct module_info* info){
+    info->name_index = loader_u2(loader);
+    return 0;
 }
 
-int read_method_handle_info(Loader* loader, struct string_info* string_info){
-    
-}
-
-int read_method_type_info(Loader* loader, struct string_info* string_info){
-    
-}
-
-int read_dynamic_info(Loader* loader, struct string_info* string_info){
-    
-}
-
-int read_invoke_dynamic_info(Loader* loader, struct string_info* string_info){
-    
-}
-
-int read_module_info(Loader* loader, struct string_info* string_info){
-    
-}
-
-int read_package_info(Loader* loader, struct string_info* string_info){
-    
+int read_package_info(Loader* loader, struct package_info* info){
+    info->name_index = loader_u2(loader);
+    return 0;
 }

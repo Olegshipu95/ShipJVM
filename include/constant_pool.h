@@ -29,25 +29,32 @@ enum CONSTANT_POOL_TAG {
 
 struct UTF8_info{
   uint16_t lenght;
-  uint8_t* string;
+  uint8_t* bytes;
+};
+
+struct abstract_primitive{
+  uint32_t bytes;
 };
 
 struct integer_info{
-  uint32_t bytes;
+  struct abstract_primitive info;
 };
 
 struct float_info{
-  uint32_t bytes;
+  struct abstract_primitive info;
+};
+
+struct abstract_big_primitive{
+  uint32_t high_bytes;
+  uint32_t low_bytes;
 };
 
 struct long_info{
-  uint32_t high_bytes;
-  uint32_t low_bytes;
+  struct abstract_big_primitive info;
 };
 
 struct double_info{
-  uint32_t high_bytes;
-  uint32_t low_bytes;
+  struct abstract_big_primitive info;
 };
 
 struct class_info{
@@ -58,22 +65,21 @@ struct string_info{
   uint16_t string_index;
 };
 
-struct ref_type_abstract{
+struct abstract_ref_type{
   uint16_t class_index;
   uint16_t name_and_type_index;
-
 };
 
 struct fieldref_info{
-  struct ref_type_abstract fieldref; 
+  struct abstract_ref_type info; 
 };
 
 struct methodref_info{
-  struct ref_type_abstract methodref; 
+  struct abstract_ref_type info; 
 };
 
 struct interface_meth_ref_info{
-  struct ref_type_abstract interf_meth_ref;
+  struct abstract_ref_type info;
 };
 
 struct name_and_type_info{
@@ -90,17 +96,17 @@ struct method_type_info {
   uint16_t descriptor_index;
 };
 
-struct dynamic_absract_info{
+struct absract_dynamic_info{
   uint16_t bootstrap_method_attr_index;
   uint16_t name_and_type_index;
 };
 
 struct dynamic_info {
-  struct dynamic_absract_info dynamic;
+  struct absract_dynamic_info info;
 };
 
 struct invoke_dynamic_info {
-  struct dynamic_absract_info invoke_dynamic;
+  struct absract_dynamic_info info;
 };
 
 struct module_info {
@@ -139,6 +145,18 @@ struct cp_info {
   };
 };
 
+int read_utf8_info(Loader* loader, struct UTF8_info* utf8);
+int read_primitive_info(Loader* loader, struct abstract_primitive* info);
+int read_big_primitive_info(Loader* loader, struct abstract_big_primitive* info);
+int read_class_info(Loader* loader, struct class_info* info);
+int read_string_info(Loader* loader, struct string_info* info);
+int read_ref_type_info(Loader* loader, struct abstract_ref_type* info);
+int read_name_and_type_info(Loader* loader, struct name_and_type_info* info);
+int read_method_handle_info(Loader* loader, struct method_handle_info* info);
+int read_method_type_info(Loader* loader, struct method_type_info* info);
+int read_dynamic_info(Loader* loader, struct absract_dynamic_info* info);
+int read_module_info(Loader* loader, struct module_info* info);
+int read_package_info(Loader* loader, struct package_info* info);
 
 
 
