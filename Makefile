@@ -5,11 +5,12 @@ CC = gcc
 CFLAGS = -I./include  -std=c11
 
 #Имя исполняемого файла
-TARGET = my_program
+TARGET = jvm
 
 #Папки с исходными файлами
-SRC_DIR = src
-INCLUDE_DIR = include
+SRC_DIR ?= ./src
+INCLUDE_DIR ?= ./include
+BUILD_DIR ?= ./build
 
 #Автоматический поиск исходных файлов
 SOURCES = $(wildcard $(SRC_DIR)/*.c)

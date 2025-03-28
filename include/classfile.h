@@ -21,15 +21,15 @@ struct method_info {
   uint16_t             name_index;
   uint16_t             descriptor_index;
   uint16_t             attributes_count;
-  attribute_info* attributes; // size = attributes_count
+  struct attribute_info* attributes; // size = attributes_count
 };
 
-struct ClassFile {
+struct class_file {
   uint32_t magic;
   uint16_t minor_version;
   uint16_t major_version;
   uint16_t constant_pool_count;
-  struct cp_info* constantPool; // size = constant_pool_count
+  struct cp_info* constant_pool; // size = constant_pool_count
   uint16_t access_flags;
   uint16_t this_class;
   uint16_t super_class;
@@ -42,5 +42,7 @@ struct ClassFile {
   uint16_t attributes_count;
   struct attribute_info* attributes; // size = attributes_count
 };
+
+void init_class_file(struct class_file* class);
 
 #endif

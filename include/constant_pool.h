@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <errno.h>
+#include "classfile_stream.h"
 
 enum CONSTANT_POOL_TAG {
   UTF8 = 1,
@@ -26,7 +29,7 @@ enum CONSTANT_POOL_TAG {
 
 struct UTF8_info{
   uint16_t lenght;
-  char* string;
+  uint8_t* string;
 };
 
 struct integer_info{
@@ -58,6 +61,7 @@ struct string_info{
 struct ref_type_abstract{
   uint16_t class_index;
   uint16_t name_and_type_index;
+
 };
 
 struct fieldref_info{
@@ -108,9 +112,12 @@ struct package_info {
 };
 
 struct cp_info {
+  
   uint8_t tag;
-  union constant_info
+
+  union
   {
+
     struct UTF8_info utf8_info; // 1
     struct integer_info integer_info; // 3
     struct float_info float_info; // 4
@@ -128,8 +135,13 @@ struct cp_info {
     struct invoke_dynamic_info invoke_dynamic_info; // 18
     struct module_info module_info; // 19
     struct package_info package_info; // 20
-  } constant_info;
+
+  };
 };
+
+
+
+
 
 
 #endif
