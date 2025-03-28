@@ -21,7 +21,7 @@ int parse_const_pool(struct class_file* class, Loader* loader) {
     return EINVAL;
   }
 
-  class->constant_pool = malloc(pool_count);
+  class->constant_pool = malloc(pool_count * sizeof(struct cp_info));
   
   if(class->constant_pool == NULL){
     perror("can not allocate memory for constant pool\n");
@@ -35,14 +35,15 @@ int parse_const_pool(struct class_file* class, Loader* loader) {
     tag = loader_u1(loader);
     class->constant_pool[i].tag = tag;
     printf("I: %hu, tag is - %hhu, type - ", i, tag);
-    if(i == 11){
+    if(i == 10){
       function_for_debug();
     }
 
     switch (tag) {
       case UTF8:
-        printf("UTF8\n");
+        printf("UTF8, ");
         read_utf8_info(loader, &(class->constant_pool[i].utf8_info));
+        printf("data - %.*s\n", class->constant_pool[i].utf8_info.lenght ,class->constant_pool[i].utf8_info.bytes);
         break;
       case INTEGER:
         printf("INTEGER\n");
@@ -124,7 +125,7 @@ int parse_class_file() {
   int err = 0;
   FILE* file = fopen("tests/Add.class", "rb");
   Loader loader = {.file = file, .error = 0};
-  struct class_file class_file;
+  struct class_file class;
 
   if (!file) {
     perror("Failed to open file\n");
@@ -132,12 +133,12 @@ int parse_class_file() {
     goto exit;
   }
 
-  init_class_file(&class_file);
-  class_file.magic = loader_u4(&loader);
-  class_file.major_version = loader_u2(&loader);
-  class_file.minor_version = loader_u2(&loader);
-  class_file.constant_pool_count = loader_u2(&loader);
-  printf("Constant_pool_count is %hu\n", class_file.constant_pool_count);
+  init_class_file(&class);
+  class.magic = loader_u4(&loader);
+  class.major_version = loader_u2(&loader);
+  class.minor_version = loader_u2(&loader);
+  class.constant_pool_count = loader_u2(&loader);
+  printf("Constant_pool_count is %hu\n", class.constant_pool_count);
 
   if (loader.error) {
     perror("Error reading file\n");
@@ -145,10 +146,20 @@ int parse_class_file() {
     goto exit;
   }
 
-  err = parse_const_pool(&class_file, &loader);
+  err = parse_const_pool(&class, &loader);
 
   if (err != 0) {
     printf("Error after parse const pool is - %d\n", err);
+  }
+
+  class.access_flags = loader_u2(&loader);
+  class.this_class = loader_u2(&loader);
+  class.super_class = loader_u2(&loader);
+  class.interfaces_count = loader_u2(&loader);
+  class.interfaces = malloc(class.interfaces_count * sizeof(uint16_t));
+  
+  if (class.interfaces == NULL){
+    printf("ERROR: can not malloc data for interfaces");
   }
 
   if (loader.error) {
@@ -156,8 +167,8 @@ int parse_class_file() {
     err = ENOEXEC;
     goto exit;
   } else {
-    printf("Magic: 0x%X, Version: %hu.%hu\n", class_file.magic,
-           class_file.major_version, class_file.minor_version);
+    printf("Magic: 0x%X, Version: %hu.%hu\n", class.magic,
+           class.major_version, class.minor_version);
   }
 
 exit:
