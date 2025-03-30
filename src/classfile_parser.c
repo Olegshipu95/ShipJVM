@@ -1,12 +1,265 @@
 #include "classfile_parser.h"
 
+int is_string_match(const char* str, size_t len, const char* expected) {
+  if (len != strlen(expected)) {
+      return 0;
+  }
+  return memcmp(str, expected, len) == 0;
+}
+
+int parse_attributes(Loader* loader, struct class_file* class, struct attribute_info *attr){
+  int iter;
+  int err = 0;
+  
+  if(attr==NULL){
+    printf("ERROR: Attributes array is null");
+    return EINVAL;
+  }
+
+  attr->attribute_name_index = loader_u2(loader);
+  attr->attribute_length = loader_u4(loader);
+  struct UTF8_info* UTF8 = validate_constant(class, attr->attribute_name_index);
+
+  if(UTF8 == NULL){
+    printf("ERROR while reading attr name");
+    err = 1;
+  }
+  attr->info = malloc((size_t)(attr->attribute_length) * sizeof(struct attribute_info));
+
+  if (attr->info){
+    printf("ERROR after malloc for attr");
+    err = 1;
+  }
+
+  
+
+  for(iter = 0; iter < class->attributes_count; iter++){
+    if(is_string_match(UTF8->bytes, UTF8->lenght, "Code")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+      struct code_attribute* code = (struct code_attribute*)attr->info;
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "ConstantValue")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "StackMapTable")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+      
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "BootstrapMethods")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "NestHost")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "NestMembers")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "PermittedSubclasses")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "Exceptions")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "InnerClasses")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "EnclosingMethod")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "Synthetic")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "Signature")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "Record")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "SourceFile")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "LineNumberTable")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "LocalVariableTable")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "SourceDebugExtension")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "Deprecated")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "RuntimeVisibleAnnotations")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "RuntimeInvisibleAnnotations")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "RuntimeVisibleParameterAnnotations")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "RuntimeInvisibleParameterAnnotations")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "RuntimeVisibleTypeAnnotations")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "RuntimeInvisibleTypeAnnotations")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "AnnotationDefault")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "MethodParameters")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "Module")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "ModulePackages")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else if(is_string_match(UTF8->bytes, UTF8->lenght, "ModuleMainClass")){
+      #ifdef DEBUG
+      assert((size_t)(attr->attribute_length) * sizeof(struct attribute_info)
+       == sizeof(struct code_attribute))
+      #endif
+
+    }
+    else {
+      print("ERROR!!!");
+    }
+  }
+
+  return 0;
+}
+
 int parse_class_fields(Loader* loader, struct field_info* fields) {
   fields->access_flags = loader_u2(loader);
   fields->name_index = loader_u2(loader);
   fields->descriptor_index = loader_u2(loader);
   fields->attributes_count = loader_u2(loader);
   fields->access_flags = loader_u2(loader);
-  return 0;
+  fields->attributes = malloc(sizeof(struct attribute_info) *
+                        (size_t)(fields->attributes_count));
+  if(fields->attributes == NULL){
+    printf("ERROR: can't allocate memory for fields attributes");
+    return ENOMEM;
+  }
+  int err = parse_attributes(loader, fields->attributes_count, fields->attributes);
+  return err;
 }
 
 int parse_const_pool(struct class_file* class, Loader* loader) {
