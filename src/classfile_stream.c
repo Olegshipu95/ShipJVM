@@ -24,7 +24,11 @@ uint16_t loader_u2(Loader* loader) {
 uint32_t loader_u4(Loader* loader) {
   uint8_t buf[4];
   loader_read_bytes(loader, buf, 4);
-  return (uint32_t)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
+  return (uint32_t)(
+    ((uint32_t)buf[0] << 24) |
+    ((uint32_t)buf[1] << 16) |
+    ((uint32_t)buf[2] << 8) |
+    (uint32_t)buf[3]);
 }
 
 uint64_t loader_u8(Loader* loader) {

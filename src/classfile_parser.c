@@ -1,8 +1,12 @@
 #include "classfile_parser.h"
 
-
-void function_for_debug(){
-
+int parse_class_fields(Loader* loader, struct field_info* fields) {
+  fields->access_flags = loader_u2(loader);
+  fields->name_index = loader_u2(loader);
+  fields->descriptor_index = loader_u2(loader);
+  fields->attributes_count = loader_u2(loader);
+  fields->access_flags = loader_u2(loader);
+  return 0;
 }
 
 int parse_const_pool(struct class_file* class, Loader* loader) {
@@ -11,55 +15,55 @@ int parse_const_pool(struct class_file* class, Loader* loader) {
   uint8_t tag;
   int error = 0;
 
-  if (pool_count == 0){
+  if (pool_count == 0) {
     perror("Constant_pool_count is 0\n");
     return EINVAL;
   }
 
-  if(class->constant_pool != NULL){
+  if (class->constant_pool != NULL) {
     perror("Constant pool has already been initialized\n");
     return EINVAL;
   }
 
   class->constant_pool = malloc(pool_count * sizeof(struct cp_info));
-  
-  if(class->constant_pool == NULL){
+
+  if (class->constant_pool == NULL) {
     perror("can not allocate memory for constant pool\n");
     return ENOMEM;
   }
 
   printf("CONSTANT POOL:\n");
 
-
-  for (i = 0; i < pool_count-1; i++) {
+  for (i = 0; i < pool_count - 1; i++) {
     tag = loader_u1(loader);
     class->constant_pool[i].tag = tag;
     printf("I: %hu, tag is - %hhu, type - ", i, tag);
-    if(i == 10){
-      function_for_debug();
-    }
 
     switch (tag) {
       case UTF8:
         printf("UTF8, ");
         read_utf8_info(loader, &(class->constant_pool[i].utf8_info));
-        printf("data - %.*s\n", class->constant_pool[i].utf8_info.lenght ,class->constant_pool[i].utf8_info.bytes);
+        printf("data - %.*s\n", class->constant_pool[i].utf8_info.lenght,
+               class->constant_pool[i].utf8_info.bytes);
         break;
       case INTEGER:
         printf("INTEGER\n");
-        read_primitive_info(loader, &(class->constant_pool[i].integer_info.info));
+        read_primitive_info(loader,
+                            &(class->constant_pool[i].integer_info.info));
         break;
       case FLOAT:
         printf("FLOAT\n");
-        read_primitive_info(loader, &(class->constant_pool[i].float_info.info));     
+        read_primitive_info(loader, &(class->constant_pool[i].float_info.info));
         break;
       case LONG:
         printf("LONG\n");
-        read_big_primitive_info(loader, &(class->constant_pool[i].long_info.info));
+        read_big_primitive_info(loader,
+                                &(class->constant_pool[i].long_info.info));
         break;
       case DOUBLE:
         printf("DOUBLE\n");
-        read_big_primitive_info(loader, &(class->constant_pool[i].double_info.info));
+        read_big_primitive_info(loader,
+                                &(class->constant_pool[i].double_info.info));
         break;
       case CLASS:
         printf("CLASS\n");
@@ -71,27 +75,33 @@ int parse_const_pool(struct class_file* class, Loader* loader) {
         break;
       case FIELD_REF:
         printf("FIELD_RED\n");
-        read_ref_type_info(loader, &(class->constant_pool[i].fieldref_info.info));
+        read_ref_type_info(loader,
+                           &(class->constant_pool[i].fieldref_info.info));
         break;
       case METHOD_REF:
         printf("METHOD_REF\n");
-        read_ref_type_info(loader, &(class->constant_pool[i].methodref_info.info));
+        read_ref_type_info(loader,
+                           &(class->constant_pool[i].methodref_info.info));
         break;
       case INTERF_METHOD_REF:
         printf("INTEGER_METHOD\n");
-        read_ref_type_info(loader, &(class->constant_pool[i].interface_meth_ref_info.info));
+        read_ref_type_info(
+            loader, &(class->constant_pool[i].interface_meth_ref_info.info));
         break;
       case NAME_AND_TYPE:
         printf("NAME_AND_TYPE\n");
-        read_name_and_type_info(loader, &(class->constant_pool[i].name_and_type_info));
+        read_name_and_type_info(loader,
+                                &(class->constant_pool[i].name_and_type_info));
         break;
       case METHOD_HANDLE:
         printf("METHOD_HANDLE\n");
-        read_method_handle_info(loader, &(class->constant_pool[i].method_handle_info));
+        read_method_handle_info(loader,
+                                &(class->constant_pool[i].method_handle_info));
         break;
       case METHOD_TYPE:
         printf("METHOD_TYPE\n");
-        read_method_type_info(loader, &(class->constant_pool[i].method_type_info));
+        read_method_type_info(loader,
+                              &(class->constant_pool[i].method_type_info));
         break;
       case DYNAMIC:
         printf("DYNAMIC\n");
@@ -99,7 +109,8 @@ int parse_const_pool(struct class_file* class, Loader* loader) {
         break;
       case INVOKE_METHOD:
         printf("INVOKE_METHOD\n");
-        read_dynamic_info(loader, &(class->constant_pool[i].invoke_dynamic_info.info));
+        read_dynamic_info(loader,
+                          &(class->constant_pool[i].invoke_dynamic_info.info));
         break;
       case MODULE:
         printf("MODULE\n");
@@ -110,7 +121,8 @@ int parse_const_pool(struct class_file* class, Loader* loader) {
         read_package_info(loader, &(class->constant_pool[i].package_info));
         break;
       default:
-        printf("unknown\n, ERROR: unsupported tag: %hhu on iteration: %hu\n", tag, i);
+        printf("unknown\n, ERROR: unsupported tag: %hhu on iteration: %hu\n",
+               tag, i);
         error = EINVAL;
         goto exit;
     }
@@ -126,6 +138,7 @@ int parse_class_file() {
   FILE* file = fopen("tests/Add.class", "rb");
   Loader loader = {.file = file, .error = 0};
   struct class_file class;
+  uint16_t iterator;
 
   if (!file) {
     perror("Failed to open file\n");
@@ -157,18 +170,34 @@ int parse_class_file() {
   class.super_class = loader_u2(&loader);
   class.interfaces_count = loader_u2(&loader);
   class.interfaces = malloc(class.interfaces_count * sizeof(uint16_t));
-  
-  if (class.interfaces == NULL){
+
+  if (class.interfaces == NULL) {
     printf("ERROR: can not malloc data for interfaces");
   }
+
+  for (iterator = 0; iterator < class.interfaces_count; ++iterator) {
+    class.interfaces[iterator] = loader_u2(&loader);
+  }
+
+  class.fields_count = loader_u2(&loader);
+
+  class.fields = malloc(sizeof(struct field_info) * class.fields_count);
+
+  if (class.fields == NULL) {
+    printf("ERROR: can not malloc data for interfaces");
+  }
+
+  // for (iterator = 0; iterator < class.fields_count; ++iterator) {
+  //   class.fields[iterator];
+  // }
 
   if (loader.error) {
     perror("Error reading file\n");
     err = ENOEXEC;
     goto exit;
   } else {
-    printf("Magic: 0x%X, Version: %hu.%hu\n", class.magic,
-           class.major_version, class.minor_version);
+    printf("Magic: 0x%X, Version: %hu.%hu\n", class.magic, class.major_version,
+           class.minor_version);
   }
 
 exit:
