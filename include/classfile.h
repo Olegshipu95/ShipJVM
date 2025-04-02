@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include "constant_pool.h"
-#include "attribute_info.h"
 
+#include "attribute_info.h"
+#include "constant_pool.h"
 
 struct field_info {
   uint16_t access_flags;
@@ -43,5 +43,6 @@ struct class_file {
 };
 
 void init_class_file(struct class_file* class);
-int get_constant(struct class_file* class, uint16_t index, struct cp_info** cp_info);
+int get_constant(struct class_file* class, uint16_t index,
+                 struct cp_info** cp_info);
 #endif
