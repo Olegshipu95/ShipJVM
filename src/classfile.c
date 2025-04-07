@@ -18,15 +18,14 @@ void init_class_file(struct class_file* class) {
   class->attributes = 0;
 }
 
-
- int get_constant(struct class_file* class, uint16_t index, struct cp_info** cp_info){
-
-  if (index == 0 || index > class->constant_pool_count){
+int get_constant(struct class_file* class, uint16_t index,
+                 struct cp_info** cp_info) {
+  if (index == 0 || index > class->constant_pool_count) {
     printf("Can't take constant by that adress");
     return EINVAL;
   }
-  
-  *cp_info = &(class->constant_pool[index-1]);
-  
+
+  *cp_info = &(class->constant_pool[index - 1]);
+
   return 0;
 }
