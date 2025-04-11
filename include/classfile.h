@@ -12,7 +12,7 @@ struct field_info {
   uint16_t name_index;
   uint16_t descriptor_index;
   uint16_t attributes_count;
-  struct attribute_info* attributes;  // size = attributes_count
+  struct attribute_info** attributes;  // size = attributes_count
 };
 
 struct method_info {

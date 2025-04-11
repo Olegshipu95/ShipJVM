@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "attribute_info.h"
+#include "attribute_parser.h"
 #include "classfile.h"
 #include "classfile_stream.h"
 #include "constant_pool.h"
