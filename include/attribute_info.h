@@ -97,7 +97,7 @@ struct RuntimeVisibleAnnotations_attribute;
 struct RuntimeInvisibleAnnotations_attribute;
 struct RuntimeVisibleParameterAnnotations_attribute;
 struct RuntimeInvisibleParameterAnnotations_attribute;
-struct RuntimeVisibleTypeAnnotations;
+struct RuntimeVisibleTypeAnnotations_attribute;
 struct RuntimeInvisibleTypeAnnotations_attribute;
 struct AnnotationDefault_attribute;
 struct MethodParameters_attribute;
@@ -111,27 +111,27 @@ struct attribute_info {
 };
 
 struct ConstantValue_attribute {
-  uint16_t attribute_name_index;
-  uint32_t attribute_length;
+  struct attribute_info info;
   uint16_t constant_value_index;
 };
 
+struct exception_table {
+  uint16_t start_pc;
+  uint16_t end_pc;
+  uint16_t handler_pc;
+  uint16_t catch_type;
+};
+
 struct Code_attribute {
-  uint16_t attribute_name_index;
-  uint32_t attribute_length;
+  struct attribute_info info;
   uint16_t max_stack;
   uint16_t max_locals;
   uint32_t code_length;
   uint8_t* code; /* size = code_length */
   uint16_t exception_table_length;
-  struct {
-    uint16_t start_pc;
-    uint16_t end_pc;
-    uint16_t handler_pc;
-    uint16_t catch_type;
-  }* exception_table; /* size = exception_table_length */
+  struct exception_table* table; /* size = exception_table_length */
   uint16_t attributes_count;
-  struct attribute_info* attributes; /* size = attributes_count */
+  struct attribute_info** attributes; /* size = attributes_count */
 };
 
 /**
@@ -255,17 +255,7 @@ union stack_map_frame {
  * StackMapTable attribute structure as defined in JVM specification
  */
 struct StackMapTable_attribute {
-  /**
-   * Index into the constant pool table pointing to
-   * the UTF8 string "StackMapTable"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute excluding initial 6 bytes
-   * (name_index + length fields)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of stack map frame entries in this attribute
@@ -285,16 +275,7 @@ struct StackMapTable_attribute {
  * Used for invokedynamic instruction support
  */
 struct BootstrapMethods_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "BootstrapMethods"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute excluding the initial 6 bytes
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of bootstrap methods in this attribute
@@ -330,16 +311,7 @@ struct BootstrapMethods_attribute {
  * belongs
  */
 struct NestHost_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "NestHost"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (must be 2)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Index into the constant pool of a CONSTANT_Class_info
@@ -353,16 +325,7 @@ struct NestHost_attribute {
  * Lists all classes that are members of the nest hosted by the current class
  */
 struct NestMembers_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "NestMembers"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (2 + 2*number_of_classes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of classes in the nest
@@ -381,16 +344,7 @@ struct NestMembers_attribute {
  * Specifies the allowed direct subclasses of a sealed class
  */
 struct PermittedSubclasses_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "PermittedSubclasses"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (2 + 2*number_of_classes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of permitted subclasses
@@ -409,16 +363,7 @@ struct PermittedSubclasses_attribute {
  * Lists checked exceptions that may be thrown by a method
  */
 struct Exceptions_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "Exceptions"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (2 + 2*number_of_exceptions)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of exceptions in the exception table
@@ -437,16 +382,7 @@ struct Exceptions_attribute {
  * Contains information about inner classes of a class
  */
 struct InnerClasses_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "InnerClasses"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (2 + 8*number_of_classes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of entries in the classes table
@@ -487,16 +423,7 @@ struct InnerClasses_attribute {
  * Indicates the immediately enclosing method of a nested class
  */
 struct EnclosingMethod_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "EnclosingMethod"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (must be 4)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Index into the constant pool of a CONSTANT_Class_info
@@ -516,16 +443,7 @@ struct EnclosingMethod_attribute {
  * Marks synthetic elements generated by the compiler
  */
 struct Synthetic_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "Synthetic"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (must be 0)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 };
 
 /**
@@ -533,16 +451,7 @@ struct Synthetic_attribute {
  * Stores generic type information for classes, methods, and fields
  */
 struct Signature_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "Signature"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (must be 2)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Index into the constant pool of a CONSTANT_Utf8_info
@@ -584,16 +493,7 @@ struct record_component_info {
  * Contains metadata about record class components
  */
 struct Record_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "Record"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute excluding the initial 6 bytes
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of components in this record
@@ -611,16 +511,7 @@ struct Record_attribute {
  * Records the source file from which this class was compiled
  */
 struct SourceFile_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "SourceFile"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (must be 2)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Index into the constant pool of a CONSTANT_Utf8_info
@@ -634,16 +525,7 @@ struct SourceFile_attribute {
  * Maps bytecode offsets to source code line numbers
  */
 struct LineNumberTable_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "LineNumberTable"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of entries in the line number table
@@ -671,16 +553,7 @@ struct LineNumberTable_attribute {
  * Stores debug information about local variables
  */
 struct LocalVariableTable_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "LocalVariableTable"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of entries in the local variable table
@@ -721,20 +594,10 @@ struct LocalVariableTable_attribute {
 };
 
 /**
- * LocalVariableTypeTable attribute structure
  * Stores generic type information for local variables
  */
 struct LocalVariableTypeTable_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "LocalVariableTypeTable"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of entries in the local variable type table
@@ -780,16 +643,7 @@ struct LocalVariableTypeTable_attribute {
  * Contains extended debugging information in implementation-defined format
  */
 struct SourceDebugExtension_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "SourceDebugExtension"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the debug extension data
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Array of bytes containing implementation-specific debug information
@@ -799,20 +653,10 @@ struct SourceDebugExtension_attribute {
 };
 
 /**
- * Deprecated attribute structure
  * Marks deprecated class, field, or method
  */
 struct Deprecated_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "Deprecated"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (must be 0)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 };
 
 struct annotation;
@@ -912,16 +756,7 @@ struct annotation {
  * Stores annotations that should be visible at runtime
  */
 struct RuntimeVisibleAnnotations_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "RuntimeVisibleAnnotations"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of annotations
@@ -939,16 +774,7 @@ struct RuntimeVisibleAnnotations_attribute {
  * Stores annotations that should not be visible at runtime
  */
 struct RuntimeInvisibleAnnotations_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "RuntimeInvisibleAnnotations"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of annotations
@@ -966,16 +792,7 @@ struct RuntimeInvisibleAnnotations_attribute {
  * Stores parameter annotations visible at runtime
  */
 struct RuntimeVisibleParameterAnnotations_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "RuntimeVisibleParameterAnnotations"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of method parameters
@@ -1091,16 +908,7 @@ struct type_path {
  * Stores parameter annotations that should not be visible at runtime
  */
 struct RuntimeInvisibleParameterAnnotations_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "RuntimeInvisibleParameterAnnotations"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of method parameters
@@ -1189,20 +997,10 @@ struct type_annotation {
 };
 
 /**
- * RuntimeVisibleTypeAnnotations attribute structure
  * Stores type annotations that should be visible at runtime
  */
 struct RuntimeVisibleTypeAnnotations_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "RuntimeVisibleTypeAnnotations"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of type annotations
@@ -1220,16 +1018,7 @@ struct RuntimeVisibleTypeAnnotations_attribute {
  * Stores type annotations that should not be visible at runtime
  */
 struct RuntimeInvisibleTypeAnnotations_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "RuntimeInvisibleTypeAnnotations"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (excluding initial 6 bytes)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of type annotations
@@ -1247,16 +1036,7 @@ struct RuntimeInvisibleTypeAnnotations_attribute {
  * Specifies default value for an annotation type element
  */
 struct AnnotationDefault_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "AnnotationDefault"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (depends on default_value size)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * The default value for this annotation element
@@ -1269,16 +1049,7 @@ struct AnnotationDefault_attribute {
  * Contains metadata about method parameters
  */
 struct MethodParameters_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "MethodParameters"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (1 + 4*parameters_count)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of parameter entries
@@ -1307,9 +1078,7 @@ struct MethodParameters_attribute {
  * Contains module definition metadata
  */
 struct Module_attribute {
-  /* Attribute header */
-  uint16_t attribute_name_index; /* Points to "Module" in constant pool */
-  uint32_t attribute_length;     /* Total attribute size excluding header */
+  struct attribute_info info;
 
   /* Module basic info */
   uint16_t module_name_index;    /* CONSTANT_Module_info index */
@@ -1361,16 +1130,7 @@ struct Module_attribute {
  * Lists all packages owned by this module
  */
 struct ModulePackages_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "ModulePackages"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (2 + 2*package_count)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Number of packages in this module
@@ -1389,16 +1149,7 @@ struct ModulePackages_attribute {
  * Specifies the main class for executable modules
  */
 struct ModuleMainClass_attribute {
-  /**
-   * Index into the constant pool pointing to
-   * the UTF8 string "ModuleMainClass"
-   */
-  uint16_t attribute_name_index;
-
-  /**
-   * Length of the attribute (must be 2)
-   */
-  uint32_t attribute_length;
+  struct attribute_info info;
 
   /**
    * Index into the constant pool of a CONSTANT_Class_info
