@@ -1,13 +1,13 @@
 #include "attribute_parser.h"
 
-struct attribute_info* parse_attribute(Loader* loader,
-                                       struct class_file* class) {
+struct attribute_info *parse_attribute(Loader *loader,
+                                       struct class_file *class) {
   int iter;
   int err = 0;
 
   uint16_t attribute_name_index = loader_u2(loader);
   uint16_t attribute_length = loader_u4(loader);
-  struct UTF8_info* UTF8 = validate_constant(class, attribute_name_index);
+  struct UTF8_info *UTF8 = validate_constant(class, attribute_name_index);
 
   if (UTF8 == NULL) {
     printf("ERROR while reading attr name");
@@ -16,7 +16,7 @@ struct attribute_info* parse_attribute(Loader* loader,
   }
 
   if (is_string_match(UTF8->bytes, UTF8->lenght, "ConstantValue")) {
-    struct ConstantValue_attribute* attr =
+    struct ConstantValue_attribute *attr =
         malloc(sizeof(struct ConstantValue_attribute));
     if (attr == NULL) {
       printf("ERROR while allocating memory for ConstantValue_attribute");
@@ -32,7 +32,7 @@ struct attribute_info* parse_attribute(Loader* loader,
     }
     return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "Code")) {
-    struct Code_attribute* attr = malloc(sizeof(struct Code_attribute));
+    struct Code_attribute *attr = malloc(sizeof(struct Code_attribute));
     if (attr == NULL) {
       printf("ERROR while allocating memory for Code_attribute");
       err = ENOMEM;
@@ -41,56 +41,291 @@ struct attribute_info* parse_attribute(Loader* loader,
     attr->info.attribute_name_index = attribute_name_index;
     attr->info.attribute_length = attribute_length;
     err = parse_Code_attribute(loader, class, attr);
+
     if (err != 0) {
       printf("ERROR while parsing Code_attribute");
       return NULL;
     }
     return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "StackMapTable")) {
+    struct StackMapTable_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing StackMapTable");
+      return NULL;
+    }
+
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
+  } else if (is_string_match(UTF8->bytes, UTF8->lenght, "BootstrapMethods")) {
+    struct BootstrapMethods_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing BootstrapMethods_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "NestHost")) {
+    struct NestHost_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing NestHost_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "NestMembers")) {
+    struct NestMembers_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing NestMembers_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght,
                              "PermittedSubclasses")) {
+    struct PermittedSubclasses_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing PermittedSubclasses_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "Exceptions")) {
-  } else if (is_string_match(UTF8->bytes, UTF8->lenght, "InnerClasses")) {
+    struct Exceptions_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing Exceptions_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
+  } else if (is_string_match(UTF8->bytes, UTF8->lenght,
+                             "InnerClasses_attribute")) {
+    struct InnerClasses_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing InnerClasses_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "EnclosingMethod")) {
+    struct EnclosingMethod_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing EnclosingMethod_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "Synthetic")) {
+    struct Synthetic_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing Synthetic_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "Signature")) {
+    struct Signature_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing Signature_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "Record")) {
+    struct Record_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing Record_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "SourceFile")) {
+    struct SourceFile_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing SourceFile_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "LineNumberTable")) {
+    struct LineNumberTable_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing LineNumberTable_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "LocalVariableTable")) {
+    struct LocalVariableTable_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing LocalVariableTable_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
+  } else if (is_string_match(UTF8->bytes, UTF8->lenght,
+                             "LocalVariableTypeTable")) {
+    struct LocalVariableTypeTable_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing LocalVariableTypeTable_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght,
                              "SourceDebugExtension")) {
+    struct SourceDebugExtension_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing SourceDebugExtension_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "Deprecated")) {
+    struct Deprecated_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing Deprecated_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght,
                              "RuntimeVisibleAnnotations")) {
+    struct RuntimeVisibleAnnotations_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing RuntimeVisibleAnnotations_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght,
                              "RuntimeInvisibleAnnotations")) {
+    struct RuntimeInvisibleAnnotations_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing RuntimeInvisibleAnnotations_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght,
                              "RuntimeVisibleParameterAnnotations")) {
+    struct RuntimeVisibleParameterAnnotations_attribute *attr = 0;
+    if (err != 0) {
+      printf(
+          "ERROR while parsing "
+          "RuntimeVisibleParameterAnnotations_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght,
                              "RuntimeInvisibleParameterAnnotations")) {
+    struct RuntimeInvisibleParameterAnnotations_attribute *attr = 0;
+    if (err != 0) {
+      printf(
+          "ERROR while parsing "
+          "RuntimeInvisibleParameterAnnotations_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght,
                              "RuntimeVisibleTypeAnnotations")) {
+    struct RuntimeVisibleTypeAnnotations_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing RuntimeVisibleTypeAnnotations_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght,
                              "RuntimeInvisibleTypeAnnotations")) {
+    struct RuntimeInvisibleTypeAnnotations_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing RuntimeInvisibleTypeAnnotations_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "AnnotationDefault")) {
+    struct AnnotationDefault_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing AnnotationDefault_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "MethodParameters")) {
+    struct MethodParameters_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing MethodParameters_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "Module")) {
+    struct Module_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing Module_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "ModulePackages")) {
+    struct ModulePackages_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing ModulePackages_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else if (is_string_match(UTF8->bytes, UTF8->lenght, "ModuleMainClass")) {
+    struct ModuleMainClass_attribute *attr = 0;
+    if (err != 0) {
+      printf("ERROR while parsing ModuleMainClass_attribute");
+      return NULL;
+    }
+    attr->info.attribute_name_index = attribute_name_index;
+    attr->info.attribute_length = attribute_length;
+    return attr;
   } else {
     print("ERROR!!!");
+    return 1;
   }
 
   return 0;
 }
 
-int read_attributes(Loader* loader, struct class_file* class,
-                    struct attribute_info*** info, uint16_t count) {
-  struct attribute_info** attributes =
-      malloc(sizeof(struct attribute_info*) * (size_t)(count));
+int read_attributes(Loader *loader, struct class_file *class,
+                    struct attribute_info ***info, uint16_t count) {
+  struct attribute_info **attributes =
+      malloc(sizeof(struct attribute_info *) * (size_t)(count));
   int iter = 0;
   if (attributes == NULL) {
     printf("ERROR: can't allocate memory for fields attributes");
@@ -102,8 +337,8 @@ int read_attributes(Loader* loader, struct class_file* class,
   return 0;
 }
 
-int parse_ConstantValue_at(Loader* loader,
-                           struct ConstantValue_attribute* attr) {
+int parse_ConstantValue_at(Loader *loader,
+                           struct ConstantValue_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
@@ -111,8 +346,8 @@ int parse_ConstantValue_at(Loader* loader,
   return 0;
 }
 
-int parse_Code_attribute(Loader* loader, struct class_file* class,
-                         struct Code_attribute* attr) {
+int parse_Code_attribute(Loader *loader, struct class_file *class,
+                         struct Code_attribute *attr) {
   int error = 0;
   uint32_t iter = 0;
   if (attr == NULL) {
@@ -148,8 +383,9 @@ int parse_Code_attribute(Loader* loader, struct class_file* class,
   return error;
 }
 
-void verification_type_parser(Loader* loader,
-                              union verification_type_info* stack) {
+void verification_type_parser(Loader *loader,
+                              union verification_type_info *stack) {
+  stack->tag = loader_u1(loader);
   switch (stack->tag) {
     case 0:  // ITEM_Top
       break;
@@ -185,191 +421,214 @@ void verification_type_parser(Loader* loader,
   }
 }
 
-int stack_map_frame_parser(Loader* loader, union stack_map_frame* entry) {
+int stack_map_frame_parser(Loader *loader, union stack_map_frame *entry) {
   entry->frame_type = loader_u1(loader);
-  if (entry->frame_type >= 0 && entry->frame_type <= 63) {
-    // SAME FRAME
-  } else if (entry->frame_type >= 64 && entry->frame_type <= 127) {
-    // SAME_LOCALS_1_STACK_ITEM
+  if (entry->frame_type >= 0 && entry->frame_type <= 63) {  // SAME FRAME
+  } else if (entry->frame_type >= 64 &&
+             entry->frame_type <= 127) {  // SAME_LOCALS_1_STACK_ITEM
 
     entry->same_locals_1_stack_item_frame.stack ==
         malloc(sizeof(union verification_type_info));
+
     if (entry->same_locals_1_stack_item_frame.stack == NULL) {
-      printf("Error in malloc for entry->same_locals_1_stack_item_frame.stack");
+      printf(
+          "Error in malloc for "
+          "entry->same_locals_1_stack_item_frame.stack");
       return ENOMEM;
     }
-    entry->same_locals_1_stack_item_frame.stack->tag = loader_u1(loader);
+
     verification_type_parser(loader,
                              entry->same_locals_1_stack_item_frame.stack);
-  } else if (entry->frame_type == 247) {
-    // SAME_LOCALS_1_STACK_ITEM_EXTENDED
+  } else if (entry->frame_type == 247) {  // SAME_LOCALS_1_STACK_ITEM_EXTENDED
+
     entry->same_locals_1_stack_item_frame_extended.offset_delta =
         loader_u2(loader);
     entry->same_locals_1_stack_item_frame_extended.stack ==
         malloc(sizeof(union verification_type_info));
+
     if (entry->same_locals_1_stack_item_frame_extended.stack == NULL) {
       printf(
           "Error in malloc for "
           "entry->same_locals_1_stack_item_frame_extended.stack");
       return ENOMEM;
     }
+
     verification_type_parser(
         loader, entry->same_locals_1_stack_item_frame_extended.stack);
-  } else if (entry->frame_type >= 248 && entry->frame_type <= 250) {
-    // CHOP
+  } else if (entry->frame_type >= 248 && entry->frame_type <= 250) {  // CHOP
+
     entry->chop_frame.offset_delta = loader_u2(loader);
-  } else if (entry->frame_type == 250) {
-    // SAME_FRAME_EXTENDED
+  } else if (entry->frame_type == 250) {  // SAME_FRAME_EXTENDED
+
     entry->same_frame_extended.offset_delta = loader_u2(loader);
-  } else if (entry->frame_type >= 252 && entry->frame_type <= 254) {
-    // APPEND
+  } else if (entry->frame_type >= 252 && entry->frame_type <= 254) {  // APPEND
+
     entry->append_frame.offset_delta = loader_u2(loader);
     entry->append_frame.locals = malloc((size_t)(entry->frame_type - 251) *
                                         sizeof(union verification_type_info));
 
-    if (entry->append_frame.locals == NULL){
-        printf("Can not allocate memory for entry->append_frame.locals");
-        return ENOMEM;
+    if (entry->append_frame.locals == NULL) {
+      printf("Can not allocate memory for entry->append_frame.locals");
+      return ENOMEM;
     }
+
     for (int i = 0; i < (entry->frame_type - 251); i++) {
-      entry->append_frame.locals[i].tag = loader_u1(loader);
       verification_type_parser(loader, &entry->append_frame.locals[i]);
     }
-  } else if (entry->frame_type == 255) {
-    // FULL_FRAME
+  } else if (entry->frame_type == 255) {  // FULL_FRAME
+    uint16_t iter;
+
     entry->full_frame.offset_delta = loader_u2(loader);
     entry->full_frame.number_of_locals = loader_u2(loader);
-    entry->full_frame.locals =
-        calloc(entry->full_frame.number_of_locals,
-               sizeof(vm_verification_type_info_t));
 
-    for (int i = 0; i < (entry->frame.full_frame.number_of_locals); i++) {
-      entry->frame.full_frame.locals[i].tag = loader_u1(loader);
-      verification_type_parser(&entry->frame.full_frame.locals[i], loader);
+    entry->full_frame.locals =
+        malloc((size_t)(entry->full_frame.number_of_locals) *
+               sizeof(union verification_type_info));
+
+    if (entry->full_frame.locals == NULL) {
+      printf("Can not allocate memory for entry->full_frame.locals");
+      return ENOMEM;
     }
 
-    entry->frame.full_frame.number_of_stack_items = loader_u2(loader);
-    entry->frame.full_frame.stack =
-        calloc(entry->frame.full_frame.number_of_stack_items,
-               sizeof(vm_verification_type_info_t));
+    for (iter = 0; iter < (entry->full_frame.number_of_locals); iter++) {
+      verification_type_parser(loader, &entry->full_frame.locals[iter]);
+    }
 
-    for (int i = 0; i < (entry->frame.full_frame.number_of_stack_items); i++) {
-      entry->frame.full_frame.stack[i].tag = loader_u1(loader);
-      verification_type_parser(&entry->frame.full_frame.stack[i], loader);
+    entry->full_frame.number_of_stack_items = loader_u2(loader);
+    entry->full_frame.stack =
+        malloc((size_t)(entry->full_frame.number_of_stack_items) *
+               sizeof(union verification_type_info));
+
+    if (entry->full_frame.locals == NULL) {
+      printf(
+          "Can not allocate memory for "
+          "entry->full_frame.number_of_stack_items");
+      return ENOMEM;
+    }
+
+    for (iter = 0; iter < (entry->full_frame.number_of_stack_items); iter++) {
+      verification_type_parser(loader, &entry->full_frame.stack[iter]);
     }
   }
 }
 
-int parse_StackMapTable_at(Loader* loader,
-                           struct StackMapTable_attribute* attr) {
+int parse_StackMapTable_at(Loader *loader,
+                           struct StackMapTable_attribute *attr) {
   int error = 0;
   uint16_t iter = 0;
+
   if (attr == NULL) {
     return EINVAL;
   }
+
   attr->number_of_entries = loader_u2(loader);
+
   attr->entries =
       malloc((sizeof(union stack_map_frame) * attr->number_of_entries));
+
   if (attr->entries == NULL) {
     printf("Can not allocate memory in StackMapTable_at");
     return ENOMEM;
   }
+
   for (iter; iter < attr->number_of_entries; ++iter) {
-    error = stack_map_frame_parser(loader, attr->entries + iter);
+    error = stack_map_frame_parser(loader, &attr->entries[iter]);
   }
+
+  return error;
+}
+
+int parse_BootstrapMethods_at(Loader *loader,
+                              struct BootstrapMethods_attribute *attr) {
+  if (attr == NULL) {
+    return EINVAL;
+  }
+
   return 0;
 }
 
-int parse_BootstrapMethods_at(Loader* loader,
-                              struct BootstrapMethods_attribute* attr) {
+int parse_NestHost_at(Loader *loader, struct NestHost_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_NestHost_at(Loader* loader, struct NestHost_attribute* attr) {
+int parse_NestMembers_at(Loader *loader, struct NestMembers_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_NestMembers_at(Loader* loader, struct NestMembers_attribute* attr) {
+int parse_PermittedSubclasses_at(Loader *loader,
+                                 struct PermittedSubclasses_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_PermittedSubclasses_at(Loader* loader,
-                                 struct PermittedSubclasses_attribute* attr) {
+int parse_Exceptions_at(Loader *loader, struct Exceptions_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_Exceptions_at(Loader* loader, struct Exceptions_attribute* attr) {
+int parse_InnerClasses_at(Loader *loader, struct InnerClasses_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_InnerClasses_at(Loader* loader, struct InnerClasses_attribute* attr) {
+int parse_EnclosingMethod_at(Loader *loader,
+                             struct EnclosingMethod_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_EnclosingMethod_at(Loader* loader,
-                             struct EnclosingMethod_attribute* attr) {
+int parse_Synthetic_at(Loader *loader, struct Synthetic_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_Synthetic_at(Loader* loader, struct Synthetic_attribute* attr) {
+int parse_Signature_at(Loader *loader, struct Signature_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_Signature_at(Loader* loader, struct Signature_attribute* attr) {
+int parse_Record_at(Loader *loader, struct Record_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_Record_at(Loader* loader, struct Record_attribute* attr) {
+int parse_SourceFile_at(Loader *loader, struct SourceFile_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_SourceFile_at(Loader* loader, struct SourceFile_attribute* attr) {
+int parse_lineNumberTable_at(Loader *loader,
+                             struct LineNumberTable_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_lineNumberTable_at(Loader* loader,
-                             struct LineNumberTable_attribute* attr) {
-  if (attr == NULL) {
-    return EINVAL;
-  }
-  return 0;
-}
-
-int parse_LocalVariableTable_at(Loader* loader,
-                                struct LocalVariableTable_attribute* attr) {
+int parse_LocalVariableTable_at(Loader *loader,
+                                struct LocalVariableTable_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
@@ -377,22 +636,22 @@ int parse_LocalVariableTable_at(Loader* loader,
 }
 
 int parse_LocalVariableTypeTable_at(
-    Loader* loader, struct LocalVariableTypeTable_attribute* attr) {
+    Loader *loader, struct LocalVariableTypeTable_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_SourceDebugExtension_at(Loader* loader,
-                                  struct SourceDebugExtension_attribute* attr) {
+int parse_SourceDebugExtension_at(Loader *loader,
+                                  struct SourceDebugExtension_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_Deprecated_at(Loader* loader, struct Deprecated_attribute* attr) {
+int parse_Deprecated_at(Loader *loader, struct Deprecated_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
@@ -400,7 +659,7 @@ int parse_Deprecated_at(Loader* loader, struct Deprecated_attribute* attr) {
 }
 
 int parse_RuntimeInvisibleAnnotations_at(
-    Loader* loader, struct RuntimeInvisibleAnnotations_attribute* attr) {
+    Loader *loader, struct RuntimeInvisibleAnnotations_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
@@ -408,7 +667,7 @@ int parse_RuntimeInvisibleAnnotations_at(
 }
 
 int parse_RuntimeVisibleParameterAnnotations_at(
-    Loader* loader, struct RuntimeVisibleParameterAnnotations_attribute* attr) {
+    Loader *loader, struct RuntimeVisibleParameterAnnotations_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
@@ -416,8 +675,8 @@ int parse_RuntimeVisibleParameterAnnotations_at(
 }
 
 int parse_RuntimeInvisibleParameterAnnotations_at(
-    Loader* loader,
-    struct RuntimeInvisibleParameterAnnotations_attribute* attr) {
+    Loader *loader,
+    struct RuntimeInvisibleParameterAnnotations_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
@@ -425,7 +684,7 @@ int parse_RuntimeInvisibleParameterAnnotations_at(
 }
 
 int parse_RuntimeVisibleTypeAnnotations_at(
-    Loader* loader, struct RuntimeVisibleTypeAnnotations_attribute* attr) {
+    Loader *loader, struct RuntimeVisibleTypeAnnotations_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
@@ -433,46 +692,46 @@ int parse_RuntimeVisibleTypeAnnotations_at(
 }
 
 int parse_RuntimeInvisibleTypeAnnotations_at(
-    Loader* loader, struct RuntimeInvisibleTypeAnnotations_attribute* attr) {
+    Loader *loader, struct RuntimeInvisibleTypeAnnotations_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_AnnotationDefault_at(Loader* loader,
-                               struct AnnotationDefault_attribute* attr) {
+int parse_AnnotationDefault_at(Loader *loader,
+                               struct AnnotationDefault_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_MethodParameters_at(Loader* loader,
-                              struct MethodParameters_attribute* attr) {
+int parse_MethodParameters_at(Loader *loader,
+                              struct MethodParameters_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_Module_at(Loader* loader, struct Module_attribute* attr) {
+int parse_Module_at(Loader *loader, struct Module_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_ModulePackages_at(Loader* loader,
-                            struct ModulePackages_attribute* attr) {
+int parse_ModulePackages_at(Loader *loader,
+                            struct ModulePackages_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }
   return 0;
 }
 
-int parse_ModuleMainClass_at(Loader* loader,
-                             struct ModuleMainClass_attribute* attr) {
+int parse_ModuleMainClass_at(Loader *loader,
+                             struct ModuleMainClass_attribute *attr) {
   if (attr == NULL) {
     return EINVAL;
   }

@@ -1,6 +1,6 @@
 #include "classfile_parser.h"
 
-int parse_const_pool(struct class_file* class, Loader* loader) {
+int parse_const_pool(struct class_file *class, Loader *loader) {
   uint16_t pool_count = class->constant_pool_count;
   uint16_t i;
   uint8_t tag;
@@ -124,15 +124,15 @@ exit:
   return error;
 }
 
-int is_string_match(const char* str, size_t len, const char* expected) {
+int is_string_match(const char *str, size_t len, const char *expected) {
   if (len != strlen(expected)) {
     return 0;
   }
   return memcmp(str, expected, len) == 0;
 }
 
-int parse_class_fields(Loader* loader, struct class_file* class,
-                       struct field_info* fields) {
+int parse_class_fields(Loader *loader, struct class_file *class,
+                       struct field_info *fields) {
   int error = 0;
   fields->access_flags = loader_u2(loader);
   fields->name_index = loader_u2(loader);
@@ -145,7 +145,7 @@ int parse_class_fields(Loader* loader, struct class_file* class,
 
 int parse_class_file() {
   int err = 0;
-  FILE* file = fopen("tests/Add.class", "rb");
+  FILE *file = fopen("tests/Add.class", "rb");
   Loader loader = {.file = file, .error = 0};
   struct class_file class;
   uint16_t iterator;
