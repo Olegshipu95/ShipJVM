@@ -1,5 +1,7 @@
 #include "classfile.h"
-void init_class_file(struct class_file *class) {
+void
+init_class_file (struct class_file *class)
+{
   class->magic = 0;
   class->minor_version = 0;
   class->major_version = 0;
@@ -18,12 +20,15 @@ void init_class_file(struct class_file *class) {
   class->attributes = 0;
 }
 
-int get_constant(struct class_file *class, uint16_t index,
-                 struct cp_info **cp_info) {
-  if (index == 0 || index > class->constant_pool_count) {
-    printf("Can't take constant by that adress");
-    return EINVAL;
-  }
+int
+get_constant (struct class_file *class, uint16_t index,
+              struct cp_info **cp_info)
+{
+  if (index == 0 || index > class->constant_pool_count)
+    {
+      printf ("Can't take constant by that adress");
+      return EINVAL;
+    }
 
   *cp_info = &(class->constant_pool[index - 1]);
 

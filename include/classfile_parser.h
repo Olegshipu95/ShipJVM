@@ -16,6 +16,6 @@
 #include "classfile_stream.h"
 #include "constant_pool.h"
 
-int parse_class_file();
+int parse_class_file ();
 
 #endif

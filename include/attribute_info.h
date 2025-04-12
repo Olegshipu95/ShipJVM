@@ -105,90 +105,106 @@ struct Module_attribute;
 struct ModulePackages_attribute;
 struct ModuleMainClass_attribute;
 
-struct attribute_info {
+struct attribute_info
+{
   uint16_t attribute_name_index;
   uint32_t attribute_length;
 };
 
-struct ConstantValue_attribute {
+struct ConstantValue_attribute
+{
   struct attribute_info info;
   uint16_t constant_value_index;
 };
 
-struct exception_table {
+struct exception_table
+{
   uint16_t start_pc;
   uint16_t end_pc;
   uint16_t handler_pc;
   uint16_t catch_type;
 };
 
-struct Code_attribute {
+struct Code_attribute
+{
   struct attribute_info info;
   uint16_t max_stack;
   uint16_t max_locals;
   uint32_t code_length;
-  uint8_t* code; /* size = code_length */
+  uint8_t *code; /* size = code_length */
   uint16_t exception_table_length;
-  struct exception_table* table; /* size = exception_table_length */
+  struct exception_table *table; /* size = exception_table_length */
   uint16_t attributes_count;
-  struct attribute_info** attributes; /* size = attributes_count */
+  struct attribute_info **attributes; /* size = attributes_count */
 };
 
 /**
  * Union representing verification type info in StackMapTable
  * Uses tag byte to determine which type is actually stored
  */
-union verification_type_info {
+union verification_type_info
+{
   uint8_t tag;
-  struct {
-    uint8_t tag;  // = ITEM_Top (0)
+  struct
+  {
+    uint8_t tag; // = ITEM_Top (0)
   } Top_variable_info;
 
-  struct {
-    uint8_t tag;  // = ITEM_Integer (1)
+  struct
+  {
+    uint8_t tag; // = ITEM_Integer (1)
   } Integer_variable_info;
 
-  struct {
-    uint8_t tag;  // = ITEM_Float (2)
+  struct
+  {
+    uint8_t tag; // = ITEM_Float (2)
   } Float_variable_info;
 
-  struct {
-    uint8_t tag;  // = ITEM_Long (4)
+  struct
+  {
+    uint8_t tag; // = ITEM_Long (4)
   } Long_variable_info;
 
-  struct {
-    uint8_t tag;  // = ITEM_Double (3)
+  struct
+  {
+    uint8_t tag; // = ITEM_Double (3)
   } Double_variable_info;
 
-  struct {
-    uint8_t tag;  // = ITEM_Null (5)
+  struct
+  {
+    uint8_t tag; // = ITEM_Null (5)
   } Null_variable_info;
 
-  struct {
-    uint8_t tag;  // = ITEM_UninitializedThis (6)
+  struct
+  {
+    uint8_t tag; // = ITEM_UninitializedThis (6)
   } UninitializedThis_variable_info;
 
-  struct {
-    uint8_t tag;           // = ITEM_Object (7)
-    uint16_t cpool_index;  // Constant pool index
+  struct
+  {
+    uint8_t tag;          // = ITEM_Object (7)
+    uint16_t cpool_index; // Constant pool index
   } Object_variable_info;
 
-  struct {
-    uint8_t tag;      // = ITEM_Uninitialized (8)
-    uint16_t offset;  // Bytecode offset
+  struct
+  {
+    uint8_t tag;     // = ITEM_Uninitialized (8)
+    uint16_t offset; // Bytecode offset
   } Uninitialized_variable_info;
 };
 
 /**
  * Union representing different stack map frame types
  */
-union stack_map_frame {
+union stack_map_frame
+{
   uint8_t frame_type;
   /**
    * Frame type where the frame has exactly the same locals as the previous
    * frame and the operand stack is empty (frame_type = 0-63)
    */
-  struct {
+  struct
+  {
     uint8_t frame_type; /* SAME (0-63) */
   } same_frame;
 
@@ -196,9 +212,10 @@ union stack_map_frame {
    * Frame type where the frame has exactly the same locals as the previous
    * frame and the operand stack has one entry (frame_type = 64-127)
    */
-  struct {
+  struct
+  {
     uint8_t frame_type; /* SAME_LOCALS_1_STACK_ITEM (64-127) */
-    union verification_type_info* stack;  // size = 1
+    union verification_type_info *stack; // size = 1
   } same_locals_1_stack_item_frame;
 
   /**
@@ -206,17 +223,19 @@ union stack_map_frame {
    * frame except one additional verification type on the stack, with explicit
    * offset delta
    */
-  struct {
+  struct
+  {
     uint8_t frame_type; /* SAME_LOCALS_1_STACK_ITEM_EXTENDED (247) */
     uint16_t offset_delta;
-    union verification_type_info* stack;  // size = 1
+    union verification_type_info *stack; // size = 1
   } same_locals_1_stack_item_frame_extended;
 
   /**
    * Frame type where the frame has the same locals as the previous frame
    * except that the last k locals are absent (frame_type = 248-250)
    */
-  struct {
+  struct
+  {
     uint8_t frame_type; /* CHOP (248-250) */
     uint16_t offset_delta;
   } chop_frame;
@@ -225,7 +244,8 @@ union stack_map_frame {
    * Frame type that has exactly the same locals as the previous frame and
    * the operand stack is empty, with explicit offset delta
    */
-  struct {
+  struct
+  {
     uint8_t frame_type; /* SAME_FRAME_EXTENDED (251) */
     uint16_t offset_delta;
   } same_frame_extended;
@@ -234,29 +254,32 @@ union stack_map_frame {
    * Frame type where the frame has the same locals as the previous frame
    * except that k additional locals are defined (frame_type = 252-254)
    */
-  struct {
+  struct
+  {
     uint8_t frame_type; /* APPEND (252-254) */
     uint16_t offset_delta;
-    union verification_type_info* locals; /* size = frame_type - 251 */
+    union verification_type_info *locals; /* size = frame_type - 251 */
   } append_frame;
 
   /**
    * Complete frame data with explicit locals and stack info
    */
-  struct {
+  struct
+  {
     uint8_t frame_type; /* FULL_FRAME (255) */
     uint16_t offset_delta;
     uint16_t number_of_locals;
-    union verification_type_info* locals; /* size = number_of_locals */
+    union verification_type_info *locals; /* size = number_of_locals */
     uint16_t number_of_stack_items;
-    union verification_type_info* stack; /* size = number_of_stack_items */
+    union verification_type_info *stack; /* size = number_of_stack_items */
   } full_frame;
 };
 
 /**
  * StackMapTable attribute structure as defined in JVM specification
  */
-struct StackMapTable_attribute {
+struct StackMapTable_attribute
+{
   struct attribute_info info;
 
   /**
@@ -269,14 +292,15 @@ struct StackMapTable_attribute {
    * the local variables and operand stack at specific
    * bytecode offsets
    */
-  union stack_map_frame* entries; /* array of size number_of_entries */
+  union stack_map_frame *entries; /* array of size number_of_entries */
 };
 
 /**
  * BootstrapMethods attribute structure
  * Used for invokedynamic instruction support
  */
-struct BootstrapMethods_attribute {
+struct BootstrapMethods_attribute
+{
   struct attribute_info info;
 
   /**
@@ -287,7 +311,8 @@ struct BootstrapMethods_attribute {
   /**
    * Array of bootstrap method entries
    */
-  struct {
+  struct
+  {
     /**
      * Index into the constant pool of a CONSTANT_MethodHandle
      * representing the bootstrap method
@@ -303,8 +328,8 @@ struct BootstrapMethods_attribute {
      * Array of constant pool indices (each a CONSTANT_* entry)
      * representing the bootstrap arguments
      */
-    uint16_t* bootstrap_arguments; /* array of size num_bootstrap_arguments */
-  }* bootstrap_methods;            /* array of size num_bootstrap_methods */
+    uint16_t *bootstrap_arguments; /* array of size num_bootstrap_arguments */
+  } *bootstrap_methods;            /* array of size num_bootstrap_methods */
 };
 
 /**
@@ -312,7 +337,8 @@ struct BootstrapMethods_attribute {
  * Indicates which class is the host of the nest to which the current class
  * belongs
  */
-struct NestHost_attribute {
+struct NestHost_attribute
+{
   struct attribute_info info;
 
   /**
@@ -326,7 +352,8 @@ struct NestHost_attribute {
  * NestMembers attribute structure (Java 11+)
  * Lists all classes that are members of the nest hosted by the current class
  */
-struct NestMembers_attribute {
+struct NestMembers_attribute
+{
   struct attribute_info info;
 
   /**
@@ -338,14 +365,15 @@ struct NestMembers_attribute {
    * Array of constant pool indices (each a CONSTANT_Class_info)
    * representing the nest member classes
    */
-  uint16_t* classes; /* array of size number_of_classes */
+  uint16_t *classes; /* array of size number_of_classes */
 };
 
 /**
  * PermittedSubclasses attribute structure (Java 17+)
  * Specifies the allowed direct subclasses of a sealed class
  */
-struct PermittedSubclasses_attribute {
+struct PermittedSubclasses_attribute
+{
   struct attribute_info info;
 
   /**
@@ -357,14 +385,15 @@ struct PermittedSubclasses_attribute {
    * Array of constant pool indices (each a CONSTANT_Class_info)
    * representing the permitted subclasses
    */
-  uint16_t* classes; /* array of size number_of_classes */
+  uint16_t *classes; /* array of size number_of_classes */
 };
 
 /**
  * Exceptions attribute structure
  * Lists checked exceptions that may be thrown by a method
  */
-struct Exceptions_attribute {
+struct Exceptions_attribute
+{
   struct attribute_info info;
 
   /**
@@ -376,14 +405,15 @@ struct Exceptions_attribute {
    * Array of constant pool indices (each a CONSTANT_Class_info)
    * representing the exception classes
    */
-  uint16_t* exception_index_table; /* array of size number_of_exceptions */
+  uint16_t *exception_index_table; /* array of size number_of_exceptions */
 };
 
 /**
  * InnerClasses attribute structure
  * Contains information about inner classes of a class
  */
-struct InnerClasses_attribute {
+struct InnerClasses_attribute
+{
   struct attribute_info info;
 
   /**
@@ -394,7 +424,8 @@ struct InnerClasses_attribute {
   /**
    * Array of inner class entries
    */
-  struct {
+  struct
+  {
     /**
      * Index into the constant pool of a CONSTANT_Class_info
      * representing the inner class
@@ -417,14 +448,15 @@ struct InnerClasses_attribute {
      * Access flags of the inner class (ACC_PUBLIC, ACC_PRIVATE, etc.)
      */
     uint16_t inner_class_access_flags;
-  }* classes; /* array of size number_of_classes */
+  } *classes; /* array of size number_of_classes */
 };
 
 /**
  * EnclosingMethod attribute structure
  * Indicates the immediately enclosing method of a nested class
  */
-struct EnclosingMethod_attribute {
+struct EnclosingMethod_attribute
+{
   struct attribute_info info;
 
   /**
@@ -444,7 +476,8 @@ struct EnclosingMethod_attribute {
  * Synthetic attribute structure
  * Marks synthetic elements generated by the compiler
  */
-struct Synthetic_attribute {
+struct Synthetic_attribute
+{
   struct attribute_info info;
 };
 
@@ -452,7 +485,8 @@ struct Synthetic_attribute {
  * Signature attribute structure
  * Stores generic type information for classes, methods, and fields
  */
-struct Signature_attribute {
+struct Signature_attribute
+{
   struct attribute_info info;
 
   /**
@@ -466,7 +500,8 @@ struct Signature_attribute {
  * Record component information structure
  * Represents a single component in a record declaration
  */
-struct record_component_info {
+struct record_component_info
+{
   /**
    * Index into the constant pool of a CONSTANT_Utf8_info
    * representing the component name
@@ -487,14 +522,15 @@ struct record_component_info {
   /**
    * Array of attributes associated with this component
    */
-  struct attribute_info* attributes; /* array of size attributes_count */
+  struct attribute_info *attributes; /* array of size attributes_count */
 };
 
 /**
  * Record attribute structure (Java 14+)
  * Contains metadata about record class components
  */
-struct Record_attribute {
+struct Record_attribute
+{
   struct attribute_info info;
 
   /**
@@ -505,14 +541,16 @@ struct Record_attribute {
   /**
    * Array of record component information structures
    */
-  struct record_component_info* components; /* array of size components_count */
+  struct record_component_info
+      *components; /* array of size components_count */
 };
 
 /**
  * SourceFile attribute structure
  * Records the source file from which this class was compiled
  */
-struct SourceFile_attribute {
+struct SourceFile_attribute
+{
   struct attribute_info info;
 
   /**
@@ -526,7 +564,8 @@ struct SourceFile_attribute {
  * LineNumberTable attribute structure
  * Maps bytecode offsets to source code line numbers
  */
-struct LineNumberTable_attribute {
+struct LineNumberTable_attribute
+{
   struct attribute_info info;
 
   /**
@@ -537,7 +576,8 @@ struct LineNumberTable_attribute {
   /**
    * Array of line number entries
    */
-  struct {
+  struct
+  {
     /**
      * Bytecode offset (program counter) where this line starts
      */
@@ -547,14 +587,15 @@ struct LineNumberTable_attribute {
      * Corresponding source file line number
      */
     uint16_t line_number;
-  }* line_number_table; /* array of size line_number_table_length */
+  } *line_number_table; /* array of size line_number_table_length */
 };
 
 /**
  * LocalVariableTable attribute structure
  * Stores debug information about local variables
  */
-struct LocalVariableTable_attribute {
+struct LocalVariableTable_attribute
+{
   struct attribute_info info;
 
   /**
@@ -565,7 +606,8 @@ struct LocalVariableTable_attribute {
   /**
    * Array of local variable entries
    */
-  struct {
+  struct
+  {
     /**
      * Bytecode offset where variable scope begins
      */
@@ -592,13 +634,14 @@ struct LocalVariableTable_attribute {
      * Index in the local variable array of this variable
      */
     uint16_t index;
-  }* local_variable_table; /* array of size local_variable_table_length */
+  } *local_variable_table; /* array of size local_variable_table_length */
 };
 
 /**
  * Stores generic type information for local variables
  */
-struct LocalVariableTypeTable_attribute {
+struct LocalVariableTypeTable_attribute
+{
   struct attribute_info info;
 
   /**
@@ -609,7 +652,8 @@ struct LocalVariableTypeTable_attribute {
   /**
    * Array of local variable type entries
    */
-  struct {
+  struct
+  {
     /**
      * Bytecode offset where variable scope begins
      */
@@ -636,7 +680,7 @@ struct LocalVariableTypeTable_attribute {
      * Index in the local variable array of this variable
      */
     uint16_t index;
-  }* local_variable_type_table; /* array of size
+  } *local_variable_type_table; /* array of size
                                    local_variable_type_table_length */
 };
 
@@ -644,20 +688,22 @@ struct LocalVariableTypeTable_attribute {
  * SourceDebugExtension attribute structure
  * Contains extended debugging information in implementation-defined format
  */
-struct SourceDebugExtension_attribute {
+struct SourceDebugExtension_attribute
+{
   struct attribute_info info;
 
   /**
    * Array of bytes containing implementation-specific debug information
    * (typically SMAP data for JSR-045)
    */
-  uint8_t* debug_extension; /* array of size attribute_length */
+  uint8_t *debug_extension; /* array of size attribute_length */
 };
 
 /**
  * Marks deprecated class, field, or method
  */
-struct Deprecated_attribute {
+struct Deprecated_attribute
+{
   struct attribute_info info;
 };
 
@@ -667,7 +713,8 @@ struct annotation;
  * Element_value structure
  * Represents the value of an annotation element
  */
-struct element_value {
+struct element_value
+{
   /**
    * Tag indicating the type of this element value
    * Possible values:
@@ -683,7 +730,8 @@ struct element_value {
   /**
    * Union of possible value types
    */
-  union {
+  union
+  {
     /**
      * For primitive and String values (tags
      * 'B','C','D','F','I','J','S','Z','s') Index into the constant pool of
@@ -694,7 +742,8 @@ struct element_value {
     /**
      * For enum constants (tag 'e')
      */
-    struct {
+    struct
+    {
       uint16_t type_name_index;  /* Index of enum type descriptor */
       uint16_t const_name_index; /* Index of enum constant name */
     } enum_const_value;
@@ -708,14 +757,15 @@ struct element_value {
     /**
      * For nested annotations (tag '@')
      */
-    struct annotation* annotation_value;
+    struct annotation *annotation_value;
 
     /**
      * For arrays (tag '[')
      */
-    struct {
+    struct
+    {
       uint16_t num_values;          /* Number of elements */
-      struct element_value* values; /* Array of element values */
+      struct element_value *values; /* Array of element values */
     } array_value;
   } value;
 };
@@ -724,7 +774,8 @@ struct element_value {
  * Annotation structure
  * Represents a single annotation
  */
-struct annotation {
+struct annotation
+{
   /**
    * Index into the constant pool of a CONSTANT_Utf8_info
    * representing the annotation type descriptor
@@ -739,7 +790,8 @@ struct annotation {
   /**
    * Array of annotation element-value pairs
    */
-  struct {
+  struct
+  {
     /**
      * Index into the constant pool of a CONSTANT_Utf8_info
      * representing the element name
@@ -750,14 +802,15 @@ struct annotation {
      * The element value
      */
     struct element_value value;
-  }* element_value_pairs; /* array of size num_element_value_pairs */
+  } *element_value_pairs; /* array of size num_element_value_pairs */
 };
 
 /**
  * RuntimeVisibleAnnotations attribute structure
  * Stores annotations that should be visible at runtime
  */
-struct RuntimeVisibleAnnotations_attribute {
+struct RuntimeVisibleAnnotations_attribute
+{
   struct attribute_info info;
 
   /**
@@ -768,14 +821,15 @@ struct RuntimeVisibleAnnotations_attribute {
   /**
    * Array of annotation structures
    */
-  struct annotation* annotations; /* array of size num_annotations */
+  struct annotation *annotations; /* array of size num_annotations */
 };
 
 /**
  * RuntimeInvisibleAnnotations attribute structure
  * Stores annotations that should not be visible at runtime
  */
-struct RuntimeInvisibleAnnotations_attribute {
+struct RuntimeInvisibleAnnotations_attribute
+{
   struct attribute_info info;
 
   /**
@@ -786,14 +840,15 @@ struct RuntimeInvisibleAnnotations_attribute {
   /**
    * Array of annotation structures
    */
-  struct annotation* annotations; /* array of size num_annotations */
+  struct annotation *annotations; /* array of size num_annotations */
 };
 
 /**
  * RuntimeVisibleParameterAnnotations attribute structure
  * Stores parameter annotations visible at runtime
  */
-struct RuntimeVisibleParameterAnnotations_attribute {
+struct RuntimeVisibleParameterAnnotations_attribute
+{
   struct attribute_info info;
 
   /**
@@ -804,7 +859,8 @@ struct RuntimeVisibleParameterAnnotations_attribute {
   /**
    * Array of parameter annotation collections
    */
-  struct {
+  struct
+  {
     /**
      * Number of annotations on this parameter
      */
@@ -813,28 +869,31 @@ struct RuntimeVisibleParameterAnnotations_attribute {
     /**
      * Array of annotations for this parameter
      */
-    struct annotation* annotations; /* array of size num_annotations */
-  }* parameter_annotations;         /* array of size num_parameters */
+    struct annotation *annotations; /* array of size num_annotations */
+  } *parameter_annotations;         /* array of size num_parameters */
 };
 
 /**
  * Type parameter target (for class/method type parameters)
  */
-struct type_parameter_target {
+struct type_parameter_target
+{
   uint8_t type_parameter_index; /* 0-based type parameter index */
 };
 
 /**
  * Supertype target (for extends/implements clauses)
  */
-struct supertype_target {
+struct supertype_target
+{
   uint16_t supertype_index; /* Index in interfaces/superclass list */
 };
 
 /**
  * Type parameter bound target
  */
-struct type_parameter_bound_target {
+struct type_parameter_bound_target
+{
   uint8_t type_parameter_index; /* 0-based type parameter index */
   uint8_t bound_index;          /* 0-based bound index */
 };
@@ -842,54 +901,62 @@ struct type_parameter_bound_target {
 /**
  * Empty target (for field declarations, method return types, etc.)
  */
-struct empty_target {
+struct empty_target
+{
   /* No additional data */
 };
 
 /**
  * Formal parameter target
  */
-struct formal_parameter_target {
+struct formal_parameter_target
+{
   uint8_t formal_parameter_index; /* 0-based parameter index */
 };
 
 /**
  * Throws target
  */
-struct throws_target {
+struct throws_target
+{
   uint16_t throws_type_index; /* Index in exception table */
 };
 
 /**
  * Local variable target
  */
-struct localvar_target {
+struct localvar_target
+{
   uint16_t table_length; /* Number of scope entries */
-  struct {
+  struct
+  {
     uint16_t start_pc; /* Start of scope (bytecode offset) */
     uint16_t length;   /* Scope length */
     uint16_t index;    /* Local variable index */
-  }* table;            /* Array of scope entries */
+  } *table;            /* Array of scope entries */
 };
 
 /**
  * Catch target (exception handler)
  */
-struct catch_target {
+struct catch_target
+{
   uint16_t exception_table_index; /* Index in exception table */
 };
 
 /**
  * Offset target (various bytecode offsets)
  */
-struct offset_target {
+struct offset_target
+{
   uint16_t offset; /* Bytecode offset */
 };
 
 /**
  * Type argument target (generic type arguments)
  */
-struct type_argument_target {
+struct type_argument_target
+{
   uint16_t offset;             /* Bytecode offset */
   uint8_t type_argument_index; /* 0-based type argument index */
 };
@@ -897,19 +964,22 @@ struct type_argument_target {
 /**
  * Type path (path to nested type)
  */
-struct type_path {
+struct type_path
+{
   uint8_t path_length; /* Number of path entries */
-  struct {
+  struct
+  {
     uint8_t type_path_kind;      /* Path step kind (0=array,1=inner,etc) */
     uint8_t type_argument_index; /* For parameterized types */
-  }* path;                       /* Array of path steps */
+  } *path;                       /* Array of path steps */
 };
 
 /**
  * RuntimeInvisibleParameterAnnotations attribute structure
  * Stores parameter annotations that should not be visible at runtime
  */
-struct RuntimeInvisibleParameterAnnotations_attribute {
+struct RuntimeInvisibleParameterAnnotations_attribute
+{
   struct attribute_info info;
 
   /**
@@ -920,7 +990,8 @@ struct RuntimeInvisibleParameterAnnotations_attribute {
   /**
    * Array of parameter annotation collections
    */
-  struct {
+  struct
+  {
     /**
      * Number of annotations on this parameter
      */
@@ -929,15 +1000,16 @@ struct RuntimeInvisibleParameterAnnotations_attribute {
     /**
      * Array of annotations for this parameter
      */
-    struct annotation* annotations; /* array of size num_annotations */
-  }* parameter_annotations;         /* array of size num_parameters */
+    struct annotation *annotations; /* array of size num_annotations */
+  } *parameter_annotations;         /* array of size num_parameters */
 };
 
 /**
  * Type annotation structure
  * Extended annotation format for Java type annotations
  */
-struct type_annotation {
+struct type_annotation
+{
   /**
    * Type of target being annotated (item 17.1 in JVMS)
    * Possible values:
@@ -954,7 +1026,8 @@ struct type_annotation {
   /**
    * Target-specific information
    */
-  union {
+  union
+  {
     struct type_parameter_target type_parameter;
     struct supertype_target supertype;
     struct type_parameter_bound_target type_parameter_bound;
@@ -985,7 +1058,8 @@ struct type_annotation {
   /**
    * Array of annotation element-value pairs
    */
-  struct {
+  struct
+  {
     /**
      * Index into the constant pool of element name
      */
@@ -995,13 +1069,14 @@ struct type_annotation {
      * The element value
      */
     struct element_value value;
-  }* element_value_pairs; /* array of size num_element_value_pairs */
+  } *element_value_pairs; /* array of size num_element_value_pairs */
 };
 
 /**
  * Stores type annotations that should be visible at runtime
  */
-struct RuntimeVisibleTypeAnnotations_attribute {
+struct RuntimeVisibleTypeAnnotations_attribute
+{
   struct attribute_info info;
 
   /**
@@ -1012,14 +1087,15 @@ struct RuntimeVisibleTypeAnnotations_attribute {
   /**
    * Array of type annotation structures
    */
-  struct type_annotation* annotations; /* array of size num_annotations */
+  struct type_annotation *annotations; /* array of size num_annotations */
 };
 
 /**
  * RuntimeInvisibleTypeAnnotations attribute structure
  * Stores type annotations that should not be visible at runtime
  */
-struct RuntimeInvisibleTypeAnnotations_attribute {
+struct RuntimeInvisibleTypeAnnotations_attribute
+{
   struct attribute_info info;
 
   /**
@@ -1030,14 +1106,15 @@ struct RuntimeInvisibleTypeAnnotations_attribute {
   /**
    * Array of type annotation structures
    */
-  struct type_annotation* annotations; /* array of size num_annotations */
+  struct type_annotation *annotations; /* array of size num_annotations */
 };
 
 /**
  * AnnotationDefault attribute structure
  * Specifies default value for an annotation type element
  */
-struct AnnotationDefault_attribute {
+struct AnnotationDefault_attribute
+{
   struct attribute_info info;
 
   /**
@@ -1050,7 +1127,8 @@ struct AnnotationDefault_attribute {
  * MethodParameters attribute structure
  * Contains metadata about method parameters
  */
-struct MethodParameters_attribute {
+struct MethodParameters_attribute
+{
   struct attribute_info info;
 
   /**
@@ -1061,7 +1139,8 @@ struct MethodParameters_attribute {
   /**
    * Array of parameter entries
    */
-  struct {
+  struct
+  {
     /**
      * Index into the constant pool of a CONSTANT_Utf8_info
      * representing the parameter name (0 if unnamed)
@@ -1072,14 +1151,15 @@ struct MethodParameters_attribute {
      * Parameter access flags (e.g., ACC_FINAL, ACC_SYNTHETIC, ACC_MANDATED)
      */
     uint16_t access_flags;
-  }* parameters; /* array of size parameters_count */
+  } *parameters; /* array of size parameters_count */
 };
 
 /**
  * Module attribute structure (Java 9+)
  * Contains module definition metadata
  */
-struct Module_attribute {
+struct Module_attribute
+{
   struct attribute_info info;
 
   /* Module basic info */
@@ -1089,49 +1169,53 @@ struct Module_attribute {
 
   /* Requires section */
   uint16_t requires_count;
-  struct {
+  struct
+  {
     uint16_t requires_index;         /* CONSTANT_Module_info index */
     uint16_t requires_flags;         /* ACC_TRANSITIVE, etc. */
     uint16_t requires_version_index; /* CONSTANT_Utf8_info (0 if none) */
-  }*
-    requires; /* array of size requires_count */
+  } *requires;                       /* array of size requires_count */
 
   /* Exports section */
   uint16_t exports_count;
-  struct {
+  struct
+  {
     uint16_t exports_index; /* CONSTANT_Package_info index */
     uint16_t exports_flags; /* ACC_SYNTHETIC, etc. */
     uint16_t exports_to_count;
-    uint16_t* exports_to_index; /* CONSTANT_Module_info indices */
-  }* exports;                   /* array of size exports_count */
+    uint16_t *exports_to_index; /* CONSTANT_Module_info indices */
+  } *exports;                   /* array of size exports_count */
 
   /* Opens section */
   uint16_t opens_count;
-  struct {
+  struct
+  {
     uint16_t opens_index; /* CONSTANT_Package_info index */
     uint16_t opens_flags; /* ACC_SYNTHETIC */
     uint16_t opens_to_count;
-    uint16_t* opens_to_index; /* CONSTANT_Module_info indices */
-  }* opens;                   /* array of size opens_count */
+    uint16_t *opens_to_index; /* CONSTANT_Module_info indices */
+  } *opens;                   /* array of size opens_count */
 
   /* Uses section */
   uint16_t uses_count;
-  uint16_t* uses_index; /* CONSTANT_Class_info indices */
+  uint16_t *uses_index; /* CONSTANT_Class_info indices */
 
   /* Provides section */
   uint16_t provides_count;
-  struct {
+  struct
+  {
     uint16_t provides_index; /* CONSTANT_Class_info index */
     uint16_t provides_with_count;
-    uint16_t* provides_with_index; /* CONSTANT_Class_info indices */
-  }* provides;                     /* array of size provides_count */
+    uint16_t *provides_with_index; /* CONSTANT_Class_info indices */
+  } *provides;                     /* array of size provides_count */
 };
 
 /**
  * ModulePackages attribute structure (Java 9+)
  * Lists all packages owned by this module
  */
-struct ModulePackages_attribute {
+struct ModulePackages_attribute
+{
   struct attribute_info info;
 
   /**
@@ -1143,14 +1227,15 @@ struct ModulePackages_attribute {
    * Array of constant pool indices (each a CONSTANT_Package_info)
    * representing the packages in this module
    */
-  uint16_t* package_index; /* array of size package_count */
+  uint16_t *package_index; /* array of size package_count */
 };
 
 /**
  * ModuleMainClass attribute structure (Java 9+)
  * Specifies the main class for executable modules
  */
-struct ModuleMainClass_attribute {
+struct ModuleMainClass_attribute
+{
   struct attribute_info info;
 
   /**

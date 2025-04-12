@@ -3,14 +3,15 @@
 #include <stdint.h>
 #include <stdio.h>
 
-typedef struct {
-  FILE* file;
+typedef struct
+{
+  FILE *file;
   int error;
 } Loader;
 
-uint8_t loader_u1(Loader* loader);
-uint16_t loader_u2(Loader* loader);
-uint32_t loader_u4(Loader* loader);
-uint64_t loader_u8(Loader* loader);
+uint8_t loader_u1 (Loader *loader);
+uint16_t loader_u2 (Loader *loader);
+uint32_t loader_u4 (Loader *loader);
+uint64_t loader_u8 (Loader *loader);
 
 #endif
