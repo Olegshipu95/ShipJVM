@@ -295,6 +295,26 @@ struct StackMapTable_attribute
   union stack_map_frame *entries; /* array of size number_of_entries */
 };
 
+struct bootstrap_methods
+{
+  /**
+   * Index into the constant pool of a CONSTANT_MethodHandle
+   * representing the bootstrap method
+   */
+  uint16_t bootstrap_method_ref;
+
+  /**
+   * Number of arguments for this bootstrap method
+   */
+  uint16_t num_bootstrap_arguments;
+
+  /**
+   * Array of constant pool indices (each a CONSTANT_* entry)
+   * representing the bootstrap arguments
+   */
+  uint16_t *bootstrap_arguments; /* array of size num_bootstrap_arguments */
+};
+
 /**
  * BootstrapMethods attribute structure
  * Used for invokedynamic instruction support
@@ -311,25 +331,8 @@ struct BootstrapMethods_attribute
   /**
    * Array of bootstrap method entries
    */
-  struct
-  {
-    /**
-     * Index into the constant pool of a CONSTANT_MethodHandle
-     * representing the bootstrap method
-     */
-    uint16_t bootstrap_method_ref;
-
-    /**
-     * Number of arguments for this bootstrap method
-     */
-    uint16_t num_bootstrap_arguments;
-
-    /**
-     * Array of constant pool indices (each a CONSTANT_* entry)
-     * representing the bootstrap arguments
-     */
-    uint16_t *bootstrap_arguments; /* array of size num_bootstrap_arguments */
-  } *bootstrap_methods;            /* array of size num_bootstrap_methods */
+  struct bootstrap_methods
+      *bootstrap_methods; /* array of size num_bootstrap_methods */
 };
 
 /**
@@ -409,6 +412,35 @@ struct Exceptions_attribute
 };
 
 /**
+ * Array of inner class entries
+ */
+struct inner_class_entries
+{
+  /**
+   * Index into the constant pool of a CONSTANT_Class_info
+   * representing the inner class
+   */
+  uint16_t inner_class_info_index;
+
+  /**
+   * Index into the constant pool of a CONSTANT_Class_info
+   * representing the outer class (0 if not member)
+   */
+  uint16_t outer_class_info_index;
+
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the original name of the inner class (0 if anonymous)
+   */
+  uint16_t inner_name_index;
+
+  /**
+   * Access flags of the inner class (ACC_PUBLIC, ACC_PRIVATE, etc.)
+   */
+  uint16_t inner_class_access_flags;
+};
+
+/**
  * InnerClasses attribute structure
  * Contains information about inner classes of a class
  */
@@ -421,34 +453,7 @@ struct InnerClasses_attribute
    */
   uint16_t number_of_classes;
 
-  /**
-   * Array of inner class entries
-   */
-  struct
-  {
-    /**
-     * Index into the constant pool of a CONSTANT_Class_info
-     * representing the inner class
-     */
-    uint16_t inner_class_info_index;
-
-    /**
-     * Index into the constant pool of a CONSTANT_Class_info
-     * representing the outer class (0 if not member)
-     */
-    uint16_t outer_class_info_index;
-
-    /**
-     * Index into the constant pool of a CONSTANT_Utf8_info
-     * representing the original name of the inner class (0 if anonymous)
-     */
-    uint16_t inner_name_index;
-
-    /**
-     * Access flags of the inner class (ACC_PUBLIC, ACC_PRIVATE, etc.)
-     */
-    uint16_t inner_class_access_flags;
-  } *classes; /* array of size number_of_classes */
+  struct inner_class_entries *classes; /* array of size number_of_classes */
 };
 
 /**
@@ -522,7 +527,7 @@ struct record_component_info
   /**
    * Array of attributes associated with this component
    */
-  struct attribute_info *attributes; /* array of size attributes_count */
+  struct attribute_info **attributes; /* array of size attributes_count */
 };
 
 /**
@@ -561,6 +566,22 @@ struct SourceFile_attribute
 };
 
 /**
+ * Array of line number entries
+ */
+struct line_number_table
+{
+  /**
+   * Bytecode offset (program counter) where this line starts
+   */
+  uint16_t start_pc;
+
+  /**
+   * Corresponding source file line number
+   */
+  uint16_t line_number;
+};
+
+/**
  * LineNumberTable attribute structure
  * Maps bytecode offsets to source code line numbers
  */
@@ -576,18 +597,40 @@ struct LineNumberTable_attribute
   /**
    * Array of line number entries
    */
-  struct
-  {
-    /**
-     * Bytecode offset (program counter) where this line starts
-     */
-    uint16_t start_pc;
+  struct line_number_table *table; /* array of size line_number_table_length */
+};
 
-    /**
-     * Corresponding source file line number
-     */
-    uint16_t line_number;
-  } *line_number_table; /* array of size line_number_table_length */
+/**
+ * Array of local variable entries
+ */
+struct local_variable_table
+{
+  /**
+   * Bytecode offset where variable scope begins
+   */
+  uint16_t start_pc;
+
+  /**
+   * Length of variable scope (in bytes)
+   */
+  uint16_t length;
+
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the variable name
+   */
+  uint16_t name_index;
+
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the variable descriptor
+   */
+  uint16_t descriptor_index;
+
+  /**
+   * Index in the local variable array of this variable
+   */
+  uint16_t index;
 };
 
 /**
@@ -606,35 +649,41 @@ struct LocalVariableTable_attribute
   /**
    * Array of local variable entries
    */
-  struct
-  {
-    /**
-     * Bytecode offset where variable scope begins
-     */
-    uint16_t start_pc;
+  struct local_variable_table
+      *table; /* array of size local_variable_table_length */
+};
 
-    /**
-     * Length of variable scope (in bytes)
-     */
-    uint16_t length;
+/**
+ * Array of local variable type entries
+ */
+struct local_variable_type_table
+{
+  /**
+   * Bytecode offset where variable scope begins
+   */
+  uint16_t start_pc;
 
-    /**
-     * Index into the constant pool of a CONSTANT_Utf8_info
-     * representing the variable name
-     */
-    uint16_t name_index;
+  /**
+   * Length of variable scope (in bytes)
+   */
+  uint16_t length;
 
-    /**
-     * Index into the constant pool of a CONSTANT_Utf8_info
-     * representing the variable descriptor
-     */
-    uint16_t descriptor_index;
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the variable name
+   */
+  uint16_t name_index;
 
-    /**
-     * Index in the local variable array of this variable
-     */
-    uint16_t index;
-  } *local_variable_table; /* array of size local_variable_table_length */
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the generic signature
+   */
+  uint16_t signature_index;
+
+  /**
+   * Index in the local variable array of this variable
+   */
+  uint16_t index;
 };
 
 /**
@@ -652,35 +701,7 @@ struct LocalVariableTypeTable_attribute
   /**
    * Array of local variable type entries
    */
-  struct
-  {
-    /**
-     * Bytecode offset where variable scope begins
-     */
-    uint16_t start_pc;
-
-    /**
-     * Length of variable scope (in bytes)
-     */
-    uint16_t length;
-
-    /**
-     * Index into the constant pool of a CONSTANT_Utf8_info
-     * representing the variable name
-     */
-    uint16_t name_index;
-
-    /**
-     * Index into the constant pool of a CONSTANT_Utf8_info
-     * representing the generic signature
-     */
-    uint16_t signature_index;
-
-    /**
-     * Index in the local variable array of this variable
-     */
-    uint16_t index;
-  } *local_variable_type_table; /* array of size
+  struct local_variable_type_table *table; /* array of size
                                    local_variable_type_table_length */
 };
 

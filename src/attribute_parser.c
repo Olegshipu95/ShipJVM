@@ -59,39 +59,76 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "StackMapTable"))
     {
-      struct StackMapTable_attribute *attr = 0;
+      struct StackMapTable_attribute *attr
+          = malloc (sizeof (struct StackMapTable_attribute));
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for StackMapTable_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_StackMapTable_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing StackMapTable");
           return NULL;
         }
 
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "BootstrapMethods"))
     {
-      struct BootstrapMethods_attribute *attr = 0;
+      struct BootstrapMethods_attribute *attr
+          = malloc (sizeof (struct BootstrapMethods_attribute));
+
+      if (attr == NULL)
+        {
+          printf (
+              "ERROR while allocating memory for BootstrapMethods_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_BootstrapMethods_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing BootstrapMethods_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestHost"))
     {
-      struct NestHost_attribute *attr = 0;
+      struct NestHost_attribute *attr
+          = malloc (sizeof (struct NestHost_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for NestHost_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_NestHost_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing NestHost_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestMembers"))
@@ -421,13 +458,13 @@ read_attributes (Loader *loader, struct class_file *class,
 {
   struct attribute_info **attributes
       = malloc (sizeof (struct attribute_info *) * (size_t)(count));
-  int iter = 0;
+  int iter;
   if (attributes == NULL)
     {
       printf ("ERROR: can't allocate memory for fields attributes");
       return ENOMEM;
     }
-  for (iter; iter < count; iter++)
+  for (iter = 0; iter < count; iter++)
     {
       attributes[iter] = parse_attribute (loader, class);
     }
@@ -463,7 +500,7 @@ parse_Code_attribute (Loader *loader, struct class_file *class,
     {
       return ENOMEM;
     }
-  for (iter; iter < attr->code_length; ++iter)
+  for (iter = 0; iter < attr->code_length; ++iter)
     {
       attr->code[iter] = loader_u1 (loader);
     }
@@ -662,7 +699,7 @@ parse_StackMapTable_at (Loader *loader, struct StackMapTable_attribute *attr)
       return ENOMEM;
     }
 
-  for (iter; iter < attr->number_of_entries; ++iter)
+  for (iter = 0; iter < attr->number_of_entries; ++iter)
     {
       error = stack_map_frame_parser (loader, &attr->entries[iter]);
     }
@@ -671,15 +708,56 @@ parse_StackMapTable_at (Loader *loader, struct StackMapTable_attribute *attr)
 }
 
 int
+parse_bootstrap_methods (Loader *loader, struct bootstrap_methods *meth)
+{
+  uint16_t iter;
+  meth->bootstrap_method_ref = loader_u2 (loader);
+  meth->num_bootstrap_arguments = loader_u2 (loader);
+  meth->bootstrap_arguments
+      = malloc (sizeof (uint16_t) * (size_t)(meth->num_bootstrap_arguments));
+  if (meth->bootstrap_arguments == NULL)
+    {
+      printf ("Can not allocate memory for bootstrap_arguments");
+      return ENOMEM;
+    }
+  for (iter = 0; iter < meth->num_bootstrap_arguments; ++iter)
+    {
+      meth->bootstrap_arguments[iter] = loader_u2 (loader);
+    }
+  return 0;
+}
+
+int
 parse_BootstrapMethods_at (Loader *loader,
                            struct BootstrapMethods_attribute *attr)
 {
+  uint16_t iter = 0;
+  int error = 0;
   if (attr == NULL)
     {
       return EINVAL;
     }
+  attr->num_bootstrap_methods = loader_u2 (loader);
+  attr->bootstrap_methods = malloc ((size_t)(attr->num_bootstrap_methods)
+                                    * sizeof (struct bootstrap_methods));
 
-  return 0;
+  if (attr->bootstrap_methods == NULL)
+    {
+      printf ("Can not allocate memory in BootstrapMethods_at");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->num_bootstrap_methods; ++iter)
+    {
+      error
+          |= parse_bootstrap_methods (loader, &attr->bootstrap_methods[iter]);
+    }
+
+  if (error != 0)
+    {
+      printf ("Error in parsing Bootstrap_methods");
+    }
+  return error;
 }
 
 int
@@ -689,16 +767,36 @@ parse_NestHost_at (Loader *loader, struct NestHost_attribute *attr)
     {
       return EINVAL;
     }
+
+  attr->host_class_index = loader_u2 (loader);
+
   return 0;
 }
 
 int
 parse_NestMembers_at (Loader *loader, struct NestMembers_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->number_of_classes = loader_u2 (loader);
+  attr->classes
+      = malloc (sizeof (uint16_t) * (size_t)(attr->number_of_classes));
+
+  if (attr->classes == NULL)
+    {
+      printf ("Can not allocate memory for attr->classes in NestMembers");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->number_of_classes; iter++)
+    {
+      attr->classes[iter] = loader_u2 (loader);
+    }
+
   return 0;
 }
 
@@ -706,30 +804,86 @@ int
 parse_PermittedSubclasses_at (Loader *loader,
                               struct PermittedSubclasses_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->number_of_classes = loader_u2 (loader);
+  attr->classes
+      = malloc (sizeof (uint16_t) * (size_t)(attr->number_of_classes));
+
+  if (attr->classes == NULL)
+    {
+      printf (
+          "Can not allocate memory for attr->classes in PermittedSubclasses");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->number_of_classes; iter++)
+    {
+      attr->classes[iter] = loader_u2 (loader);
+    }
+
   return 0;
 }
 
 int
 parse_Exceptions_at (Loader *loader, struct Exceptions_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->number_of_exceptions = loader_u2 (loader);
+  attr->exception_index_table
+      = malloc (sizeof (uint16_t) * (size_t)(attr->number_of_exceptions));
+
+  if (attr->exception_index_table == NULL)
+    {
+      printf (
+          "Can not allocate memory for exception_index_table in Exceptions");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->number_of_exceptions; iter++)
+    {
+      attr->exception_index_table[iter] = loader_u2 (loader);
+    }
+
   return 0;
 }
 
 int
 parse_InnerClasses_at (Loader *loader, struct InnerClasses_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->number_of_classes = loader_u2 (loader);
+  attr->classes = malloc (sizeof (struct inner_class_entries)
+                          * (size_t)(attr->number_of_classes));
+
+  if (attr->classes == NULL)
+    {
+      printf ("Can not allocate memory for inner classes in InnerClasses");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->number_of_classes; ++iter)
+    {
+      attr->classes[iter].inner_class_info_index = loader_u2 (loader);
+      attr->classes[iter].outer_class_info_index = loader_u2 (loader);
+      attr->classes[iter].inner_name_index = loader_u2 (loader);
+      attr->classes[iter].inner_class_access_flags = loader_u2 (loader);
+    }
+
   return 0;
 }
 
@@ -741,6 +895,10 @@ parse_EnclosingMethod_at (Loader *loader,
     {
       return EINVAL;
     }
+
+  attr->class_index = loader_u2 (loader);
+  attr->method_index = loader_u2 (loader);
+
   return 0;
 }
 
@@ -751,6 +909,7 @@ parse_Synthetic_at (Loader *loader, struct Synthetic_attribute *attr)
     {
       return EINVAL;
     }
+
   return 0;
 }
 
@@ -761,17 +920,60 @@ parse_Signature_at (Loader *loader, struct Signature_attribute *attr)
     {
       return EINVAL;
     }
+
+  attr->signature_index = loader_u2 (loader);
+
   return 0;
+}
+
+int
+parser_record_component_info (Loader *loader, struct class_file *class,
+                              struct record_component_info *record)
+{
+  int error = 0;
+  record->name_index = loader_u2 (loader);
+  record->descriptor_index = loader_u2 (loader);
+  record->attributes_count = loader_u2 (loader);
+
+  error = read_attributes (loader, class, &record->attributes,
+                           record->attributes_count);
+
+  return error;
 }
 
 int
 parse_Record_at (Loader *loader, struct Record_attribute *attr)
 {
+  uint16_t iter;
+  int error = 0;
+
   if (attr == NULL)
     {
       return EINVAL;
     }
-  return 0;
+
+  attr->components_count = loader_u2 (loader);
+  attr->components = malloc (sizeof (struct record_component_info)
+                             * (size_t)(attr->components_count));
+
+  if (attr->components == NULL)
+    {
+      printf ("Can not allocate memory for components in Record");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->components_count; iter++)
+    {
+      error
+          |= parser_record_component_info (loader, &(attr->components[iter]));
+    }
+
+  if (error != 0)
+    {
+      printf ("ERROR: error in parsing record_component_info in Record");
+    }
+
+  return error;
 }
 
 int
@@ -781,17 +983,35 @@ parse_SourceFile_at (Loader *loader, struct SourceFile_attribute *attr)
     {
       return EINVAL;
     }
+  attr->sourcefile_index = loader_u2 (loader);
   return 0;
 }
 
 int
-parse_lineNumberTable_at (Loader *loader,
+parse_LineNumberTable_at (Loader *loader,
                           struct LineNumberTable_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+  attr->line_number_table_length = loader_u2 (loader);
+  attr->table = malloc (sizeof (struct line_number_table)
+                        * attr->line_number_table_length);
+
+  if (attr->table == NULL)
+    {
+      printf ("ERROR: Can not allocate memory for table in LineNumberTable");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->line_number_table_length; iter++)
+    {
+      attr->table[iter].start_pc = loader_u2 (loader);
+      attr->table[iter].line_number = loader_u2 (loader);
+    }
+
   return 0;
 }
 
@@ -799,10 +1019,31 @@ int
 parse_LocalVariableTable_at (Loader *loader,
                              struct LocalVariableTable_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->local_variable_table_length = loader_u2 (loader);
+  attr->table = malloc (sizeof (struct local_variable_table)
+                        * (size_t)(attr->local_variable_table_length));
+
+  if (attr->table == NULL)
+    {
+      printf ("ERROR: Can not allocate memory for table in LineNumberTable");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->local_variable_table_length; iter++)
+    {
+      attr->table[iter].start_pc = loader_u2 (loader);
+      attr->table[iter].length = loader_u2 (loader);
+      attr->table[iter].name_index = loader_u2 (loader);
+      attr->table[iter].descriptor_index = loader_u2 (loader);
+      attr->table[iter].index = loader_u2 (loader);
+    }
+
   return 0;
 }
 
@@ -810,10 +1051,31 @@ int
 parse_LocalVariableTypeTable_at (Loader *loader,
                                  struct LocalVariableTypeTable_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->local_variable_type_table_length = loader_u2 (loader);
+  attr->table = malloc (sizeof (struct local_variable_type_table)
+                        * (size_t)(attr->local_variable_type_table_length));
+  if (attr->table == NULL)
+    {
+      printf ("ERROR: Can not allocate memory for table in "
+              "LocalVariableTypeTable");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->local_variable_type_table_length; ++iter)
+    {
+      attr->table[iter].start_pc = loader_u2 (loader);
+      attr->table[iter].length = loader_u2 (loader);
+      attr->table[iter].name_index = loader_u2 (loader);
+      attr->table[iter].signature_index = loader_u2 (loader);
+      attr->table[iter].index = loader_u2 (loader);
+    }
+
   return 0;
 }
 
@@ -821,10 +1083,26 @@ int
 parse_SourceDebugExtension_at (Loader *loader,
                                struct SourceDebugExtension_attribute *attr)
 {
+  uint32_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->debug_extension
+      = malloc (sizeof (uint8_t) * (size_t)(attr->info.attribute_length));
+  if (attr->debug_extension == NULL)
+    {
+      printf ("ERROR: can not allocate memory for debug_extension in "
+              "SourceDebugExtension");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->info.attribute_length; ++iter)
+    {
+      attr->debug_extension[iter] = loader_u1 (loader);
+    }
+
   return 0;
 }
 
