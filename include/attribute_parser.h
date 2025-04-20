@@ -30,7 +30,7 @@ int parse_Synthetic_at (Loader *loader, struct Synthetic_attribute *);
 int parse_Signature_at (Loader *loader, struct Signature_attribute *);
 int parse_Record_at (Loader *loader, struct Record_attribute *);
 int parse_SourceFile_at (Loader *loader, struct SourceFile_attribute *);
-int parse_lineNumberTable_at (Loader *loader,
+int parse_LineNumberTable_at (Loader *loader,
                               struct LineNumberTable_attribute *);
 int parse_LocalVariableTable_at (Loader *loader,
                                  struct LocalVariableTable_attribute *);

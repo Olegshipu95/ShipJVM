@@ -17,6 +17,8 @@ parse_attribute (Loader *loader, struct class_file *class)
       return NULL;
     }
 
+  printf ("UTF IS - %.*s", UTF8->bytes, UTF8->lenght);
+
   if (is_string_match (UTF8->bytes, UTF8->lenght, "ConstantValue"))
     {
       struct ConstantValue_attribute *attr
@@ -133,320 +135,624 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestMembers"))
     {
-      struct NestMembers_attribute *attr = 0;
+      struct NestMembers_attribute *attr
+          = malloc (sizeof (struct NestMembers_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for NestMembers_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
       if (err != 0)
         {
           printf ("ERROR while parsing NestMembers_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
+      err = parse_NestMembers_at (loader, attr);
+
+      if (err != 0)
+        {
+          printf ("ERROR while parsing NestMembers_attribute");
+          return NULL;
+        }
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "PermittedSubclasses"))
     {
-      struct PermittedSubclasses_attribute *attr = 0;
+      struct PermittedSubclasses_attribute *attr
+          = malloc (sizeof (struct PermittedSubclasses_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "PermittedSubclasses_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_PermittedSubclasses_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing PermittedSubclasses_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Exceptions"))
     {
-      struct Exceptions_attribute *attr = 0;
+      struct Exceptions_attribute *attr
+          = malloc (sizeof (struct Exceptions_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for Exceptions_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_Exceptions_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing Exceptions_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "InnerClasses_attribute"))
     {
-      struct InnerClasses_attribute *attr = 0;
+      struct InnerClasses_attribute *attr
+          = malloc (sizeof (struct InnerClasses_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for InnerClasses_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_InnerClasses_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing InnerClasses_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "EnclosingMethod"))
     {
-      struct EnclosingMethod_attribute *attr = 0;
+
+      struct EnclosingMethod_attribute *attr
+          = malloc (sizeof (struct EnclosingMethod_attribute));
+
+      if (attr == NULL)
+        {
+          printf (
+              "ERROR while allocating memory for EnclosingMethod_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_EnclosingMethod_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing EnclosingMethod_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Synthetic"))
     {
-      struct Synthetic_attribute *attr = 0;
+      struct Synthetic_attribute *attr
+          = malloc (sizeof (struct Synthetic_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for Synthetic_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_Synthetic_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing Synthetic_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Signature"))
     {
-      struct Signature_attribute *attr = 0;
+      struct Signature_attribute *attr
+          = malloc (sizeof (struct Signature_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for Signature_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_Signature_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing Signature_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Record"))
     {
-      struct Record_attribute *attr = 0;
+      struct Record_attribute *attr
+          = malloc (sizeof (struct Record_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for Record_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_Record_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing Record_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "SourceFile"))
     {
-      struct SourceFile_attribute *attr = 0;
+      struct SourceFile_attribute *attr
+          = malloc (sizeof (struct SourceFile_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for SourceFile_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_SourceFile_at (loader, attr);
       if (err != 0)
         {
           printf ("ERROR while parsing SourceFile_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "LineNumberTable"))
     {
-      struct LineNumberTable_attribute *attr = 0;
+      struct LineNumberTable_attribute *attr
+          = malloc (sizeof (struct LineNumberTable_attribute));
+
+      if (attr == NULL)
+        {
+          printf (
+              "ERROR while allocating memory for LineNumberTable_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_LineNumberTable_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing LineNumberTable_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "LocalVariableTable"))
     {
-      struct LocalVariableTable_attribute *attr = 0;
+      struct LocalVariableTable_attribute *attr
+          = malloc (sizeof (struct LocalVariableTable_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "LocalVariableTable_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+
+      err = parse_LocalVariableTable_at (loader, attr);
       if (err != 0)
         {
           printf ("ERROR while parsing LocalVariableTable_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "LocalVariableTypeTable"))
     {
-      struct LocalVariableTypeTable_attribute *attr = 0;
+      struct LocalVariableTypeTable_attribute *attr
+          = malloc (sizeof (struct LocalVariableTypeTable_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "LocalVariableTypeTable_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_LocalVariableTypeTable_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing LocalVariableTypeTable_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "SourceDebugExtension"))
     {
-      struct SourceDebugExtension_attribute *attr = 0;
+      struct SourceDebugExtension_attribute *attr
+          = malloc (sizeof (struct SourceDebugExtension_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "SourceDebugExtension_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_SourceDebugExtension_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing SourceDebugExtension_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Deprecated"))
     {
-      struct Deprecated_attribute *attr = 0;
+      struct Deprecated_attribute *attr
+          = malloc (sizeof (struct Deprecated_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for Deprecated_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_Deprecated_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing Deprecated_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "RuntimeVisibleAnnotations"))
     {
-      struct RuntimeVisibleAnnotations_attribute *attr = 0;
+      struct RuntimeVisibleAnnotations_attribute *attr
+          = malloc (sizeof (struct RuntimeVisibleAnnotations_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeVisibleAnnotations_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing RuntimeVisibleAnnotations_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
+
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "RuntimeInvisibleAnnotations"))
     {
-      struct RuntimeInvisibleAnnotations_attribute *attr = 0;
+      struct RuntimeInvisibleAnnotations_attribute *attr
+          = malloc (sizeof (struct RuntimeInvisibleAnnotations_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeInvisibleAnnotations_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
       if (err != 0)
         {
           printf ("ERROR while parsing RuntimeInvisibleAnnotations_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "RuntimeVisibleParameterAnnotations"))
     {
-      struct RuntimeVisibleParameterAnnotations_attribute *attr = 0;
+      struct RuntimeVisibleParameterAnnotations_attribute *attr = malloc (
+          sizeof (struct RuntimeVisibleParameterAnnotations_attribute));
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeInvisibleAnnotations_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing "
                   "RuntimeVisibleParameterAnnotations_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "RuntimeInvisibleParameterAnnotations"))
     {
-      struct RuntimeInvisibleParameterAnnotations_attribute *attr = 0;
+      struct RuntimeInvisibleParameterAnnotations_attribute *attr = malloc (
+          sizeof (struct RuntimeInvisibleParameterAnnotations_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeInvisibleParameterAnnotations_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing "
                   "RuntimeInvisibleParameterAnnotations_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "RuntimeVisibleTypeAnnotations"))
     {
-      struct RuntimeVisibleTypeAnnotations_attribute *attr = 0;
+      struct RuntimeVisibleTypeAnnotations_attribute *attr
+          = malloc (sizeof (struct RuntimeVisibleTypeAnnotations_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeVisibleTypeAnnotations_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeVisibleAnnotations_at (loader, attr);
+
       if (err != 0)
         {
           printf (
               "ERROR while parsing RuntimeVisibleTypeAnnotations_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "RuntimeInvisibleTypeAnnotations"))
     {
-      struct RuntimeInvisibleTypeAnnotations_attribute *attr = 0;
+      struct RuntimeInvisibleTypeAnnotations_attribute *attr
+          = malloc (sizeof (struct RuntimeInvisibleTypeAnnotations_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeInvisibleTypeAnnotations_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
       if (err != 0)
         {
           printf (
               "ERROR while parsing RuntimeInvisibleTypeAnnotations_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "AnnotationDefault"))
     {
-      struct AnnotationDefault_attribute *attr = 0;
+      // TODO
+      struct AnnotationDefault_attribute *attr
+          = malloc (sizeof (struct AnnotationDefault_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "AnnotationDefault_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_AnnotationDefault_at (loader, attr);
+
       if (err != 0)
         {
           printf ("ERROR while parsing AnnotationDefault_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "MethodParameters"))
     {
-      struct MethodParameters_attribute *attr = 0;
+      struct MethodParameters_attribute *attr
+          = malloc (sizeof (struct MethodParameters_attribute));
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "MethodParameters_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_MethodParameters_at (loader, attr);
       if (err != 0)
         {
           printf ("ERROR while parsing MethodParameters_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Module"))
     {
-      struct Module_attribute *attr = 0;
+      struct Module_attribute *attr
+          = malloc (sizeof (struct Module_attribute));
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "Module_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_Module_at (loader, attr);
       if (err != 0)
         {
           printf ("ERROR while parsing Module_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "ModulePackages"))
     {
-      struct ModulePackages_attribute *attr = 0;
+      struct ModulePackages_attribute *attr
+          = malloc (sizeof (struct ModulePackages_attribute));
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "ModulePackages_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_ModulePackages_at (loader, attr);
       if (err != 0)
         {
           printf ("ERROR while parsing ModulePackages_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "ModuleMainClass"))
     {
-      struct ModuleMainClass_attribute *attr = 0;
+      struct ModuleMainClass_attribute *attr
+          = malloc (sizeof (struct ModuleMainClass_attribute));
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "ModuleMainClass_attribute");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_ModuleMainClass_at (loader, attr);
       if (err != 0)
         {
           printf ("ERROR while parsing ModuleMainClass_attribute");
           return NULL;
         }
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
       return attr;
     }
   else
     {
       print ("ERROR!!!");
-      return 1;
+      return NULL;
     }
 
   return 0;
@@ -533,22 +839,16 @@ verification_type_parser (Loader *loader, union verification_type_info *stack)
   switch (stack->tag)
     {
     case 0: // ITEM_Top
-      break;
 
     case 1: // ITEM_Integer
-      break;
 
     case 2: // ITEM_Float
-      break;
 
     case 3: // ITEM_Double
-      break;
 
     case 4: // ITEM_Long
-      break;
 
     case 5: // ITEM_Null
-      break;
 
     case 6: // ITEM_UninitializedThis
       break;
@@ -562,6 +862,7 @@ verification_type_parser (Loader *loader, union verification_type_info *stack)
       break;
 
     default:
+      printf ("ERROR: can not parse verification_type_parser");
       break;
     }
 }
@@ -1106,6 +1407,7 @@ parse_SourceDebugExtension_at (Loader *loader,
   return 0;
 }
 
+// IT's ALL
 int
 parse_Deprecated_at (Loader *loader, struct Deprecated_attribute *attr)
 {
@@ -1116,13 +1418,94 @@ parse_Deprecated_at (Loader *loader, struct Deprecated_attribute *attr)
   return 0;
 }
 
+int parse_annotations (Loader *loader, struct annotation *annotation);
+
+int
+parse_element_value (Loader *loader, struct element_value *elem)
+{
+  int error = 0;
+  uint16_t iter = 0;
+  elem->tag = loader_u1 (loader);
+  switch (elem->tag)
+    {
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'F':
+    case 'I':
+    case 'J':
+    case 'S':
+    case 'Z':
+    case 's':
+      elem->value.const_value_index = loader_u2 (loader);
+      break;
+
+    case 'e':
+      elem->value.enum_const_value.type_name_index = loader_u2 (loader);
+      elem->value.enum_const_value.const_name_index = loader_u2 (loader);
+      break;
+
+    case 'c':
+      elem->value.class_info_index = loader_u2 (loader);
+      break;
+
+    case '@':
+      error = parse_annotations (loader, &elem->value.annotation_value);
+      break;
+
+    case '[':
+      elem->value.array_value.num_values = loader_u2 (loader);
+      elem->value.array_value.values = malloc (
+          sizeof (struct element_value) * elem->value.array_value.num_values);
+      if (elem->value.array_value.values == NULL)
+        {
+          printf ("ERROR: can not allocate memory for element_value");
+          return ENOMEM;
+        }
+      for (iter = 0; iter < elem->value.array_value.num_values; ++iter)
+        {
+          parse_element_value (loader, &elem->value.array_value.values[iter]);
+        }
+      break;
+
+    default:
+      printf ("ERROR: can not parse elem->tag");
+      return EIO;
+      break;
+    }
+}
+
+int
+parse_annotations (Loader *loader, struct annotation *annotation)
+{
+  uint16_t iter;
+  annotation->type_index = loader_u2 (loader);
+  annotation->num_element_value_pairs = loader_u2 (loader);
+  for (iter = 0; iter < annotation->num_element_value_pairs; iter++)
+    {
+      annotation->element_value_pairs[iter].element_name_index
+          = loader_u2 (loader);
+      parse_element_value (loader,
+                           &annotation->element_value_pairs[iter].value);
+    }
+}
+
 int
 parse_RuntimeInvisibleAnnotations_at (
     Loader *loader, struct RuntimeInvisibleAnnotations_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
+    }
+
+  attr->num_annotations = loader_u2 (loader);
+  attr->annotations
+      = malloc (sizeof (struct annotation) * (size_t)(attr->num_annotations));
+  for (iter = 0; iter < attr->num_annotations; ++iter)
+    {
+      parse_annotations (loader, &attr->annotations[iter]);
     }
   return 0;
 }
@@ -1131,9 +1514,43 @@ int
 parse_RuntimeVisibleParameterAnnotations_at (
     Loader *loader, struct RuntimeVisibleParameterAnnotations_attribute *attr)
 {
+  uint8_t iter;
+
   if (attr == NULL)
     {
       return EINVAL;
+    }
+
+  attr->num_parameters = loader_u1 (loader);
+  attr->parameter_annotations = malloc (sizeof (struct parameter_annotations)
+                                        * (size_t)(attr->num_parameters));
+
+  if (attr->parameter_annotations == NULL)
+    {
+      printf ("ERROR: can not allocate memory for parameter annotations");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->num_parameters; ++iter)
+    {
+      attr->parameter_annotations[iter].num_annotations = loader_u2 (loader);
+      attr->parameter_annotations[iter].annotations = malloc (
+          sizeof (struct annotation)
+          * (size_t)(attr->parameter_annotations[iter].num_annotations));
+
+      if (attr->parameter_annotations[iter].annotations == NULL)
+        {
+          printf ("ERROR: can not allocate memory for annotations in "
+                  "parameter annotations");
+          return ENOMEM;
+        }
+
+      for (uint16_t i = 0;
+           i < attr->parameter_annotations[iter].num_annotations; i++)
+        {
+          parse_annotations (
+              loader, &attr->parameter_annotations[iter].annotations[i]);
+        }
     }
   return 0;
 }
@@ -1143,24 +1560,72 @@ parse_RuntimeInvisibleParameterAnnotations_at (
     Loader *loader,
     struct RuntimeInvisibleParameterAnnotations_attribute *attr)
 {
+  uint8_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->num_parameters = loader_u1 (loader);
+  attr->parameter_annotations = malloc (sizeof (struct parameter_annotations)
+                                        * (size_t)(attr->num_parameters));
+
+  if (attr->parameter_annotations == NULL)
+    {
+      printf ("ERROR: can not allocate memory for parameter annotations");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->num_parameters; ++iter)
+    {
+      attr->parameter_annotations[iter].num_annotations = loader_u2 (loader);
+      attr->parameter_annotations[iter].annotations = malloc (
+          sizeof (struct annotation)
+          * (size_t)(attr->parameter_annotations[iter].num_annotations));
+
+      if (attr->parameter_annotations[iter].annotations == NULL)
+        {
+          printf ("ERROR: can not allocate memory for annotations in "
+                  "parameter annotations");
+          return ENOMEM;
+        }
+
+      for (uint16_t i = 0;
+           i < attr->parameter_annotations[iter].num_annotations; i++)
+        {
+          parse_annotations (
+              loader, &attr->parameter_annotations[iter].annotations[i]);
+        }
+    }
   return 0;
 }
 
+// TODO
 int
 parse_RuntimeVisibleTypeAnnotations_at (
     Loader *loader, struct RuntimeVisibleTypeAnnotations_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+
+  attr->num_annotations = loader_u2 (loader);
+  attr->type_annotation = malloc (sizeof (struct type_annotation)
+                                  * (size_t)(attr->num_annotations));
+
+  if (attr->type_annotation == NULL)
+    {
+      printf ("ERROR: can not allocate memory for type_annotation in "
+              "RuntimeVisibleTypeAnnotations");
+      return ENOMEM;
+    }
+
   return 0;
 }
 
+// TODO
 int
 parse_RuntimeInvisibleTypeAnnotations_at (
     Loader *loader, struct RuntimeInvisibleTypeAnnotations_attribute *attr)
@@ -1172,6 +1637,7 @@ parse_RuntimeInvisibleTypeAnnotations_at (
   return 0;
 }
 
+// TODO
 int
 parse_AnnotationDefault_at (Loader *loader,
                             struct AnnotationDefault_attribute *attr)
@@ -1187,30 +1653,199 @@ int
 parse_MethodParameters_at (Loader *loader,
                            struct MethodParameters_attribute *attr)
 {
+  uint8_t iter;
   if (attr == NULL)
     {
       return EINVAL;
+    }
+  attr->parameters_count = loader_u1 (loader);
+  attr->parameters = malloc (sizeof (struct method_params)
+                             * (size_t)(attr->parameters_count));
+  if (attr->parameters == NULL)
+    {
+      printf (
+          "ERROR: can not allocate memory for parameters in MethodParameters");
+      return ENOMEM;
+    }
+  for (iter = 0; iter < attr->parameters_count; ++iter)
+    {
+      attr->parameters[iter].name_index = loader_u2 (loader);
+      attr->parameters[iter].access_flags = loader_u2 (loader);
+    }
+
+  return 0;
+}
+
+int
+parse_module_exports (Loader *loader, struct exports *exports)
+{
+  uint16_t iter;
+  exports->exports_index = loader_u2 (loader);
+  exports->exports_flags = loader_u2 (loader);
+  exports->exports_to_count = loader_u2 (loader);
+  exports->exports_to_index
+      = malloc (sizeof (uint16_t) * (size_t)(exports->exports_to_count));
+
+  if (exports->exports_to_index == NULL)
+    {
+      printf ("ERROR: Can not allocate memory for exports_to_index in Module");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < exports->exports_to_count; ++iter)
+    {
+      exports->exports_to_index[iter] = loader_u2 (loader);
     }
   return 0;
 }
 
 int
+parse_module_opens (Loader *loader, struct opens *opens)
+{
+  uint16_t iter;
+  opens->opens_index = loader_u2 (loader);
+  opens->opens_flags = loader_u2 (loader);
+  opens->opens_to_count = loader_u2 (loader);
+  opens->opens_to_index
+      = malloc (sizeof (uint16_t) * (size_t)(opens->opens_to_count));
+
+  if (opens->opens_to_index == NULL)
+    {
+      printf ("ERROR: Can not allocate memory for opens_to_index in Module");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < opens->opens_to_count; ++iter)
+    {
+      opens->opens_to_index[iter] = loader_u2 (loader);
+    }
+  return 0;
+}
+
+int
+parse_module_provides (Loader *loader, struct provides *provides)
+{
+  uint16_t iter;
+  provides->provides_index = loader_u2 (loader);
+  provides->provides_with_count = loader_u2 (loader);
+  provides->provides_with_index
+      = malloc (sizeof (uint16_t) * (size_t)(provides->provides_with_count));
+
+  if (provides->provides_with_count == NULL)
+    {
+      printf (
+          "ERROR: Can not allocate memory for provides_with_index in Module");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < provides->provides_with_count; ++iter)
+    {
+      provides->provides_with_index[iter] = loader_u2 (loader);
+    }
+  return 0;
+}
+
+// TODO
+int
 parse_Module_at (Loader *loader, struct Module_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+  attr->module_name_index = loader_u2 (loader);
+  attr->module_flags = loader_u2 (loader);
+  attr->module_version_index = loader_u2 (loader);
+
+  attr->requires_count = loader_u2 (loader);
+  attr->requires
+      = malloc (sizeof (struct requires) * (size_t)(attr->requires_count));
+
+  if (attr->requires == NULL)
+    {
+      printf ("ERROR: can not allocate memory for requires in Module");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->requires_count; ++iter)
+    {
+      attr->requires[iter].requires_index = loader_u2 (loader);
+      attr->requires[iter].requires_flags = loader_u2 (loader);
+      attr->requires[iter].requires_version_index = loader_u2 (loader);
+    }
+
+  attr->exports_count = loader_u2 (loader);
+  attr->exports
+      = malloc (sizeof (struct exports) * (size_t)(attr->exports_count));
+
+  if (attr->exports == NULL)
+    {
+      printf ("ERROR: can not allocate memory for exports in Module");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->exports_count; ++iter)
+    {
+      parse_module_exports (loader, attr->exports);
+    }
+
+  attr->opens_count = loader_u2 (loader);
+  attr->opens = malloc (sizeof (struct opens) * (size_t)(attr->opens_count));
+  if (attr->opens == NULL)
+    {
+      printf ("ERROR: can not allocate memory for opens in Module");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->opens_count; ++iter)
+    {
+      parse_module_opens (loader, attr->opens);
+    }
+
+  attr->uses_count = loader_u2 (loader);
+  attr->uses_index
+      = malloc (sizeof (attr->uses_index) * (size_t)(attr->uses_count));
+
+  if (attr->uses_index == NULL)
+    {
+      printf ("ERROR: Can not allocate memory for uses index in Module");
+      return ENOMEM;
+    }
+
+  for (iter = 0; iter < attr->uses_count; iter++)
+    {
+      attr->uses_index[iter] = loader_u2 (loader);
+    }
+
+  attr->provides_count = loader_u2 (loader);
+  attr->provides
+      = malloc (sizeof (struct provides) * (size_t)(attr->provides_count));
+
+  for (iter = 0; iter < attr->provides_count; iter++)
+    {
+      parse_module_provides (loader, attr->provides);
+    }
+
   return 0;
 }
 
 int
 parse_ModulePackages_at (Loader *loader, struct ModulePackages_attribute *attr)
 {
+  uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
     }
+  attr->package_count = loader_u2 (loader);
+  attr->package_index
+      = malloc (sizeof (uint16_t) * (size_t)(attr->package_count));
+  for (iter = 0; iter < attr->package_count; ++iter)
+    {
+      attr->package_index[iter] = loader_u2 (loader);
+    }
+
   return 0;
 }
 
@@ -1222,5 +1857,7 @@ parse_ModuleMainClass_at (Loader *loader,
     {
       return EINVAL;
     }
+
+  attr->main_class_index = loader_u2 (loader);
   return 0;
 }

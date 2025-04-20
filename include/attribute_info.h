@@ -778,7 +778,7 @@ struct element_value
     /**
      * For nested annotations (tag '@')
      */
-    struct annotation *annotation_value;
+    struct annotation annotation_value;
 
     /**
      * For arrays (tag '[')
@@ -789,6 +789,20 @@ struct element_value
       struct element_value *values; /* Array of element values */
     } array_value;
   } value;
+};
+
+struct element_value_pairs
+{
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the element name
+   */
+  uint16_t element_name_index;
+
+  /**
+   * The element value
+   */
+  struct element_value value;
 };
 
 /**
@@ -811,19 +825,8 @@ struct annotation
   /**
    * Array of annotation element-value pairs
    */
-  struct
-  {
-    /**
-     * Index into the constant pool of a CONSTANT_Utf8_info
-     * representing the element name
-     */
-    uint16_t element_name_index;
-
-    /**
-     * The element value
-     */
-    struct element_value value;
-  } *element_value_pairs; /* array of size num_element_value_pairs */
+  struct element_value_pairs
+      *element_value_pairs; /* array of size num_element_value_pairs */
 };
 
 /**
@@ -865,6 +868,22 @@ struct RuntimeInvisibleAnnotations_attribute
 };
 
 /**
+ * Array of parameter annotation collections
+ */
+struct parameter_annotations
+{
+  /**
+   * Number of annotations on this parameter
+   */
+  uint16_t num_annotations;
+
+  /**
+   * Array of annotations for this parameter
+   */
+  struct annotation *annotations; /* array of size num_annotations */
+};
+
+/**
  * RuntimeVisibleParameterAnnotations attribute structure
  * Stores parameter annotations visible at runtime
  */
@@ -877,21 +896,8 @@ struct RuntimeVisibleParameterAnnotations_attribute
    */
   uint8_t num_parameters;
 
-  /**
-   * Array of parameter annotation collections
-   */
-  struct
-  {
-    /**
-     * Number of annotations on this parameter
-     */
-    uint16_t num_annotations;
-
-    /**
-     * Array of annotations for this parameter
-     */
-    struct annotation *annotations; /* array of size num_annotations */
-  } *parameter_annotations;         /* array of size num_parameters */
+  struct parameter_annotations
+      *parameter_annotations; /* array of size num_parameters */
 };
 
 /**
@@ -1011,18 +1017,8 @@ struct RuntimeInvisibleParameterAnnotations_attribute
   /**
    * Array of parameter annotation collections
    */
-  struct
-  {
-    /**
-     * Number of annotations on this parameter
-     */
-    uint16_t num_annotations;
-
-    /**
-     * Array of annotations for this parameter
-     */
-    struct annotation *annotations; /* array of size num_annotations */
-  } *parameter_annotations;         /* array of size num_parameters */
+  struct parameter_annotations
+      *parameter_annotations; /* array of size num_parameters */
 };
 
 /**
@@ -1108,7 +1104,7 @@ struct RuntimeVisibleTypeAnnotations_attribute
   /**
    * Array of type annotation structures
    */
-  struct type_annotation *annotations; /* array of size num_annotations */
+  struct type_annotation *type_annotation; /* array of size num_annotations */
 };
 
 /**
@@ -1144,6 +1140,20 @@ struct AnnotationDefault_attribute
   struct element_value default_value;
 };
 
+struct method_params
+{
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the parameter name (0 if unnamed)
+   */
+  uint16_t name_index;
+
+  /**
+   * Parameter access flags (e.g., ACC_FINAL, ACC_SYNTHETIC, ACC_MANDATED)
+   */
+  uint16_t access_flags;
+};
+
 /**
  * MethodParameters attribute structure
  * Contains metadata about method parameters
@@ -1160,19 +1170,37 @@ struct MethodParameters_attribute
   /**
    * Array of parameter entries
    */
-  struct
-  {
-    /**
-     * Index into the constant pool of a CONSTANT_Utf8_info
-     * representing the parameter name (0 if unnamed)
-     */
-    uint16_t name_index;
+  struct method_params *parameters; /* array of size parameters_count */
+};
 
-    /**
-     * Parameter access flags (e.g., ACC_FINAL, ACC_SYNTHETIC, ACC_MANDATED)
-     */
-    uint16_t access_flags;
-  } *parameters; /* array of size parameters_count */
+struct requires
+{
+  uint16_t requires_index;         /* CONSTANT_Module_info index */
+  uint16_t requires_flags;         /* ACC_TRANSITIVE, etc. */
+  uint16_t requires_version_index; /* CONSTANT_Utf8_info (0 if none) */
+};
+
+struct exports
+{
+  uint16_t exports_index; /* CONSTANT_Package_info index */
+  uint16_t exports_flags; /* ACC_SYNTHETIC, etc. */
+  uint16_t exports_to_count;
+  uint16_t *exports_to_index; /* CONSTANT_Module_info indices */
+};
+
+struct opens
+{
+  uint16_t opens_index; /* CONSTANT_Package_info index */
+  uint16_t opens_flags; /* ACC_SYNTHETIC */
+  uint16_t opens_to_count;
+  uint16_t *opens_to_index; /* CONSTANT_Module_info indices */
+};
+
+struct provides
+{
+  uint16_t provides_index; /* CONSTANT_Class_info index */
+  uint16_t provides_with_count;
+  uint16_t *provides_with_index; /* CONSTANT_Class_info indices */
 };
 
 /**
@@ -1190,32 +1218,15 @@ struct Module_attribute
 
   /* Requires section */
   uint16_t requires_count;
-  struct
-  {
-    uint16_t requires_index;         /* CONSTANT_Module_info index */
-    uint16_t requires_flags;         /* ACC_TRANSITIVE, etc. */
-    uint16_t requires_version_index; /* CONSTANT_Utf8_info (0 if none) */
-  } *requires;                       /* array of size requires_count */
+  struct requires *requires; /* array of size requires_count */
 
   /* Exports section */
   uint16_t exports_count;
-  struct
-  {
-    uint16_t exports_index; /* CONSTANT_Package_info index */
-    uint16_t exports_flags; /* ACC_SYNTHETIC, etc. */
-    uint16_t exports_to_count;
-    uint16_t *exports_to_index; /* CONSTANT_Module_info indices */
-  } *exports;                   /* array of size exports_count */
+  struct exports *exports; /* array of size exports_count */
 
   /* Opens section */
   uint16_t opens_count;
-  struct
-  {
-    uint16_t opens_index; /* CONSTANT_Package_info index */
-    uint16_t opens_flags; /* ACC_SYNTHETIC */
-    uint16_t opens_to_count;
-    uint16_t *opens_to_index; /* CONSTANT_Module_info indices */
-  } *opens;                   /* array of size opens_count */
+  struct opens *opens; /* array of size opens_count */
 
   /* Uses section */
   uint16_t uses_count;
@@ -1223,12 +1234,7 @@ struct Module_attribute
 
   /* Provides section */
   uint16_t provides_count;
-  struct
-  {
-    uint16_t provides_index; /* CONSTANT_Class_info index */
-    uint16_t provides_with_count;
-    uint16_t *provides_with_index; /* CONSTANT_Class_info indices */
-  } *provides;                     /* array of size provides_count */
+  struct provides *provides; /* array of size provides_count */
 };
 
 /**
