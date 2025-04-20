@@ -22,7 +22,7 @@ struct method_info
   uint16_t name_index;
   uint16_t descriptor_index;
   uint16_t attributes_count;
-  struct attribute_info *attributes; // size = attributes_count
+  struct attribute_info **attributes; // size = attributes_count
 };
 
 struct class_file
@@ -48,4 +48,5 @@ struct class_file
 void init_class_file (struct class_file *class);
 int get_constant (struct class_file *class, uint16_t index,
                   struct cp_info **cp_info);
+struct UTF8_info *validate_constant (struct class_file *class, uint16_t index);
 #endif

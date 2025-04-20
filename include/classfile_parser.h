@@ -9,6 +9,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "attribute_info.h"
 #include "attribute_parser.h"
@@ -17,5 +18,6 @@
 #include "constant_pool.h"
 
 int parse_class_file ();
+int is_string_match (uint8_t *str, size_t len, const char *expected);
 
 #endif

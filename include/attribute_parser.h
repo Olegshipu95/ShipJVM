@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "attribute_info.h"
+#include "classfile_parser.h"
 #include "classfile_stream.h"
 #include "constant_pool.h"
 
@@ -28,7 +29,8 @@ int parse_EnclosingMethod_at (Loader *loader,
                               struct EnclosingMethod_attribute *);
 int parse_Synthetic_at (Loader *loader, struct Synthetic_attribute *);
 int parse_Signature_at (Loader *loader, struct Signature_attribute *);
-int parse_Record_at (Loader *loader, struct Record_attribute *);
+int parse_Record_at (Loader *loader, struct class_file *class,
+                     struct Record_attribute *);
 int parse_SourceFile_at (Loader *loader, struct SourceFile_attribute *);
 int parse_LineNumberTable_at (Loader *loader,
                               struct LineNumberTable_attribute *);

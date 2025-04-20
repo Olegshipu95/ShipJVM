@@ -3,7 +3,7 @@
 struct attribute_info *
 parse_attribute (Loader *loader, struct class_file *class)
 {
-  int iter;
+  printf ("DEBUG: Start parsing attributes\n");
   int err = 0;
 
   uint16_t attribute_name_index = loader_u2 (loader);
@@ -12,12 +12,20 @@ parse_attribute (Loader *loader, struct class_file *class)
 
   if (UTF8 == NULL)
     {
-      printf ("ERROR while reading attr name");
+      printf ("ERROR while reading attr name\n");
       err = ENOMEM;
       return NULL;
     }
 
-  printf ("UTF IS - %.*s", UTF8->bytes, UTF8->lenght);
+  if (UTF8 && UTF8->bytes)
+    {
+      printf ("UTF IS - %.*s\n", UTF8->lenght, UTF8->bytes);
+    }
+  else
+    {
+      printf ("UTF8 string is NULL or invalid!\n");
+    }
+  printf ("DEBUG POINT\n");
 
   if (is_string_match (UTF8->bytes, UTF8->lenght, "ConstantValue"))
     {
@@ -25,7 +33,8 @@ parse_attribute (Loader *loader, struct class_file *class)
           = malloc (sizeof (struct ConstantValue_attribute));
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for ConstantValue_attribute");
+          printf (
+              "ERROR while allocating memory for ConstantValue_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -34,17 +43,17 @@ parse_attribute (Loader *loader, struct class_file *class)
       err = parse_ConstantValue_at (loader, attr);
       if (err != 0)
         {
-          printf ("ERROR while parsing ConstantValue_attribute");
+          printf ("ERROR while parsing ConstantValue_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Code"))
     {
       struct Code_attribute *attr = malloc (sizeof (struct Code_attribute));
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for Code_attribute");
+          printf ("ERROR while allocating memory for Code_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -54,10 +63,10 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing Code_attribute");
+          printf ("ERROR while parsing Code_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "StackMapTable"))
     {
@@ -65,7 +74,8 @@ parse_attribute (Loader *loader, struct class_file *class)
           = malloc (sizeof (struct StackMapTable_attribute));
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for StackMapTable_attribute");
+          printf (
+              "ERROR while allocating memory for StackMapTable_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -76,11 +86,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing StackMapTable");
+          printf ("ERROR while parsing StackMapTable\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "BootstrapMethods"))
     {
@@ -89,8 +99,8 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf (
-              "ERROR while allocating memory for BootstrapMethods_attribute");
+          printf ("ERROR while allocating memory for "
+                  "BootstrapMethods_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -102,11 +112,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing BootstrapMethods_attribute");
+          printf ("ERROR while parsing BootstrapMethods_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestHost"))
     {
@@ -115,7 +125,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for NestHost_attribute");
+          printf ("ERROR while allocating memory for NestHost_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -127,11 +137,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing NestHost_attribute");
+          printf ("ERROR while parsing NestHost_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestMembers"))
     {
@@ -140,7 +150,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for NestMembers_attribute");
+          printf ("ERROR while allocating memory for NestMembers_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -149,7 +159,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing NestMembers_attribute");
+          printf ("ERROR while parsing NestMembers_attribute\n");
           return NULL;
         }
 
@@ -157,11 +167,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing NestMembers_attribute");
+          printf ("ERROR while parsing NestMembers_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "PermittedSubclasses"))
     {
@@ -171,7 +181,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "PermittedSubclasses_attribute");
+                  "PermittedSubclasses_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -183,11 +193,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing PermittedSubclasses_attribute");
+          printf ("ERROR while parsing PermittedSubclasses_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Exceptions"))
     {
@@ -196,7 +206,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for Exceptions_attribute");
+          printf ("ERROR while allocating memory for Exceptions_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -208,11 +218,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing Exceptions_attribute");
+          printf ("ERROR while parsing Exceptions_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "InnerClasses_attribute"))
@@ -222,7 +232,8 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for InnerClasses_attribute");
+          printf (
+              "ERROR while allocating memory for InnerClasses_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -234,11 +245,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing InnerClasses_attribute");
+          printf ("ERROR while parsing InnerClasses_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "EnclosingMethod"))
     {
@@ -249,7 +260,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf (
-              "ERROR while allocating memory for EnclosingMethod_attribute");
+              "ERROR while allocating memory for EnclosingMethod_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -261,11 +272,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing EnclosingMethod_attribute");
+          printf ("ERROR while parsing EnclosingMethod_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Synthetic"))
     {
@@ -274,7 +285,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for Synthetic_attribute");
+          printf ("ERROR while allocating memory for Synthetic_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -286,11 +297,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing Synthetic_attribute");
+          printf ("ERROR while parsing Synthetic_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Signature"))
     {
@@ -299,7 +310,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for Signature_attribute");
+          printf ("ERROR while allocating memory for Signature_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -310,11 +321,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing Signature_attribute");
+          printf ("ERROR while parsing Signature_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Record"))
     {
@@ -323,22 +334,22 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for Record_attribute");
+          printf ("ERROR while allocating memory for Record_attribute\n");
           err = ENOMEM;
           return NULL;
         }
 
       attr->info.attribute_name_index = attribute_name_index;
       attr->info.attribute_length = attribute_length;
-      err = parse_Record_at (loader, attr);
+      err = parse_Record_at (loader, class, attr);
 
       if (err != 0)
         {
-          printf ("ERROR while parsing Record_attribute");
+          printf ("ERROR while parsing Record_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "SourceFile"))
     {
@@ -347,7 +358,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for SourceFile_attribute");
+          printf ("ERROR while allocating memory for SourceFile_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -358,10 +369,10 @@ parse_attribute (Loader *loader, struct class_file *class)
       err = parse_SourceFile_at (loader, attr);
       if (err != 0)
         {
-          printf ("ERROR while parsing SourceFile_attribute");
+          printf ("ERROR while parsing SourceFile_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "LineNumberTable"))
     {
@@ -371,7 +382,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf (
-              "ERROR while allocating memory for LineNumberTable_attribute");
+              "ERROR while allocating memory for LineNumberTable_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -382,10 +393,10 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing LineNumberTable_attribute");
+          printf ("ERROR while parsing LineNumberTable_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "LocalVariableTable"))
     {
@@ -395,7 +406,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "LocalVariableTable_attribute");
+                  "LocalVariableTable_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -406,10 +417,10 @@ parse_attribute (Loader *loader, struct class_file *class)
       err = parse_LocalVariableTable_at (loader, attr);
       if (err != 0)
         {
-          printf ("ERROR while parsing LocalVariableTable_attribute");
+          printf ("ERROR while parsing LocalVariableTable_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "LocalVariableTypeTable"))
@@ -420,7 +431,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "LocalVariableTypeTable_attribute");
+                  "LocalVariableTypeTable_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -431,11 +442,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing LocalVariableTypeTable_attribute");
+          printf ("ERROR while parsing LocalVariableTypeTable_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "SourceDebugExtension"))
     {
@@ -445,7 +456,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "SourceDebugExtension_attribute");
+                  "SourceDebugExtension_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -456,10 +467,10 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing SourceDebugExtension_attribute");
+          printf ("ERROR while parsing SourceDebugExtension_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Deprecated"))
     {
@@ -468,7 +479,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          printf ("ERROR while allocating memory for Deprecated_attribute");
+          printf ("ERROR while allocating memory for Deprecated_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -479,11 +490,11 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing Deprecated_attribute");
+          printf ("ERROR while parsing Deprecated_attribute\n");
           return NULL;
         }
 
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "RuntimeVisibleAnnotations"))
@@ -494,108 +505,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "RuntimeVisibleAnnotations_attribute");
-          err = ENOMEM;
-          return NULL;
-        }
-
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
-      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
-
-      if (err != 0)
-        {
-          printf ("ERROR while parsing RuntimeVisibleAnnotations_attribute");
-          return NULL;
-        }
-
-      return attr;
-    }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeInvisibleAnnotations"))
-    {
-      struct RuntimeInvisibleAnnotations_attribute *attr
-          = malloc (sizeof (struct RuntimeInvisibleAnnotations_attribute));
-
-      if (attr == NULL)
-        {
-          printf ("ERROR while allocating memory for "
-                  "RuntimeInvisibleAnnotations_attribute");
-          err = ENOMEM;
-          return NULL;
-        }
-
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
-      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
-      if (err != 0)
-        {
-          printf ("ERROR while parsing RuntimeInvisibleAnnotations_attribute");
-          return NULL;
-        }
-      return attr;
-    }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeVisibleParameterAnnotations"))
-    {
-      struct RuntimeVisibleParameterAnnotations_attribute *attr = malloc (
-          sizeof (struct RuntimeVisibleParameterAnnotations_attribute));
-      if (attr == NULL)
-        {
-          printf ("ERROR while allocating memory for "
-                  "RuntimeInvisibleAnnotations_attribute");
-          err = ENOMEM;
-          return NULL;
-        }
-
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
-      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
-
-      if (err != 0)
-        {
-          printf ("ERROR while parsing "
-                  "RuntimeVisibleParameterAnnotations_attribute");
-          return NULL;
-        }
-      return attr;
-    }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeInvisibleParameterAnnotations"))
-    {
-      struct RuntimeInvisibleParameterAnnotations_attribute *attr = malloc (
-          sizeof (struct RuntimeInvisibleParameterAnnotations_attribute));
-
-      if (attr == NULL)
-        {
-          printf ("ERROR while allocating memory for "
-                  "RuntimeInvisibleParameterAnnotations_attribute");
-          err = ENOMEM;
-          return NULL;
-        }
-
-      attr->info.attribute_name_index = attribute_name_index;
-      attr->info.attribute_length = attribute_length;
-      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
-
-      if (err != 0)
-        {
-          printf ("ERROR while parsing "
-                  "RuntimeInvisibleParameterAnnotations_attribute");
-          return NULL;
-        }
-      return attr;
-    }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeVisibleTypeAnnotations"))
-    {
-      struct RuntimeVisibleTypeAnnotations_attribute *attr
-          = malloc (sizeof (struct RuntimeVisibleTypeAnnotations_attribute));
-
-      if (attr == NULL)
-        {
-          printf ("ERROR while allocating memory for "
-                  "RuntimeVisibleTypeAnnotations_attribute");
+                  "RuntimeVisibleAnnotations_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -606,11 +516,113 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf (
-              "ERROR while parsing RuntimeVisibleTypeAnnotations_attribute");
+          printf ("ERROR while parsing RuntimeVisibleAnnotations_attribute\n");
           return NULL;
         }
-      return attr;
+
+      return (struct attribute_info *)attr;
+    }
+  else if (is_string_match (UTF8->bytes, UTF8->lenght,
+                            "RuntimeInvisibleAnnotations"))
+    {
+      struct RuntimeInvisibleAnnotations_attribute *attr
+          = malloc (sizeof (struct RuntimeInvisibleAnnotations_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeInvisibleAnnotations_attribute\n");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
+      if (err != 0)
+        {
+          printf (
+              "ERROR while parsing RuntimeInvisibleAnnotations_attribute\n");
+          return NULL;
+        }
+      return (struct attribute_info *)attr;
+    }
+  else if (is_string_match (UTF8->bytes, UTF8->lenght,
+                            "RuntimeVisibleParameterAnnotations"))
+    {
+      struct RuntimeVisibleParameterAnnotations_attribute *attr = malloc (
+          sizeof (struct RuntimeVisibleParameterAnnotations_attribute));
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeVisibleParameterAnnotations_attribute\n");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeVisibleParameterAnnotations_at (loader, attr);
+
+      if (err != 0)
+        {
+          printf ("ERROR while parsing "
+                  "RuntimeVisibleParameterAnnotations_attribute\n");
+          return NULL;
+        }
+      return (struct attribute_info *)attr;
+    }
+  else if (is_string_match (UTF8->bytes, UTF8->lenght,
+                            "RuntimeInvisibleParameterAnnotations"))
+    {
+      struct RuntimeInvisibleParameterAnnotations_attribute *attr = malloc (
+          sizeof (struct RuntimeInvisibleParameterAnnotations_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeInvisibleParameterAnnotations_attribute\n");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeInvisibleParameterAnnotations_at (loader, attr);
+
+      if (err != 0)
+        {
+          printf ("ERROR while parsing "
+                  "RuntimeInvisibleParameterAnnotations_attribute\n");
+          return NULL;
+        }
+      return (struct attribute_info *)attr;
+    }
+  else if (is_string_match (UTF8->bytes, UTF8->lenght,
+                            "RuntimeVisibleTypeAnnotations"))
+    {
+      struct RuntimeVisibleTypeAnnotations_attribute *attr
+          = malloc (sizeof (struct RuntimeVisibleTypeAnnotations_attribute));
+
+      if (attr == NULL)
+        {
+          printf ("ERROR while allocating memory for "
+                  "RuntimeVisibleTypeAnnotations_attribute\n");
+          err = ENOMEM;
+          return NULL;
+        }
+
+      attr->info.attribute_name_index = attribute_name_index;
+      attr->info.attribute_length = attribute_length;
+      err = parse_RuntimeVisibleTypeAnnotations_at (loader, attr);
+
+      if (err != 0)
+        {
+          printf (
+              "ERROR while parsing RuntimeVisibleTypeAnnotations_attribute\n");
+          return NULL;
+        }
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght,
                             "RuntimeInvisibleTypeAnnotations"))
@@ -621,7 +633,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "RuntimeInvisibleTypeAnnotations_attribute");
+                  "RuntimeInvisibleTypeAnnotations_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -630,11 +642,11 @@ parse_attribute (Loader *loader, struct class_file *class)
       attr->info.attribute_length = attribute_length;
       if (err != 0)
         {
-          printf (
-              "ERROR while parsing RuntimeInvisibleTypeAnnotations_attribute");
+          printf ("ERROR while parsing "
+                  "RuntimeInvisibleTypeAnnotations_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "AnnotationDefault"))
     {
@@ -645,7 +657,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "AnnotationDefault_attribute");
+                  "AnnotationDefault_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -656,10 +668,10 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          printf ("ERROR while parsing AnnotationDefault_attribute");
+          printf ("ERROR while parsing AnnotationDefault_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "MethodParameters"))
     {
@@ -668,7 +680,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "MethodParameters_attribute");
+                  "MethodParameters_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -678,10 +690,10 @@ parse_attribute (Loader *loader, struct class_file *class)
       err = parse_MethodParameters_at (loader, attr);
       if (err != 0)
         {
-          printf ("ERROR while parsing MethodParameters_attribute");
+          printf ("ERROR while parsing MethodParameters_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Module"))
     {
@@ -690,7 +702,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "Module_attribute");
+                  "Module_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -700,10 +712,10 @@ parse_attribute (Loader *loader, struct class_file *class)
       err = parse_Module_at (loader, attr);
       if (err != 0)
         {
-          printf ("ERROR while parsing Module_attribute");
+          printf ("ERROR while parsing Module_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "ModulePackages"))
     {
@@ -712,7 +724,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "ModulePackages_attribute");
+                  "ModulePackages_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -722,10 +734,10 @@ parse_attribute (Loader *loader, struct class_file *class)
       err = parse_ModulePackages_at (loader, attr);
       if (err != 0)
         {
-          printf ("ERROR while parsing ModulePackages_attribute");
+          printf ("ERROR while parsing ModulePackages_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "ModuleMainClass"))
     {
@@ -734,7 +746,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           printf ("ERROR while allocating memory for "
-                  "ModuleMainClass_attribute");
+                  "ModuleMainClass_attribute\n");
           err = ENOMEM;
           return NULL;
         }
@@ -744,14 +756,14 @@ parse_attribute (Loader *loader, struct class_file *class)
       err = parse_ModuleMainClass_at (loader, attr);
       if (err != 0)
         {
-          printf ("ERROR while parsing ModuleMainClass_attribute");
+          printf ("ERROR while parsing ModuleMainClass_attribute\n");
           return NULL;
         }
-      return attr;
+      return (struct attribute_info *)attr;
     }
   else
     {
-      print ("ERROR!!!");
+      printf ("ERROR!!!\n");
       return NULL;
     }
 
@@ -762,18 +774,20 @@ int
 read_attributes (Loader *loader, struct class_file *class,
                  struct attribute_info ***info, uint16_t count)
 {
+  printf ("DEBUG: Start read attributes\n");
   struct attribute_info **attributes
       = malloc (sizeof (struct attribute_info *) * (size_t)(count));
   int iter;
   if (attributes == NULL)
     {
-      printf ("ERROR: can't allocate memory for fields attributes");
+      printf ("ERROR: can't allocate memory for fields attributes\n");
       return ENOMEM;
     }
   for (iter = 0; iter < count; iter++)
     {
       attributes[iter] = parse_attribute (loader, class);
     }
+  *info = attributes;
   return 0;
 }
 
@@ -862,7 +876,7 @@ verification_type_parser (Loader *loader, union verification_type_info *stack)
       break;
 
     default:
-      printf ("ERROR: can not parse verification_type_parser");
+      printf ("ERROR: can not parse verification_type_parser\n");
       break;
     }
 }
@@ -871,19 +885,19 @@ int
 stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
 {
   entry->frame_type = loader_u1 (loader);
-  if (entry->frame_type >= 0 && entry->frame_type <= 63)
+  if (entry->frame_type <= 63)
     { // SAME FRAME
     }
   else if (entry->frame_type >= 64 && entry->frame_type <= 127)
     { // SAME_LOCALS_1_STACK_ITEM
 
       entry->same_locals_1_stack_item_frame.stack
-          == malloc (sizeof (union verification_type_info));
+          = malloc (sizeof (union verification_type_info));
 
       if (entry->same_locals_1_stack_item_frame.stack == NULL)
         {
           printf ("Error in malloc for "
-                  "entry->same_locals_1_stack_item_frame.stack");
+                  "entry->same_locals_1_stack_item_frame.stack\n");
           return ENOMEM;
         }
 
@@ -896,12 +910,12 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
       entry->same_locals_1_stack_item_frame_extended.offset_delta
           = loader_u2 (loader);
       entry->same_locals_1_stack_item_frame_extended.stack
-          == malloc (sizeof (union verification_type_info));
+          = malloc (sizeof (union verification_type_info));
 
       if (entry->same_locals_1_stack_item_frame_extended.stack == NULL)
         {
           printf ("Error in malloc for "
-                  "entry->same_locals_1_stack_item_frame_extended.stack");
+                  "entry->same_locals_1_stack_item_frame_extended.stack\n");
           return ENOMEM;
         }
 
@@ -928,7 +942,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
 
       if (entry->append_frame.locals == NULL)
         {
-          printf ("Can not allocate memory for entry->append_frame.locals");
+          printf ("Can not allocate memory for entry->append_frame.locals\n");
           return ENOMEM;
         }
 
@@ -950,7 +964,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
 
       if (entry->full_frame.locals == NULL)
         {
-          printf ("Can not allocate memory for entry->full_frame.locals");
+          printf ("Can not allocate memory for entry->full_frame.locals\n");
           return ENOMEM;
         }
 
@@ -967,7 +981,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
       if (entry->full_frame.locals == NULL)
         {
           printf ("Can not allocate memory for "
-                  "entry->full_frame.number_of_stack_items");
+                  "entry->full_frame.number_of_stack_items\n");
           return ENOMEM;
         }
 
@@ -976,6 +990,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
           verification_type_parser (loader, &entry->full_frame.stack[iter]);
         }
     }
+  return 0;
 }
 
 int
@@ -996,7 +1011,7 @@ parse_StackMapTable_at (Loader *loader, struct StackMapTable_attribute *attr)
 
   if (attr->entries == NULL)
     {
-      printf ("Can not allocate memory in StackMapTable_at");
+      printf ("Can not allocate memory in StackMapTable_at\n");
       return ENOMEM;
     }
 
@@ -1018,7 +1033,7 @@ parse_bootstrap_methods (Loader *loader, struct bootstrap_methods *meth)
       = malloc (sizeof (uint16_t) * (size_t)(meth->num_bootstrap_arguments));
   if (meth->bootstrap_arguments == NULL)
     {
-      printf ("Can not allocate memory for bootstrap_arguments");
+      printf ("Can not allocate memory for bootstrap_arguments\n");
       return ENOMEM;
     }
   for (iter = 0; iter < meth->num_bootstrap_arguments; ++iter)
@@ -1044,7 +1059,7 @@ parse_BootstrapMethods_at (Loader *loader,
 
   if (attr->bootstrap_methods == NULL)
     {
-      printf ("Can not allocate memory in BootstrapMethods_at");
+      printf ("Can not allocate memory in BootstrapMethods_at\n");
       return ENOMEM;
     }
 
@@ -1056,7 +1071,7 @@ parse_BootstrapMethods_at (Loader *loader,
 
   if (error != 0)
     {
-      printf ("Error in parsing Bootstrap_methods");
+      printf ("Error in parsing Bootstrap_methods\n");
     }
   return error;
 }
@@ -1089,7 +1104,7 @@ parse_NestMembers_at (Loader *loader, struct NestMembers_attribute *attr)
 
   if (attr->classes == NULL)
     {
-      printf ("Can not allocate memory for attr->classes in NestMembers");
+      printf ("Can not allocate memory for attr->classes in NestMembers\n");
       return ENOMEM;
     }
 
@@ -1117,8 +1132,8 @@ parse_PermittedSubclasses_at (Loader *loader,
 
   if (attr->classes == NULL)
     {
-      printf (
-          "Can not allocate memory for attr->classes in PermittedSubclasses");
+      printf ("Can not allocate memory for attr->classes in "
+              "PermittedSubclasses\n");
       return ENOMEM;
     }
 
@@ -1146,7 +1161,7 @@ parse_Exceptions_at (Loader *loader, struct Exceptions_attribute *attr)
   if (attr->exception_index_table == NULL)
     {
       printf (
-          "Can not allocate memory for exception_index_table in Exceptions");
+          "Can not allocate memory for exception_index_table in Exceptions\n");
       return ENOMEM;
     }
 
@@ -1173,7 +1188,7 @@ parse_InnerClasses_at (Loader *loader, struct InnerClasses_attribute *attr)
 
   if (attr->classes == NULL)
     {
-      printf ("Can not allocate memory for inner classes in InnerClasses");
+      printf ("Can not allocate memory for inner classes in InnerClasses\n");
       return ENOMEM;
     }
 
@@ -1204,7 +1219,7 @@ parse_EnclosingMethod_at (Loader *loader,
 }
 
 int
-parse_Synthetic_at (Loader *loader, struct Synthetic_attribute *attr)
+parse_Synthetic_at (Loader *, struct Synthetic_attribute *attr)
 {
   if (attr == NULL)
     {
@@ -1243,7 +1258,8 @@ parser_record_component_info (Loader *loader, struct class_file *class,
 }
 
 int
-parse_Record_at (Loader *loader, struct Record_attribute *attr)
+parse_Record_at (Loader *loader, struct class_file *class,
+                 struct Record_attribute *attr)
 {
   uint16_t iter;
   int error = 0;
@@ -1259,19 +1275,19 @@ parse_Record_at (Loader *loader, struct Record_attribute *attr)
 
   if (attr->components == NULL)
     {
-      printf ("Can not allocate memory for components in Record");
+      printf ("Can not allocate memory for components in Record\n");
       return ENOMEM;
     }
 
   for (iter = 0; iter < attr->components_count; iter++)
     {
-      error
-          |= parser_record_component_info (loader, &(attr->components[iter]));
+      error |= parser_record_component_info (loader, class,
+                                             &(attr->components[iter]));
     }
 
   if (error != 0)
     {
-      printf ("ERROR: error in parsing record_component_info in Record");
+      printf ("ERROR: error in parsing record_component_info in Record\n");
     }
 
   return error;
@@ -1303,7 +1319,7 @@ parse_LineNumberTable_at (Loader *loader,
 
   if (attr->table == NULL)
     {
-      printf ("ERROR: Can not allocate memory for table in LineNumberTable");
+      printf ("ERROR: Can not allocate memory for table in LineNumberTable\n");
       return ENOMEM;
     }
 
@@ -1332,7 +1348,7 @@ parse_LocalVariableTable_at (Loader *loader,
 
   if (attr->table == NULL)
     {
-      printf ("ERROR: Can not allocate memory for table in LineNumberTable");
+      printf ("ERROR: Can not allocate memory for table in LineNumberTable\n");
       return ENOMEM;
     }
 
@@ -1364,7 +1380,7 @@ parse_LocalVariableTypeTable_at (Loader *loader,
   if (attr->table == NULL)
     {
       printf ("ERROR: Can not allocate memory for table in "
-              "LocalVariableTypeTable");
+              "LocalVariableTypeTable\n");
       return ENOMEM;
     }
 
@@ -1395,7 +1411,7 @@ parse_SourceDebugExtension_at (Loader *loader,
   if (attr->debug_extension == NULL)
     {
       printf ("ERROR: can not allocate memory for debug_extension in "
-              "SourceDebugExtension");
+              "SourceDebugExtension\n");
       return ENOMEM;
     }
 
@@ -1407,9 +1423,16 @@ parse_SourceDebugExtension_at (Loader *loader,
   return 0;
 }
 
+int
+parse_RuntimeVisibleAnnotations_at (
+    Loader *, struct RuntimeVisibleAnnotations_attribute *)
+{
+  return -1;
+}
+
 // IT's ALL
 int
-parse_Deprecated_at (Loader *loader, struct Deprecated_attribute *attr)
+parse_Deprecated_at (Loader *, struct Deprecated_attribute *attr)
 {
   if (attr == NULL)
     {
@@ -1423,7 +1446,6 @@ int parse_annotations (Loader *loader, struct annotation *annotation);
 int
 parse_element_value (Loader *loader, struct element_value *elem)
 {
-  int error = 0;
   uint16_t iter = 0;
   elem->tag = loader_u1 (loader);
   switch (elem->tag)
@@ -1450,7 +1472,7 @@ parse_element_value (Loader *loader, struct element_value *elem)
       break;
 
     case '@':
-      error = parse_annotations (loader, &elem->value.annotation_value);
+      return parse_annotations (loader, &elem->value.annotation_value);
       break;
 
     case '[':
@@ -1459,7 +1481,7 @@ parse_element_value (Loader *loader, struct element_value *elem)
           sizeof (struct element_value) * elem->value.array_value.num_values);
       if (elem->value.array_value.values == NULL)
         {
-          printf ("ERROR: can not allocate memory for element_value");
+          printf ("ERROR: can not allocate memory for element_value\n");
           return ENOMEM;
         }
       for (iter = 0; iter < elem->value.array_value.num_values; ++iter)
@@ -1469,10 +1491,11 @@ parse_element_value (Loader *loader, struct element_value *elem)
       break;
 
     default:
-      printf ("ERROR: can not parse elem->tag");
+      printf ("ERROR: can not parse elem->tag\n");
       return EIO;
       break;
     }
+  return 0;
 }
 
 int
@@ -1488,6 +1511,7 @@ parse_annotations (Loader *loader, struct annotation *annotation)
       parse_element_value (loader,
                            &annotation->element_value_pairs[iter].value);
     }
+  return 0;
 }
 
 int
@@ -1527,7 +1551,7 @@ parse_RuntimeVisibleParameterAnnotations_at (
 
   if (attr->parameter_annotations == NULL)
     {
-      printf ("ERROR: can not allocate memory for parameter annotations");
+      printf ("ERROR: can not allocate memory for parameter annotations\n");
       return ENOMEM;
     }
 
@@ -1541,7 +1565,7 @@ parse_RuntimeVisibleParameterAnnotations_at (
       if (attr->parameter_annotations[iter].annotations == NULL)
         {
           printf ("ERROR: can not allocate memory for annotations in "
-                  "parameter annotations");
+                  "parameter annotations\n");
           return ENOMEM;
         }
 
@@ -1572,7 +1596,7 @@ parse_RuntimeInvisibleParameterAnnotations_at (
 
   if (attr->parameter_annotations == NULL)
     {
-      printf ("ERROR: can not allocate memory for parameter annotations");
+      printf ("ERROR: can not allocate memory for parameter annotations\n");
       return ENOMEM;
     }
 
@@ -1586,7 +1610,7 @@ parse_RuntimeInvisibleParameterAnnotations_at (
       if (attr->parameter_annotations[iter].annotations == NULL)
         {
           printf ("ERROR: can not allocate memory for annotations in "
-                  "parameter annotations");
+                  "parameter annotations\n");
           return ENOMEM;
         }
 
@@ -1605,7 +1629,7 @@ int
 parse_RuntimeVisibleTypeAnnotations_at (
     Loader *loader, struct RuntimeVisibleTypeAnnotations_attribute *attr)
 {
-  uint16_t iter;
+  // uint16_t iter;
   if (attr == NULL)
     {
       return EINVAL;
@@ -1618,17 +1642,17 @@ parse_RuntimeVisibleTypeAnnotations_at (
   if (attr->type_annotation == NULL)
     {
       printf ("ERROR: can not allocate memory for type_annotation in "
-              "RuntimeVisibleTypeAnnotations");
+              "RuntimeVisibleTypeAnnotations\n");
       return ENOMEM;
     }
 
-  return 0;
+  return -1;
 }
 
 // TODO
 int
 parse_RuntimeInvisibleTypeAnnotations_at (
-    Loader *loader, struct RuntimeInvisibleTypeAnnotations_attribute *attr)
+    Loader *, struct RuntimeInvisibleTypeAnnotations_attribute *attr)
 {
   if (attr == NULL)
     {
@@ -1639,8 +1663,7 @@ parse_RuntimeInvisibleTypeAnnotations_at (
 
 // TODO
 int
-parse_AnnotationDefault_at (Loader *loader,
-                            struct AnnotationDefault_attribute *attr)
+parse_AnnotationDefault_at (Loader *, struct AnnotationDefault_attribute *attr)
 {
   if (attr == NULL)
     {
@@ -1663,8 +1686,8 @@ parse_MethodParameters_at (Loader *loader,
                              * (size_t)(attr->parameters_count));
   if (attr->parameters == NULL)
     {
-      printf (
-          "ERROR: can not allocate memory for parameters in MethodParameters");
+      printf ("ERROR: can not allocate memory for parameters in "
+              "MethodParameters\n");
       return ENOMEM;
     }
   for (iter = 0; iter < attr->parameters_count; ++iter)
@@ -1688,7 +1711,8 @@ parse_module_exports (Loader *loader, struct exports *exports)
 
   if (exports->exports_to_index == NULL)
     {
-      printf ("ERROR: Can not allocate memory for exports_to_index in Module");
+      printf (
+          "ERROR: Can not allocate memory for exports_to_index in Module\n");
       return ENOMEM;
     }
 
@@ -1711,7 +1735,7 @@ parse_module_opens (Loader *loader, struct opens *opens)
 
   if (opens->opens_to_index == NULL)
     {
-      printf ("ERROR: Can not allocate memory for opens_to_index in Module");
+      printf ("ERROR: Can not allocate memory for opens_to_index in Module\n");
       return ENOMEM;
     }
 
@@ -1731,10 +1755,10 @@ parse_module_provides (Loader *loader, struct provides *provides)
   provides->provides_with_index
       = malloc (sizeof (uint16_t) * (size_t)(provides->provides_with_count));
 
-  if (provides->provides_with_count == NULL)
+  if (provides->provides_with_index == NULL)
     {
-      printf (
-          "ERROR: Can not allocate memory for provides_with_index in Module");
+      printf ("ERROR: Can not allocate memory for provides_with_index in "
+              "Module\n");
       return ENOMEM;
     }
 
@@ -1764,7 +1788,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
 
   if (attr->requires == NULL)
     {
-      printf ("ERROR: can not allocate memory for requires in Module");
+      printf ("ERROR: can not allocate memory for requires in Module\n");
       return ENOMEM;
     }
 
@@ -1781,7 +1805,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
 
   if (attr->exports == NULL)
     {
-      printf ("ERROR: can not allocate memory for exports in Module");
+      printf ("ERROR: can not allocate memory for exports in Module\n");
       return ENOMEM;
     }
 
@@ -1794,7 +1818,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
   attr->opens = malloc (sizeof (struct opens) * (size_t)(attr->opens_count));
   if (attr->opens == NULL)
     {
-      printf ("ERROR: can not allocate memory for opens in Module");
+      printf ("ERROR: can not allocate memory for opens in Module\n");
       return ENOMEM;
     }
 
@@ -1809,7 +1833,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
 
   if (attr->uses_index == NULL)
     {
-      printf ("ERROR: Can not allocate memory for uses index in Module");
+      printf ("ERROR: Can not allocate memory for uses index in Module\n");
       return ENOMEM;
     }
 

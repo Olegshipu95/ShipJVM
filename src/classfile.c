@@ -24,13 +24,41 @@ int
 get_constant (struct class_file *class, uint16_t index,
               struct cp_info **cp_info)
 {
-  if (index == 0 || index > class->constant_pool_count)
+  if (!class || !class->constant_pool || !cp_info)
     {
-      printf ("Can't take constant by that adress");
+      printf ("Invalid arguments\n");
       return EINVAL;
     }
 
+  if (index == 0 || index >= class->constant_pool_count)
+    {
+      printf ("Can't take constant by that adress\n");
+      return EINVAL;
+    }
   *cp_info = &(class->constant_pool[index - 1]);
-
   return 0;
+}
+
+struct UTF8_info *
+validate_constant (struct class_file *class, uint16_t index)
+{
+  if (!class)
+    {
+      printf ("ERROR: NULL class\n");
+      return NULL;
+    }
+  struct cp_info *cp_info = NULL;
+  int err = get_constant (class, index, &cp_info);
+  if (err != 0 || cp_info == NULL)
+    {
+      printf ("ERROR: %d\n", err);
+      return NULL;
+    }
+  if (cp_info->tag != UTF8)
+    {
+      printf ("ERROR: parse const fail\n");
+      return NULL;
+    }
+  printf ("DEBUG: return correct type\n");
+  return &(cp_info->utf8_info);
 }

@@ -135,8 +135,9 @@ exit:
 }
 
 int
-is_string_match (const char *str, size_t len, const char *expected)
+is_string_match (uint8_t *buff, size_t len, const char *expected)
 {
+  const char *str = (const char *)buff;
   if (len != strlen (expected))
     {
       return 0;
@@ -148,13 +149,29 @@ int
 parse_class_fields (Loader *loader, struct class_file *class,
                     struct field_info *fields)
 {
+  printf ("DEBUG: Start parsing fields\n");
   int error = 0;
   fields->access_flags = loader_u2 (loader);
   fields->name_index = loader_u2 (loader);
   fields->descriptor_index = loader_u2 (loader);
   fields->attributes_count = loader_u2 (loader);
-  error = read_attributes (loader, class, fields->attributes,
+  error = read_attributes (loader, class, &fields->attributes,
                            fields->attributes_count);
+  return error;
+}
+
+int
+parse_class_methods (Loader *loader, struct class_file *class,
+                     struct method_info *method)
+{
+  printf ("DEBUG: Start parsing methods\n");
+  int error = 0;
+  method->access_flags = loader_u2 (loader);
+  method->name_index = loader_u2 (loader);
+  method->descriptor_index = loader_u2 (loader);
+  method->attributes_count = loader_u2 (loader);
+  error = read_attributes (loader, class, &method->attributes,
+                           method->attributes_count);
   return error;
 }
 
@@ -203,7 +220,7 @@ parse_class_file ()
 
   if (class.interfaces == NULL)
     {
-      printf ("ERROR: can not malloc data for interfaces");
+      printf ("ERROR: can not malloc data for interfaces\n");
     }
 
   for (iterator = 0; iterator < class.interfaces_count; ++iterator)
@@ -217,12 +234,29 @@ parse_class_file ()
 
   if (class.fields == NULL)
     {
-      printf ("ERROR: can not malloc data for interfaces");
+      printf ("ERROR: can not malloc data for interfaces\n");
     }
 
+  printf ("DEBUG: Start loop fields\n");
   for (iterator = 0; iterator < class.fields_count; ++iterator)
     {
-      err |= parse_class_fields (&loader, &class, class.fields + iterator);
+      err |= parse_class_fields (&loader, &class, &class.fields[iterator]);
+    }
+
+  class.methods_count = loader_u2 (&loader);
+
+  class.methods
+      = malloc (sizeof (struct method_info) * (size_t)(class.methods_count));
+
+  if (class.methods == NULL)
+    {
+      printf ("ERROR: can not malloc data for methods\n");
+    }
+
+  printf ("DEBUG: Start loop methods\n");
+  for (iterator = 0; iterator < class.methods_count; ++iterator)
+    {
+      err |= parse_class_methods (&loader, &class, &class.methods[iterator]);
     }
 
   if (loader.error)

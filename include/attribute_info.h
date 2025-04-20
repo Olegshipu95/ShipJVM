@@ -728,7 +728,30 @@ struct Deprecated_attribute
   struct attribute_info info;
 };
 
-struct annotation;
+struct element_value_pairs;
+/**
+ * Annotation structure
+ * Represents a single annotation
+ */
+struct annotation
+{
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the annotation type descriptor
+   */
+  uint16_t type_index;
+
+  /**
+   * Number of element-value pairs
+   */
+  uint16_t num_element_value_pairs;
+
+  /**
+   * Array of annotation element-value pairs
+   */
+  struct element_value_pairs
+      *element_value_pairs; /* array of size num_element_value_pairs */
+};
 
 /**
  * Element_value structure
@@ -803,30 +826,6 @@ struct element_value_pairs
    * The element value
    */
   struct element_value value;
-};
-
-/**
- * Annotation structure
- * Represents a single annotation
- */
-struct annotation
-{
-  /**
-   * Index into the constant pool of a CONSTANT_Utf8_info
-   * representing the annotation type descriptor
-   */
-  uint16_t type_index;
-
-  /**
-   * Number of element-value pairs
-   */
-  uint16_t num_element_value_pairs;
-
-  /**
-   * Array of annotation element-value pairs
-   */
-  struct element_value_pairs
-      *element_value_pairs; /* array of size num_element_value_pairs */
 };
 
 /**

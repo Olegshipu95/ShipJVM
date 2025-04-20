@@ -103,21 +103,3 @@ read_package_info (Loader *loader, struct package_info *info)
   info->name_index = loader_u2 (loader);
   return 0;
 }
-
-struct UTF8_info *
-validate_constant (struct class_file *class, uint16_t index)
-{
-  struct cp_info **cp_info = NULL;
-  int err = get_constant (class, index, cp_info);
-  if (err != 0 || cp_info == NULL)
-    {
-      printf ("ERROR: %d", err);
-      return NULL;
-    }
-  if ((*cp_info)->tag != UTF8)
-    {
-      printf ("ERROR: parse const fail");
-      return NULL;
-    }
-  return &((*cp_info)->utf8_info);
-}
