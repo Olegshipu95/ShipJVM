@@ -10,13 +10,13 @@ parse_const_pool (struct class_file *class, Loader *loader)
 
   if (pool_count == 0)
     {
-      printf ("ERROR: Constant_pool_count is 0\n");
+      prerr ("Constant_pool_count is 0");
       return EINVAL;
     }
 
   if (class->constant_pool != NULL)
     {
-      printf ("ERROR: Constant pool has already been initialized\n");
+      prerr ("Constant pool has already been initialized");
       return EINVAL;
     }
 
@@ -24,7 +24,7 @@ parse_const_pool (struct class_file *class, Loader *loader)
 
   if (class->constant_pool == NULL)
     {
-      printf ("ERROR: can not allocate memory for constant pool\n");
+      prerr ("Can not allocate memory for constant pool");
       return ENOMEM;
     }
 
@@ -147,8 +147,8 @@ parse_const_pool (struct class_file *class, Loader *loader)
           read_package_info (loader, &(class->constant_pool[i].package_info));
           break;
         default:
-          printf ("ERROR: unknown\n");
-          printf ("  ERROR: unsupported tag: %hhu on iteration: %hu\n", tag,
+          printf ("unknown\n");
+          prerr (" unsupported tag: %hhu on iteration: %hu", tag,
                   i + 1);
           free (class->constant_pool);
           return EINVAL;
@@ -204,7 +204,7 @@ parse_class_file (int, char *argv[])
   FILE *file = fopen (argv[1], "rb");
   if (!file)
     {
-      printf ("ERROR: Failed to open file");
+      prerr ("Failed to open file");
       goto exit;
     }
   Loader loader = { .file = file, .error = 0 };
@@ -236,7 +236,7 @@ parse_class_file (int, char *argv[])
 
   if (err != 0)
     {
-      printf ("ERROR: after parse const pool is - %d\n", err);
+      prerr ("after parse const pool is - %d", err);
       err = ENOEXEC;
       goto exit;
     }
@@ -249,7 +249,7 @@ parse_class_file (int, char *argv[])
 
   if (class.interfaces == NULL)
     {
-      printf ("ERROR: can not malloc data for interfaces\n");
+      prerr ("can not malloc data for interfaces");
     }
 
   for (iterator = 0; iterator < class.interfaces_count; ++iterator)
@@ -263,7 +263,7 @@ parse_class_file (int, char *argv[])
 
   if (class.fields == NULL)
     {
-      printf ("ERROR: can not malloc data for interfaces\n");
+      prerr ("can not malloc data for interfaces");
     }
 
   printf ("DEBUG: Number of fields: %hu \n", class.fields_count);
@@ -279,7 +279,7 @@ parse_class_file (int, char *argv[])
 
   if (class.methods == NULL)
     {
-      printf ("ERROR: can not malloc data for methods\n");
+      prerr ("can not malloc data for methods");
     }
 
   printf ("DEBUG: Number of methods: %hu\n", class.methods_count);

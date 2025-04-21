@@ -10,7 +10,7 @@ read_utf8_info (Loader *loader, struct UTF8_info *utf8)
 
   if (utf8->bytes == NULL)
     {
-      printf ("ERROR: Can't allocate memory for string\n");
+      prerr ("Can't allocate memory for string");
       return EINVAL;
     }
 

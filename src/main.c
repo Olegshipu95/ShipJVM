@@ -9,7 +9,7 @@ main (int argc, char *argv[])
   printf ("\n");
   if (argc < 2)
     {
-      fprintf (stderr, "Usage: %s <classfile>\n", argv[0]);
+      prerr ("Usage: %s <classfile>", argv[0]);
       return 1;
     }
   return parse_class_file (argc, argv);
