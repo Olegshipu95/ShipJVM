@@ -1,5 +1,5 @@
 #include <stdint.h>
-
+#include "util.h"
 #include "classfile_parser.h"
 
 // Пример использования

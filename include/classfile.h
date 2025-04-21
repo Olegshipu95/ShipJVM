@@ -6,6 +6,7 @@
 
 #include "attribute_info.h"
 #include "constant_pool.h"
+#include "util.h"
 
 struct field_info
 {

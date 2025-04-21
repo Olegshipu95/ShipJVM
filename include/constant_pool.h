@@ -8,6 +8,7 @@
 
 #include "classfile.h"
 #include "classfile_stream.h"
+#include "util.h"
 
 enum CONSTANT_POOL_TAG
 {

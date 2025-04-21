@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "classfile.h"
+#include "util.h"
 
 /* Verification type tags */
 #define ITEM_Top 0

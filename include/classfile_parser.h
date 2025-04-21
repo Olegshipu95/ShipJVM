@@ -16,6 +16,7 @@
 #include "classfile.h"
 #include "classfile_stream.h"
 #include "constant_pool.h"
+#include "util.h"
 
 int parse_class_file (int argc, char *argv[]);
 int is_string_match (uint8_t *str, size_t len, const char *expected);
