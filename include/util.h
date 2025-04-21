@@ -3,4 +3,9 @@
 
 #include <stdint.h>
 
+#define my_alloc(T) ((T *)malloc (sizeof (T)))
+#define my_alloc_array(T, n) ((T *)malloc (sizeof (T) * (size_t)(n)))
+
+#define prerr(fmt, ...) printf ("ERROR: " fmt "\n", ##__VA_ARGS__)
+
 #endif

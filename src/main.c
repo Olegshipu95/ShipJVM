@@ -6,6 +6,11 @@
 int
 main (int argc, char *argv[])
 {
-  printf ("Argc: %d, pointer for argv: %p\n", argc, argv); // for analyzers
-  return parse_class_file ();
+  printf ("\n");
+  if (argc < 2)
+    {
+      fprintf (stderr, "Usage: %s <classfile>\n", argv[0]);
+      return 1;
+    }
+  return parse_class_file (argc, argv);
 }

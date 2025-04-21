@@ -3,7 +3,7 @@ CC = gcc
 
 # Базовые флаги компиляции
 CFLAGS = -I$(INCLUDE_DIR) -std=c11 -Wall -Wextra -Werror -fstack-protector-strong
-LDFLAGS = 
+LDFLAGS =
 
 # Флаги для разных сборок
 RELEASE_FLAGS = -O2 -DNDEBUG -flto

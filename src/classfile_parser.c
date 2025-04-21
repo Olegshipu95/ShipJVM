@@ -10,13 +10,13 @@ parse_const_pool (struct class_file *class, Loader *loader)
 
   if (pool_count == 0)
     {
-      perror ("Constant_pool_count is 0\n");
+      printf ("ERROR: Constant_pool_count is 0\n");
       return EINVAL;
     }
 
   if (class->constant_pool != NULL)
     {
-      perror ("Constant pool has already been initialized\n");
+      printf ("ERROR: Constant pool has already been initialized\n");
       return EINVAL;
     }
 
@@ -24,7 +24,7 @@ parse_const_pool (struct class_file *class, Loader *loader)
 
   if (class->constant_pool == NULL)
     {
-      perror ("can not allocate memory for constant pool\n");
+      printf ("ERROR: can not allocate memory for constant pool\n");
       return ENOMEM;
     }
 
@@ -34,7 +34,7 @@ parse_const_pool (struct class_file *class, Loader *loader)
     {
       tag = loader_u1 (loader);
       class->constant_pool[i].tag = tag;
-      printf ("I: %hu, tag is - %hhu, type - ", i, tag);
+      printf (" I - %-3hu, tag is - %-3hhu, type - ", i + 1, tag);
 
       switch (tag)
         {
@@ -121,16 +121,16 @@ parse_const_pool (struct class_file *class, Loader *loader)
           read_package_info (loader, &(class->constant_pool[i].package_info));
           break;
         default:
-          printf (
-              "unknown\n, ERROR: unsupported tag: %hhu on iteration: %hu\n",
-              tag, i);
+          printf ("ERROR: unknown\n, ERROR: unsupported tag: %hhu on "
+                  "iteration: %hu\n",
+                  tag, i);
           error = EINVAL;
+          free (class->constant_pool);
           goto exit;
         }
     }
 
 exit:
-  free (class->constant_pool);
   return error;
 }
 
@@ -149,7 +149,6 @@ int
 parse_class_fields (Loader *loader, struct class_file *class,
                     struct field_info *fields)
 {
-  printf ("DEBUG: Start parsing fields\n");
   int error = 0;
   fields->access_flags = loader_u2 (loader);
   fields->name_index = loader_u2 (loader);
@@ -164,7 +163,7 @@ int
 parse_class_methods (Loader *loader, struct class_file *class,
                      struct method_info *method)
 {
-  printf ("DEBUG: Start parsing methods\n");
+  printf ("DEBUG METH\n");
   int error = 0;
   method->access_flags = loader_u2 (loader);
   method->name_index = loader_u2 (loader);
@@ -176,10 +175,15 @@ parse_class_methods (Loader *loader, struct class_file *class,
 }
 
 int
-parse_class_file ()
+parse_class_file (int, char *argv[])
 {
   int err = 0;
-  FILE *file = fopen ("tests/Add.class", "rb");
+  FILE *file = fopen (argv[1], "rb");
+  if (!file)
+    {
+      printf ("ERROR: Failed to open file");
+      goto exit;
+    }
   Loader loader = { .file = file, .error = 0 };
   struct class_file class;
   uint16_t iterator;
@@ -200,7 +204,7 @@ parse_class_file ()
 
   if (loader.error)
     {
-      perror ("Error reading file\n");
+      perror ("ERROR: reading file\n");
       err = ENOEXEC;
       goto exit;
     }
@@ -209,7 +213,7 @@ parse_class_file ()
 
   if (err != 0)
     {
-      printf ("Error after parse const pool is - %d\n", err);
+      printf ("ERROR: after parse const pool is - %d\n", err);
     }
 
   class.access_flags = loader_u2 (&loader);
@@ -237,7 +241,7 @@ parse_class_file ()
       printf ("ERROR: can not malloc data for interfaces\n");
     }
 
-  printf ("DEBUG: Start loop fields\n");
+  printf ("DEBUG: Number of fields: %hu \n", class.fields_count);
   for (iterator = 0; iterator < class.fields_count; ++iterator)
     {
       err |= parse_class_fields (&loader, &class, &class.fields[iterator]);
@@ -253,20 +257,29 @@ parse_class_file ()
       printf ("ERROR: can not malloc data for methods\n");
     }
 
-  printf ("DEBUG: Start loop methods\n");
+  printf ("DEBUG: Number of methods: %hu\n", class.methods_count);
   for (iterator = 0; iterator < class.methods_count; ++iterator)
     {
       err |= parse_class_methods (&loader, &class, &class.methods[iterator]);
     }
 
+  class.attributes_count = loader_u2 (&loader);
+
+  printf ("DEBUG: Number of attributes: %hu\n", class.attributes_count);
+  err |= read_attributes (&loader, &class, &class.attributes,
+                          class.attributes_count);
+
   if (loader.error)
     {
-      perror ("Error reading file\n");
+      perror ("ERROR: Reading file\n");
       err = ENOEXEC;
       goto exit;
     }
   else
     {
+      printf ("\n");
+      printf ("Fields: %hu, methods: %hu, attributes: %hu\n",
+              class.fields_count, class.methods_count, class.attributes_count);
       printf ("Magic: 0x%X, Version: %hu.%hu\n", class.magic,
               class.major_version, class.minor_version);
     }

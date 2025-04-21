@@ -42,7 +42,7 @@ struct class_file
   uint16_t methods_count;
   struct method_info *methods; // size = methods_count
   uint16_t attributes_count;
-  struct attribute_info *attributes; // size = attributes_count
+  struct attribute_info **attributes; // size = attributes_count
 };
 
 void init_class_file (struct class_file *class);

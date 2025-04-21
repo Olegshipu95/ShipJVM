@@ -3,7 +3,6 @@
 struct attribute_info *
 parse_attribute (Loader *loader, struct class_file *class)
 {
-  printf ("DEBUG: Start parsing attributes\n");
   int err = 0;
 
   uint16_t attribute_name_index = loader_u2 (loader);
@@ -19,13 +18,12 @@ parse_attribute (Loader *loader, struct class_file *class)
 
   if (UTF8 && UTF8->bytes)
     {
-      printf ("UTF IS - %.*s\n", UTF8->lenght, UTF8->bytes);
+      printf ("ATTRIBUTE IS - %.*s\n", UTF8->lenght, UTF8->bytes);
     }
   else
     {
-      printf ("UTF8 string is NULL or invalid!\n");
+      printf ("ERROR: UTF8 string is NULL or invalid!\n");
     }
-  printf ("DEBUG POINT\n");
 
   if (is_string_match (UTF8->bytes, UTF8->lenght, "ConstantValue"))
     {
@@ -224,8 +222,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "InnerClasses_attribute"))
+  else if (is_string_match (UTF8->bytes, UTF8->lenght, "InnerClasses"))
     {
       struct InnerClasses_attribute *attr
           = malloc (sizeof (struct InnerClasses_attribute));
@@ -763,7 +760,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else
     {
-      printf ("ERROR!!!\n");
+      printf ("ERROR!!! Unknown Attribute\n");
       return NULL;
     }
 
@@ -774,7 +771,6 @@ int
 read_attributes (Loader *loader, struct class_file *class,
                  struct attribute_info ***info, uint16_t count)
 {
-  printf ("DEBUG: Start read attributes\n");
   struct attribute_info **attributes
       = malloc (sizeof (struct attribute_info *) * (size_t)(count));
   int iter;
@@ -786,6 +782,11 @@ read_attributes (Loader *loader, struct class_file *class,
   for (iter = 0; iter < count; iter++)
     {
       attributes[iter] = parse_attribute (loader, class);
+      if (attributes[iter] == NULL)
+        {
+          printf ("Can not parse attribute\n");
+          return -1;
+        }
     }
   *info = attributes;
   return 0;
@@ -815,7 +816,7 @@ parse_Code_attribute (Loader *loader, struct class_file *class,
   attr->max_stack = loader_u2 (loader);
   attr->max_locals = loader_u2 (loader);
   attr->code_length = loader_u4 (loader);
-  attr->code = malloc (attr->code_length);
+  attr->code = malloc (sizeof (uint8_t) * (size_t)(attr->code_length));
   if (attr->code == NULL)
     {
       return ENOMEM;
@@ -826,13 +827,13 @@ parse_Code_attribute (Loader *loader, struct class_file *class,
     }
   attr->exception_table_length = loader_u2 (loader);
   attr->table = malloc (sizeof (struct exception_table)
-                        * attr->exception_table_length);
+                        * (size_t)attr->exception_table_length);
   if (attr->table == NULL)
     {
       free (attr->code);
       return ENOMEM;
     }
-  for (iter = 0; iter < attr->exception_table_length; ++attr)
+  for (iter = 0; iter < attr->exception_table_length; ++iter)
     {
       attr->table[iter].start_pc = loader_u2 (loader);
       attr->table[iter].end_pc = loader_u2 (loader);

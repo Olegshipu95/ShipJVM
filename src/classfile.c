@@ -59,6 +59,5 @@ validate_constant (struct class_file *class, uint16_t index)
       printf ("ERROR: parse const fail\n");
       return NULL;
     }
-  printf ("DEBUG: return correct type\n");
   return &(cp_info->utf8_info);
 }
