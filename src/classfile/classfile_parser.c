@@ -148,8 +148,7 @@ parse_const_pool (struct class_file *class, Loader *loader)
           break;
         default:
           printf ("unknown\n");
-          prerr (" unsupported tag: %hhu on iteration: %hu", tag,
-                  i + 1);
+          prerr (" unsupported tag: %hhu on iteration: %hu", tag, i + 1);
           free (class->constant_pool);
           return EINVAL;
         }
@@ -274,8 +273,7 @@ parse_class_file (int, char *argv[])
 
   class.methods_count = loader_u2 (&loader);
 
-  class.methods
-      = my_alloc_array (struct method_info, class.methods_count);
+  class.methods = my_alloc_array (struct method_info, class.methods_count);
 
   if (class.methods == NULL)
     {

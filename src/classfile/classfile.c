@@ -26,7 +26,7 @@ get_constant (struct class_file *class, uint16_t index,
 {
   if (!class || !class->constant_pool || !cp_info)
     {
-      prerr ("Invalid arguments");
+      prerr ("Invalid arguments in get_const");
       return EINVAL;
     }
 

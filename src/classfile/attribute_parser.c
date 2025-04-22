@@ -11,7 +11,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
   if (UTF8 == NULL)
     {
-      prerr("Fail reading attr name");
+      prerr ("Fail reading attr name");
       err = ENOMEM;
       return NULL;
     }
@@ -22,7 +22,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else
     {
-      prerr("UTF8 string is NULL or invalid!");
+      prerr ("UTF8 string is NULL or invalid!");
     }
 
   if (is_string_match (UTF8->bytes, UTF8->lenght, "ConstantValue"))
@@ -96,7 +96,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "BootstrapMethods_attribute");
+                 "BootstrapMethods_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -116,8 +116,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestHost"))
     {
-      struct NestHost_attribute *attr
-          = my_alloc (struct NestHost_attribute);
+      struct NestHost_attribute *attr = my_alloc (struct NestHost_attribute);
 
       if (attr == NULL)
         {
@@ -177,7 +176,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "PermittedSubclasses_attribute");
+                 "PermittedSubclasses_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -227,8 +226,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          prerr (
-              "while allocating memory for InnerClasses_attribute");
+          prerr ("while allocating memory for InnerClasses_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -254,8 +252,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          prerr (
-              "while allocating memory for EnclosingMethod_attribute");
+          prerr ("while allocating memory for EnclosingMethod_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -275,8 +272,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Synthetic"))
     {
-      struct Synthetic_attribute *attr
-          = my_alloc (struct Synthetic_attribute);
+      struct Synthetic_attribute *attr = my_alloc (struct Synthetic_attribute);
 
       if (attr == NULL)
         {
@@ -300,8 +296,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Signature"))
     {
-      struct Signature_attribute *attr
-          = my_alloc (struct Signature_attribute);
+      struct Signature_attribute *attr = my_alloc (struct Signature_attribute);
 
       if (attr == NULL)
         {
@@ -324,8 +319,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Record"))
     {
-      struct Record_attribute *attr
-          = my_alloc (struct Record_attribute);
+      struct Record_attribute *attr = my_alloc (struct Record_attribute);
 
       if (attr == NULL)
         {
@@ -376,8 +370,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (attr == NULL)
         {
-          prerr (
-              "while allocating memory for LineNumberTable_attribute");
+          prerr ("while allocating memory for LineNumberTable_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -401,7 +394,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("ERROR while allocating memory for "
-                  "LocalVariableTable_attribute");
+                 "LocalVariableTable_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -426,7 +419,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "LocalVariableTypeTable_attribute");
+                 "LocalVariableTypeTable_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -451,7 +444,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "SourceDebugExtension_attribute");
+                 "SourceDebugExtension_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -500,7 +493,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr (" while allocating memory for "
-                  "RuntimeVisibleAnnotations_attribute");
+                 "RuntimeVisibleAnnotations_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -526,7 +519,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr (" while allocating memory for "
-                  "RuntimeInvisibleAnnotations_attribute");
+                 "RuntimeInvisibleAnnotations_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -536,8 +529,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       err = parse_RuntimeInvisibleAnnotations_at (loader, attr);
       if (err != 0)
         {
-          prerr (
-              "while parsing RuntimeInvisibleAnnotations_attribute");
+          prerr ("while parsing RuntimeInvisibleAnnotations_attribute");
           return NULL;
         }
       return (struct attribute_info *)attr;
@@ -550,7 +542,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "RuntimeVisibleParameterAnnotations_attribute");
+                 "RuntimeVisibleParameterAnnotations_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -562,7 +554,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (err != 0)
         {
           prerr ("while parsing "
-                  "RuntimeVisibleParameterAnnotations_attribute");
+                 "RuntimeVisibleParameterAnnotations_attribute");
           return NULL;
         }
       return (struct attribute_info *)attr;
@@ -576,7 +568,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "RuntimeInvisibleParameterAnnotations_attribute");
+                 "RuntimeInvisibleParameterAnnotations_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -588,7 +580,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (err != 0)
         {
           prerr ("while parsing "
-                  "RuntimeInvisibleParameterAnnotations_attribute");
+                 "RuntimeInvisibleParameterAnnotations_attribute");
           return NULL;
         }
       return (struct attribute_info *)attr;
@@ -602,7 +594,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "RuntimeVisibleTypeAnnotations_attribute");
+                 "RuntimeVisibleTypeAnnotations_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -613,8 +605,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       if (err != 0)
         {
-          prerr (
-              "while parsing RuntimeVisibleTypeAnnotations_attribute");
+          prerr ("while parsing RuntimeVisibleTypeAnnotations_attribute");
           return NULL;
         }
       return (struct attribute_info *)attr;
@@ -628,7 +619,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "RuntimeInvisibleTypeAnnotations_attribute");
+                 "RuntimeInvisibleTypeAnnotations_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -638,7 +629,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (err != 0)
         {
           prerr ("while parsing "
-                  "RuntimeInvisibleTypeAnnotations_attribute");
+                 "RuntimeInvisibleTypeAnnotations_attribute");
           return NULL;
         }
       return (struct attribute_info *)attr;
@@ -652,7 +643,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "AnnotationDefault_attribute");
+                 "AnnotationDefault_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -675,7 +666,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "MethodParameters_attribute");
+                 "MethodParameters_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -692,12 +683,11 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Module"))
     {
-      struct Module_attribute *attr
-          = my_alloc (struct Module_attribute);
+      struct Module_attribute *attr = my_alloc (struct Module_attribute);
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "Module_attribute");
+                 "Module_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -719,7 +709,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "ModulePackages_attribute");
+                 "ModulePackages_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -741,7 +731,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
-                  "ModuleMainClass_attribute");
+                 "ModuleMainClass_attribute");
           err = ENOMEM;
           return NULL;
         }
@@ -770,7 +760,7 @@ read_attributes (Loader *loader, struct class_file *class,
                  struct attribute_info ***info, uint16_t count)
 {
   struct attribute_info **attributes
-      = my_alloc_array (struct attribute_info* , count);
+      = my_alloc_array (struct attribute_info *, count);
   int iter;
   if (attributes == NULL)
     {
@@ -824,7 +814,8 @@ parse_Code_attribute (Loader *loader, struct class_file *class,
       attr->code[iter] = loader_u1 (loader);
     }
   attr->exception_table_length = loader_u2 (loader);
-  attr->table = my_alloc_array (struct exception_table, attr->exception_table_length);
+  attr->table
+      = my_alloc_array (struct exception_table, attr->exception_table_length);
   if (attr->table == NULL)
     {
       free (attr->code);
@@ -895,7 +886,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
       if (entry->same_locals_1_stack_item_frame.stack == NULL)
         {
           prerr ("in malloc for "
-                  "entry->same_locals_1_stack_item_frame.stack");
+                 "entry->same_locals_1_stack_item_frame.stack");
           return ENOMEM;
         }
 
@@ -913,7 +904,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
       if (entry->same_locals_1_stack_item_frame_extended.stack == NULL)
         {
           prerr ("in malloc for "
-                  "entry->same_locals_1_stack_item_frame_extended.stack");
+                 "entry->same_locals_1_stack_item_frame_extended.stack");
           return ENOMEM;
         }
 
@@ -979,7 +970,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
       if (entry->full_frame.locals == NULL)
         {
           prerr ("Can not allocate memory for "
-                  "entry->full_frame.number_of_stack_items");
+                 "entry->full_frame.number_of_stack_items");
           return ENOMEM;
         }
 
@@ -1097,8 +1088,7 @@ parse_NestMembers_at (Loader *loader, struct NestMembers_attribute *attr)
     }
 
   attr->number_of_classes = loader_u2 (loader);
-  attr->classes
-      = my_alloc_array (uint16_t, attr->number_of_classes);
+  attr->classes = my_alloc_array (uint16_t, attr->number_of_classes);
 
   if (attr->classes == NULL)
     {
@@ -1125,13 +1115,12 @@ parse_PermittedSubclasses_at (Loader *loader,
     }
 
   attr->number_of_classes = loader_u2 (loader);
-  attr->classes
-      = my_alloc_array (uint16_t, attr->number_of_classes);
+  attr->classes = my_alloc_array (uint16_t, attr->number_of_classes);
 
   if (attr->classes == NULL)
     {
       prerr ("Can not allocate memory for attr->classes in "
-              "PermittedSubclasses");
+             "PermittedSubclasses");
       return ENOMEM;
     }
 
@@ -1181,7 +1170,8 @@ parse_InnerClasses_at (Loader *loader, struct InnerClasses_attribute *attr)
     }
 
   attr->number_of_classes = loader_u2 (loader);
-  attr->classes = my_alloc_array (struct inner_class_entries, attr->number_of_classes);
+  attr->classes
+      = my_alloc_array (struct inner_class_entries, attr->number_of_classes);
 
   if (attr->classes == NULL)
     {
@@ -1267,7 +1257,8 @@ parse_Record_at (Loader *loader, struct class_file *class,
     }
 
   attr->components_count = loader_u2 (loader);
-  attr->components = my_alloc_array (struct record_component_info, attr->components_count);
+  attr->components
+      = my_alloc_array (struct record_component_info, attr->components_count);
 
   if (attr->components == NULL)
     {
@@ -1310,7 +1301,8 @@ parse_LineNumberTable_at (Loader *loader,
       return EINVAL;
     }
   attr->line_number_table_length = loader_u2 (loader);
-  attr->table = my_alloc_array (struct line_number_table, attr->line_number_table_length);
+  attr->table = my_alloc_array (struct line_number_table,
+                                attr->line_number_table_length);
 
   if (attr->table == NULL)
     {
@@ -1338,7 +1330,8 @@ parse_LocalVariableTable_at (Loader *loader,
     }
 
   attr->local_variable_table_length = loader_u2 (loader);
-  attr->table = my_alloc_array (struct local_variable_table, attr->local_variable_table_length);
+  attr->table = my_alloc_array (struct local_variable_table,
+                                attr->local_variable_table_length);
 
   if (attr->table == NULL)
     {
@@ -1369,11 +1362,12 @@ parse_LocalVariableTypeTable_at (Loader *loader,
     }
 
   attr->local_variable_type_table_length = loader_u2 (loader);
-  attr->table = my_alloc_array (struct local_variable_type_table, attr->local_variable_type_table_length);
+  attr->table = my_alloc_array (struct local_variable_type_table,
+                                attr->local_variable_type_table_length);
   if (attr->table == NULL)
     {
       prerr (": Can not allocate memory for table in "
-              "LocalVariableTypeTable");
+             "LocalVariableTypeTable");
       return ENOMEM;
     }
 
@@ -1404,7 +1398,7 @@ parse_SourceDebugExtension_at (Loader *loader,
   if (attr->debug_extension == NULL)
     {
       prerr (": can not allocate memory for debug_extension in "
-              "SourceDebugExtension");
+             "SourceDebugExtension");
       return ENOMEM;
     }
 
@@ -1539,7 +1533,8 @@ parse_RuntimeVisibleParameterAnnotations_at (
     }
 
   attr->num_parameters = loader_u1 (loader);
-  attr->parameter_annotations = my_alloc_array (struct parameter_annotations, attr->num_parameters);
+  attr->parameter_annotations
+      = my_alloc_array (struct parameter_annotations, attr->num_parameters);
 
   if (attr->parameter_annotations == NULL)
     {
@@ -1557,7 +1552,7 @@ parse_RuntimeVisibleParameterAnnotations_at (
       if (attr->parameter_annotations[iter].annotations == NULL)
         {
           prerr (": can not allocate memory for annotations in "
-                  "parameter annotations");
+                 "parameter annotations");
           return ENOMEM;
         }
 
@@ -1583,7 +1578,8 @@ parse_RuntimeInvisibleParameterAnnotations_at (
     }
 
   attr->num_parameters = loader_u1 (loader);
-  attr->parameter_annotations = my_alloc_array (struct parameter_annotations, attr->num_parameters);
+  attr->parameter_annotations
+      = my_alloc_array (struct parameter_annotations, attr->num_parameters);
 
   if (attr->parameter_annotations == NULL)
     {
@@ -1601,7 +1597,7 @@ parse_RuntimeInvisibleParameterAnnotations_at (
       if (attr->parameter_annotations[iter].annotations == NULL)
         {
           prerr ("can not allocate memory for annotations in "
-                  "parameter annotations");
+                 "parameter annotations");
           return ENOMEM;
         }
 
@@ -1627,12 +1623,13 @@ parse_RuntimeVisibleTypeAnnotations_at (
     }
 
   attr->num_annotations = loader_u2 (loader);
-  attr->type_annotation = my_alloc_array (struct type_annotation, attr->num_annotations);
+  attr->type_annotation
+      = my_alloc_array (struct type_annotation, attr->num_annotations);
 
   if (attr->type_annotation == NULL)
     {
       prerr ("can not allocate memory for type_annotation in "
-              "RuntimeVisibleTypeAnnotations");
+             "RuntimeVisibleTypeAnnotations");
       return ENOMEM;
     }
 
@@ -1672,11 +1669,12 @@ parse_MethodParameters_at (Loader *loader,
       return EINVAL;
     }
   attr->parameters_count = loader_u1 (loader);
-  attr->parameters = my_alloc_array (struct method_params, attr->parameters_count);
+  attr->parameters
+      = my_alloc_array (struct method_params, attr->parameters_count);
   if (attr->parameters == NULL)
     {
       prerr (": can not allocate memory for parameters in "
-              "MethodParameters");
+             "MethodParameters");
       return ENOMEM;
     }
   for (iter = 0; iter < attr->parameters_count; ++iter)
@@ -1700,8 +1698,7 @@ parse_module_exports (Loader *loader, struct exports *exports)
 
   if (exports->exports_to_index == NULL)
     {
-      prerr (
-          "Can not allocate memory for exports_to_index in Module");
+      prerr ("Can not allocate memory for exports_to_index in Module");
       return ENOMEM;
     }
 
@@ -1719,8 +1716,7 @@ parse_module_opens (Loader *loader, struct opens *opens)
   opens->opens_index = loader_u2 (loader);
   opens->opens_flags = loader_u2 (loader);
   opens->opens_to_count = loader_u2 (loader);
-  opens->opens_to_index
-      = my_alloc_array (uint16_t, opens->opens_to_count);
+  opens->opens_to_index = my_alloc_array (uint16_t, opens->opens_to_count);
 
   if (opens->opens_to_index == NULL)
     {
@@ -1747,7 +1743,7 @@ parse_module_provides (Loader *loader, struct provides *provides)
   if (provides->provides_with_index == NULL)
     {
       prerr (": Can not allocate memory for provides_with_index in "
-              "Module");
+             "Module");
       return ENOMEM;
     }
 
@@ -1772,8 +1768,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
   attr->module_version_index = loader_u2 (loader);
 
   attr->requires_count = loader_u2 (loader);
-  attr->requires
-      = my_alloc_array (struct requires, attr->requires_count);
+  attr->requires = my_alloc_array (struct requires, attr->requires_count);
 
   if (attr->requires == NULL)
     {
@@ -1789,8 +1784,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
     }
 
   attr->exports_count = loader_u2 (loader);
-  attr->exports
-      = my_alloc_array (struct exports, attr->exports_count);
+  attr->exports = my_alloc_array (struct exports, attr->exports_count);
 
   if (attr->exports == NULL)
     {
@@ -1831,8 +1825,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
     }
 
   attr->provides_count = loader_u2 (loader);
-  attr->provides
-      = my_alloc_array (struct provides, attr->provides_count);
+  attr->provides = my_alloc_array (struct provides, attr->provides_count);
 
   for (iter = 0; iter < attr->provides_count; iter++)
     {
@@ -1851,8 +1844,7 @@ parse_ModulePackages_at (Loader *loader, struct ModulePackages_attribute *attr)
       return EINVAL;
     }
   attr->package_count = loader_u2 (loader);
-  attr->package_index
-      = my_alloc_array (uint16_t, attr->package_count);
+  attr->package_index = my_alloc_array (uint16_t, attr->package_count);
   for (iter = 0; iter < attr->package_count; ++iter)
     {
       attr->package_index[iter] = loader_u2 (loader);
