@@ -20,7 +20,7 @@ parse_const_pool (struct class_file *class, Loader *loader)
       return EINVAL;
     }
 
-  class->constant_pool = malloc (pool_count * sizeof (struct cp_info));
+  class->constant_pool = my_alloc_array (struct cp_info, pool_count);
 
   if (class->constant_pool == NULL)
     {
@@ -245,7 +245,7 @@ parse_class_file (int, char *argv[])
   class.this_class = loader_u2 (&loader);
   class.super_class = loader_u2 (&loader);
   class.interfaces_count = loader_u2 (&loader);
-  class.interfaces = malloc (class.interfaces_count * sizeof (uint16_t));
+  class.interfaces = my_alloc_array (uint16_t, class.interfaces_count);
 
   if (class.interfaces == NULL)
     {
@@ -259,7 +259,7 @@ parse_class_file (int, char *argv[])
 
   class.fields_count = loader_u2 (&loader);
 
-  class.fields = malloc (sizeof (struct field_info) * class.fields_count);
+  class.fields = my_alloc_array (struct field_info, class.fields_count);
 
   if (class.fields == NULL)
     {
@@ -275,7 +275,7 @@ parse_class_file (int, char *argv[])
   class.methods_count = loader_u2 (&loader);
 
   class.methods
-      = malloc (sizeof (struct method_info) * (size_t)(class.methods_count));
+      = my_alloc_array (struct method_info, class.methods_count);
 
   if (class.methods == NULL)
     {

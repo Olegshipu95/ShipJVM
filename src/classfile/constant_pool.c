@@ -6,7 +6,7 @@ read_utf8_info (Loader *loader, struct UTF8_info *utf8)
   uint16_t i;
 
   utf8->lenght = loader_u2 (loader);
-  utf8->bytes = (uint8_t *)malloc ((size_t)utf8->lenght);
+  utf8->bytes = my_alloc_array (uint8_t, utf8->lenght);
 
   if (utf8->bytes == NULL)
     {

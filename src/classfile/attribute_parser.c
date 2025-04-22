@@ -28,7 +28,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   if (is_string_match (UTF8->bytes, UTF8->lenght, "ConstantValue"))
     {
       struct ConstantValue_attribute *attr
-          = malloc (sizeof (struct ConstantValue_attribute));
+          = my_alloc (struct ConstantValue_attribute);
       if (attr == NULL)
         {
           prerr ("while allocating memory for ConstantValue_attribute");
@@ -47,7 +47,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     }
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Code"))
     {
-      struct Code_attribute *attr = malloc (sizeof (struct Code_attribute));
+      struct Code_attribute *attr = my_alloc (struct Code_attribute);
       if (attr == NULL)
         {
           prerr ("while allocating memory for Code_attribute");
@@ -68,7 +68,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "StackMapTable"))
     {
       struct StackMapTable_attribute *attr
-          = malloc (sizeof (struct StackMapTable_attribute));
+          = my_alloc (struct StackMapTable_attribute);
       if (attr == NULL)
         {
           prerr ("while allocating memory for StackMapTable_attribute");
@@ -91,7 +91,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "BootstrapMethods"))
     {
       struct BootstrapMethods_attribute *attr
-          = malloc (sizeof (struct BootstrapMethods_attribute));
+          = my_alloc (struct BootstrapMethods_attribute);
 
       if (attr == NULL)
         {
@@ -117,7 +117,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestHost"))
     {
       struct NestHost_attribute *attr
-          = malloc (sizeof (struct NestHost_attribute));
+          = my_alloc (struct NestHost_attribute);
 
       if (attr == NULL)
         {
@@ -142,7 +142,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestMembers"))
     {
       struct NestMembers_attribute *attr
-          = malloc (sizeof (struct NestMembers_attribute));
+          = my_alloc (struct NestMembers_attribute);
 
       if (attr == NULL)
         {
@@ -172,7 +172,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "PermittedSubclasses"))
     {
       struct PermittedSubclasses_attribute *attr
-          = malloc (sizeof (struct PermittedSubclasses_attribute));
+          = my_alloc (struct PermittedSubclasses_attribute);
 
       if (attr == NULL)
         {
@@ -198,7 +198,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Exceptions"))
     {
       struct Exceptions_attribute *attr
-          = malloc (sizeof (struct Exceptions_attribute));
+          = my_alloc (struct Exceptions_attribute);
 
       if (attr == NULL)
         {
@@ -223,7 +223,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "InnerClasses"))
     {
       struct InnerClasses_attribute *attr
-          = malloc (sizeof (struct InnerClasses_attribute));
+          = my_alloc (struct InnerClasses_attribute);
 
       if (attr == NULL)
         {
@@ -250,7 +250,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     {
 
       struct EnclosingMethod_attribute *attr
-          = malloc (sizeof (struct EnclosingMethod_attribute));
+          = my_alloc (struct EnclosingMethod_attribute);
 
       if (attr == NULL)
         {
@@ -276,7 +276,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Synthetic"))
     {
       struct Synthetic_attribute *attr
-          = malloc (sizeof (struct Synthetic_attribute));
+          = my_alloc (struct Synthetic_attribute);
 
       if (attr == NULL)
         {
@@ -301,7 +301,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Signature"))
     {
       struct Signature_attribute *attr
-          = malloc (sizeof (struct Signature_attribute));
+          = my_alloc (struct Signature_attribute);
 
       if (attr == NULL)
         {
@@ -325,7 +325,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Record"))
     {
       struct Record_attribute *attr
-          = malloc (sizeof (struct Record_attribute));
+          = my_alloc (struct Record_attribute);
 
       if (attr == NULL)
         {
@@ -349,7 +349,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "SourceFile"))
     {
       struct SourceFile_attribute *attr
-          = malloc (sizeof (struct SourceFile_attribute));
+          = my_alloc (struct SourceFile_attribute);
 
       if (attr == NULL)
         {
@@ -372,7 +372,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "LineNumberTable"))
     {
       struct LineNumberTable_attribute *attr
-          = malloc (sizeof (struct LineNumberTable_attribute));
+          = my_alloc (struct LineNumberTable_attribute);
 
       if (attr == NULL)
         {
@@ -396,7 +396,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "LocalVariableTable"))
     {
       struct LocalVariableTable_attribute *attr
-          = malloc (sizeof (struct LocalVariableTable_attribute));
+          = my_alloc (struct LocalVariableTable_attribute);
 
       if (attr == NULL)
         {
@@ -421,7 +421,7 @@ parse_attribute (Loader *loader, struct class_file *class)
                             "LocalVariableTypeTable"))
     {
       struct LocalVariableTypeTable_attribute *attr
-          = malloc (sizeof (struct LocalVariableTypeTable_attribute));
+          = my_alloc (struct LocalVariableTypeTable_attribute);
 
       if (attr == NULL)
         {
@@ -446,7 +446,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "SourceDebugExtension"))
     {
       struct SourceDebugExtension_attribute *attr
-          = malloc (sizeof (struct SourceDebugExtension_attribute));
+          = my_alloc (struct SourceDebugExtension_attribute);
 
       if (attr == NULL)
         {
@@ -470,7 +470,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Deprecated"))
     {
       struct Deprecated_attribute *attr
-          = malloc (sizeof (struct Deprecated_attribute));
+          = my_alloc (struct Deprecated_attribute);
 
       if (attr == NULL)
         {
@@ -495,7 +495,7 @@ parse_attribute (Loader *loader, struct class_file *class)
                             "RuntimeVisibleAnnotations"))
     {
       struct RuntimeVisibleAnnotations_attribute *attr
-          = malloc (sizeof (struct RuntimeVisibleAnnotations_attribute));
+          = my_alloc (struct RuntimeVisibleAnnotations_attribute);
 
       if (attr == NULL)
         {
@@ -521,7 +521,7 @@ parse_attribute (Loader *loader, struct class_file *class)
                             "RuntimeInvisibleAnnotations"))
     {
       struct RuntimeInvisibleAnnotations_attribute *attr
-          = malloc (sizeof (struct RuntimeInvisibleAnnotations_attribute));
+          = my_alloc (struct RuntimeInvisibleAnnotations_attribute);
 
       if (attr == NULL)
         {
@@ -597,7 +597,7 @@ parse_attribute (Loader *loader, struct class_file *class)
                             "RuntimeVisibleTypeAnnotations"))
     {
       struct RuntimeVisibleTypeAnnotations_attribute *attr
-          = malloc (sizeof (struct RuntimeVisibleTypeAnnotations_attribute));
+          = my_alloc (struct RuntimeVisibleTypeAnnotations_attribute);
 
       if (attr == NULL)
         {
@@ -623,7 +623,7 @@ parse_attribute (Loader *loader, struct class_file *class)
                             "RuntimeInvisibleTypeAnnotations"))
     {
       struct RuntimeInvisibleTypeAnnotations_attribute *attr
-          = malloc (sizeof (struct RuntimeInvisibleTypeAnnotations_attribute));
+          = my_alloc (struct RuntimeInvisibleTypeAnnotations_attribute);
 
       if (attr == NULL)
         {
@@ -647,7 +647,7 @@ parse_attribute (Loader *loader, struct class_file *class)
     {
       // TODO
       struct AnnotationDefault_attribute *attr
-          = malloc (sizeof (struct AnnotationDefault_attribute));
+          = my_alloc (struct AnnotationDefault_attribute);
 
       if (attr == NULL)
         {
@@ -671,7 +671,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "MethodParameters"))
     {
       struct MethodParameters_attribute *attr
-          = malloc (sizeof (struct MethodParameters_attribute));
+          = my_alloc (struct MethodParameters_attribute);
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
@@ -693,7 +693,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "Module"))
     {
       struct Module_attribute *attr
-          = malloc (sizeof (struct Module_attribute));
+          = my_alloc (struct Module_attribute);
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
@@ -715,7 +715,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "ModulePackages"))
     {
       struct ModulePackages_attribute *attr
-          = malloc (sizeof (struct ModulePackages_attribute));
+          = my_alloc (struct ModulePackages_attribute);
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
@@ -737,7 +737,7 @@ parse_attribute (Loader *loader, struct class_file *class)
   else if (is_string_match (UTF8->bytes, UTF8->lenght, "ModuleMainClass"))
     {
       struct ModuleMainClass_attribute *attr
-          = malloc (sizeof (struct ModuleMainClass_attribute));
+          = my_alloc (struct ModuleMainClass_attribute);
       if (attr == NULL)
         {
           prerr ("while allocating memory for "
@@ -770,7 +770,7 @@ read_attributes (Loader *loader, struct class_file *class,
                  struct attribute_info ***info, uint16_t count)
 {
   struct attribute_info **attributes
-      = malloc (sizeof (struct attribute_info *) * (size_t)(count));
+      = my_alloc_array (struct attribute_info* , count);
   int iter;
   if (attributes == NULL)
     {
@@ -814,7 +814,7 @@ parse_Code_attribute (Loader *loader, struct class_file *class,
   attr->max_stack = loader_u2 (loader);
   attr->max_locals = loader_u2 (loader);
   attr->code_length = loader_u4 (loader);
-  attr->code = malloc (sizeof (uint8_t) * (size_t)(attr->code_length));
+  attr->code = my_alloc_array (uint8_t, attr->code_length);
   if (attr->code == NULL)
     {
       return ENOMEM;
@@ -824,8 +824,7 @@ parse_Code_attribute (Loader *loader, struct class_file *class,
       attr->code[iter] = loader_u1 (loader);
     }
   attr->exception_table_length = loader_u2 (loader);
-  attr->table = malloc (sizeof (struct exception_table)
-                        * (size_t)attr->exception_table_length);
+  attr->table = my_alloc_array (struct exception_table, attr->exception_table_length);
   if (attr->table == NULL)
     {
       free (attr->code);
@@ -891,7 +890,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
     { // SAME_LOCALS_1_STACK_ITEM
 
       entry->same_locals_1_stack_item_frame.stack
-          = malloc (sizeof (union verification_type_info));
+          = my_alloc (union verification_type_info);
 
       if (entry->same_locals_1_stack_item_frame.stack == NULL)
         {
@@ -909,7 +908,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
       entry->same_locals_1_stack_item_frame_extended.offset_delta
           = loader_u2 (loader);
       entry->same_locals_1_stack_item_frame_extended.stack
-          = malloc (sizeof (union verification_type_info));
+          = my_alloc (union verification_type_info);
 
       if (entry->same_locals_1_stack_item_frame_extended.stack == NULL)
         {
@@ -1029,7 +1028,7 @@ parse_bootstrap_methods (Loader *loader, struct bootstrap_methods *meth)
   meth->bootstrap_method_ref = loader_u2 (loader);
   meth->num_bootstrap_arguments = loader_u2 (loader);
   meth->bootstrap_arguments
-      = malloc (sizeof (uint16_t) * (size_t)(meth->num_bootstrap_arguments));
+      = my_alloc_array (uint16_t, meth->num_bootstrap_arguments);
   if (meth->bootstrap_arguments == NULL)
     {
       prerr ("Can not allocate memory for bootstrap_arguments");
@@ -1099,7 +1098,7 @@ parse_NestMembers_at (Loader *loader, struct NestMembers_attribute *attr)
 
   attr->number_of_classes = loader_u2 (loader);
   attr->classes
-      = malloc (sizeof (uint16_t) * (size_t)(attr->number_of_classes));
+      = my_alloc_array (uint16_t, attr->number_of_classes);
 
   if (attr->classes == NULL)
     {
@@ -1127,7 +1126,7 @@ parse_PermittedSubclasses_at (Loader *loader,
 
   attr->number_of_classes = loader_u2 (loader);
   attr->classes
-      = malloc (sizeof (uint16_t) * (size_t)(attr->number_of_classes));
+      = my_alloc_array (uint16_t, attr->number_of_classes);
 
   if (attr->classes == NULL)
     {
@@ -1155,7 +1154,7 @@ parse_Exceptions_at (Loader *loader, struct Exceptions_attribute *attr)
 
   attr->number_of_exceptions = loader_u2 (loader);
   attr->exception_index_table
-      = malloc (sizeof (uint16_t) * (size_t)(attr->number_of_exceptions));
+      = my_alloc_array (uint16_t, attr->number_of_exceptions);
 
   if (attr->exception_index_table == NULL)
     {
@@ -1182,8 +1181,7 @@ parse_InnerClasses_at (Loader *loader, struct InnerClasses_attribute *attr)
     }
 
   attr->number_of_classes = loader_u2 (loader);
-  attr->classes = malloc (sizeof (struct inner_class_entries)
-                          * (size_t)(attr->number_of_classes));
+  attr->classes = my_alloc_array (struct inner_class_entries, attr->number_of_classes);
 
   if (attr->classes == NULL)
     {
@@ -1269,8 +1267,7 @@ parse_Record_at (Loader *loader, struct class_file *class,
     }
 
   attr->components_count = loader_u2 (loader);
-  attr->components = malloc (sizeof (struct record_component_info)
-                             * (size_t)(attr->components_count));
+  attr->components = my_alloc_array (struct record_component_info, attr->components_count);
 
   if (attr->components == NULL)
     {
@@ -1313,8 +1310,7 @@ parse_LineNumberTable_at (Loader *loader,
       return EINVAL;
     }
   attr->line_number_table_length = loader_u2 (loader);
-  attr->table = malloc (sizeof (struct line_number_table)
-                        * attr->line_number_table_length);
+  attr->table = my_alloc_array (struct line_number_table, attr->line_number_table_length);
 
   if (attr->table == NULL)
     {
@@ -1342,8 +1338,7 @@ parse_LocalVariableTable_at (Loader *loader,
     }
 
   attr->local_variable_table_length = loader_u2 (loader);
-  attr->table = malloc (sizeof (struct local_variable_table)
-                        * (size_t)(attr->local_variable_table_length));
+  attr->table = my_alloc_array (struct local_variable_table, attr->local_variable_table_length);
 
   if (attr->table == NULL)
     {
@@ -1374,8 +1369,7 @@ parse_LocalVariableTypeTable_at (Loader *loader,
     }
 
   attr->local_variable_type_table_length = loader_u2 (loader);
-  attr->table = malloc (sizeof (struct local_variable_type_table)
-                        * (size_t)(attr->local_variable_type_table_length));
+  attr->table = my_alloc_array (struct local_variable_type_table, attr->local_variable_type_table_length);
   if (attr->table == NULL)
     {
       prerr (": Can not allocate memory for table in "
@@ -1406,7 +1400,7 @@ parse_SourceDebugExtension_at (Loader *loader,
     }
 
   attr->debug_extension
-      = malloc (sizeof (uint8_t) * (size_t)(attr->info.attribute_length));
+      = my_alloc_array (uint8_t, attr->info.attribute_length);
   if (attr->debug_extension == NULL)
     {
       prerr (": can not allocate memory for debug_extension in "
@@ -1525,7 +1519,7 @@ parse_RuntimeInvisibleAnnotations_at (
 
   attr->num_annotations = loader_u2 (loader);
   attr->annotations
-      = malloc (sizeof (struct annotation) * (size_t)(attr->num_annotations));
+      = my_alloc_array (struct annotation, attr->num_annotations);
   for (iter = 0; iter < attr->num_annotations; ++iter)
     {
       parse_annotations (loader, &attr->annotations[iter]);
@@ -1545,8 +1539,7 @@ parse_RuntimeVisibleParameterAnnotations_at (
     }
 
   attr->num_parameters = loader_u1 (loader);
-  attr->parameter_annotations = malloc (sizeof (struct parameter_annotations)
-                                        * (size_t)(attr->num_parameters));
+  attr->parameter_annotations = my_alloc_array (struct parameter_annotations, attr->num_parameters);
 
   if (attr->parameter_annotations == NULL)
     {
@@ -1590,8 +1583,7 @@ parse_RuntimeInvisibleParameterAnnotations_at (
     }
 
   attr->num_parameters = loader_u1 (loader);
-  attr->parameter_annotations = malloc (sizeof (struct parameter_annotations)
-                                        * (size_t)(attr->num_parameters));
+  attr->parameter_annotations = my_alloc_array (struct parameter_annotations, attr->num_parameters);
 
   if (attr->parameter_annotations == NULL)
     {
@@ -1635,8 +1627,7 @@ parse_RuntimeVisibleTypeAnnotations_at (
     }
 
   attr->num_annotations = loader_u2 (loader);
-  attr->type_annotation = malloc (sizeof (struct type_annotation)
-                                  * (size_t)(attr->num_annotations));
+  attr->type_annotation = my_alloc_array (struct type_annotation, attr->num_annotations);
 
   if (attr->type_annotation == NULL)
     {
@@ -1681,8 +1672,7 @@ parse_MethodParameters_at (Loader *loader,
       return EINVAL;
     }
   attr->parameters_count = loader_u1 (loader);
-  attr->parameters = malloc (sizeof (struct method_params)
-                             * (size_t)(attr->parameters_count));
+  attr->parameters = my_alloc_array (struct method_params, attr->parameters_count);
   if (attr->parameters == NULL)
     {
       prerr (": can not allocate memory for parameters in "
@@ -1706,7 +1696,7 @@ parse_module_exports (Loader *loader, struct exports *exports)
   exports->exports_flags = loader_u2 (loader);
   exports->exports_to_count = loader_u2 (loader);
   exports->exports_to_index
-      = malloc (sizeof (uint16_t) * (size_t)(exports->exports_to_count));
+      = my_alloc_array (uint16_t, exports->exports_to_count);
 
   if (exports->exports_to_index == NULL)
     {
@@ -1730,7 +1720,7 @@ parse_module_opens (Loader *loader, struct opens *opens)
   opens->opens_flags = loader_u2 (loader);
   opens->opens_to_count = loader_u2 (loader);
   opens->opens_to_index
-      = malloc (sizeof (uint16_t) * (size_t)(opens->opens_to_count));
+      = my_alloc_array (uint16_t, opens->opens_to_count);
 
   if (opens->opens_to_index == NULL)
     {
@@ -1752,7 +1742,7 @@ parse_module_provides (Loader *loader, struct provides *provides)
   provides->provides_index = loader_u2 (loader);
   provides->provides_with_count = loader_u2 (loader);
   provides->provides_with_index
-      = malloc (sizeof (uint16_t) * (size_t)(provides->provides_with_count));
+      = my_alloc_array (uint16_t, provides->provides_with_count);
 
   if (provides->provides_with_index == NULL)
     {
@@ -1783,7 +1773,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
 
   attr->requires_count = loader_u2 (loader);
   attr->requires
-      = malloc (sizeof (struct requires) * (size_t)(attr->requires_count));
+      = my_alloc_array (struct requires, attr->requires_count);
 
   if (attr->requires == NULL)
     {
@@ -1800,7 +1790,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
 
   attr->exports_count = loader_u2 (loader);
   attr->exports
-      = malloc (sizeof (struct exports) * (size_t)(attr->exports_count));
+      = my_alloc_array (struct exports, attr->exports_count);
 
   if (attr->exports == NULL)
     {
@@ -1814,7 +1804,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
     }
 
   attr->opens_count = loader_u2 (loader);
-  attr->opens = malloc (sizeof (struct opens) * (size_t)(attr->opens_count));
+  attr->opens = my_alloc_array (struct opens, attr->opens_count);
   if (attr->opens == NULL)
     {
       prerr ("can not allocate memory for opens in Module");
@@ -1827,8 +1817,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
     }
 
   attr->uses_count = loader_u2 (loader);
-  attr->uses_index
-      = malloc (sizeof (attr->uses_index) * (size_t)(attr->uses_count));
+  attr->uses_index = my_alloc_array (uint16_t, attr->uses_count);
 
   if (attr->uses_index == NULL)
     {
@@ -1843,7 +1832,7 @@ parse_Module_at (Loader *loader, struct Module_attribute *attr)
 
   attr->provides_count = loader_u2 (loader);
   attr->provides
-      = malloc (sizeof (struct provides) * (size_t)(attr->provides_count));
+      = my_alloc_array (struct provides, attr->provides_count);
 
   for (iter = 0; iter < attr->provides_count; iter++)
     {
@@ -1863,7 +1852,7 @@ parse_ModulePackages_at (Loader *loader, struct ModulePackages_attribute *attr)
     }
   attr->package_count = loader_u2 (loader);
   attr->package_index
-      = malloc (sizeof (uint16_t) * (size_t)(attr->package_count));
+      = my_alloc_array (uint16_t, attr->package_count);
   for (iter = 0; iter < attr->package_count; ++iter)
     {
       attr->package_index[iter] = loader_u2 (loader);
