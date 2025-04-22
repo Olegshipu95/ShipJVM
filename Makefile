@@ -2,8 +2,8 @@
 CC = gcc
 
 # Базовые флаги компиляции
-CFLAGS = -I$(INCLUDE_DIR) -std=c11 -Wall -Wextra -Werror -fstack-protector-strong
-LDFLAGS =
+CFLAGS = -std=c11 -Wall -Wextra -Werror -fstack-protector-strong
+LDFLAGS = 
 
 # Флаги для разных сборок
 RELEASE_FLAGS = -O2 -DNDEBUG -flto
@@ -27,19 +27,25 @@ MSAN_TARGET = jvm_msan
 
 # Папки проекта
 SRC_DIR ?= ./src
-INCLUDE_DIR ?= ./include
+INCLUDE_DIRS ?= ./include ./include/classfile ./include/runtime
 BUILD_DIR ?= ./build
 
-# Автоматический поиск исходных файлов
-SOURCES = $(wildcard $(SRC_DIR)/*.c)
+# Добавляем пути к include в CFLAGS
+CFLAGS += $(addprefix -I,$(INCLUDE_DIRS))
+
+# Автоматический поиск исходных файлов во всех поддиректориях src
+SOURCES = $(shell find $(SRC_DIR) -name '*.c')
 OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 DEBUG_OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%_debug.o,$(SOURCES))
 SANITIZE_OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%_sanitize.o,$(SOURCES))
 TSAN_OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%_tsan.o,$(SOURCES))
 MSAN_OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%_msan.o,$(SOURCES))
 
-# Создаем папку build если ее нет
+# Создаем папку build и поддиректории если их нет
 $(shell mkdir -p $(BUILD_DIR))
+$(foreach src,$(SOURCES), \
+    $(eval src_dir := $(dir $(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(src)))) \
+    $(shell mkdir -p $(src_dir)))
 
 # Правило по умолчанию - сборка релиза
 all: release
