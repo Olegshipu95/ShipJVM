@@ -27,7 +27,7 @@ MSAN_TARGET = jvm_msan
 
 # Папки проекта
 SRC_DIR ?= ./src
-INCLUDE_DIRS ?= ./include ./include/classfile ./include/runtime
+INCLUDE_DIRS ?= ./include ./include/classfile ./include/runtime ./include/util ./include/bytecode
 BUILD_DIR ?= ./build
 
 # Добавляем пути к include в CFLAGS
