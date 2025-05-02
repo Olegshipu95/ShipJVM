@@ -197,17 +197,16 @@ parse_class_methods (Loader *loader, struct class_file *class,
 }
 
 int
-parse_class_file (int, char *argv[])
+parse_class_file (struct class_file *class, const char *filename)
 {
   int err = 0;
-  FILE *file = fopen (argv[1], "rb");
+  FILE *file = fopen (filename, "rb");
   if (!file)
     {
       prerr ("Failed to open file");
       goto exit;
     }
   Loader loader = { .file = file, .error = 0 };
-  struct class_file class;
   uint16_t iterator;
 
   if (!file)
@@ -217,12 +216,12 @@ parse_class_file (int, char *argv[])
       goto exit;
     }
 
-  init_class_file (&class);
-  class.magic = loader_u4 (&loader);
-  class.major_version = loader_u2 (&loader);
-  class.minor_version = loader_u2 (&loader);
-  class.constant_pool_count = loader_u2 (&loader);
-  printf ("Constant_pool_count is %hu\n", class.constant_pool_count);
+  init_class_file (class);
+  class->magic = loader_u4 (&loader);
+  class->major_version = loader_u2 (&loader);
+  class->minor_version = loader_u2 (&loader);
+  class->constant_pool_count = loader_u2 (&loader);
+  printf ("Constant_pool_count is %hu\n", class->constant_pool_count);
 
   if (loader.error)
     {
@@ -231,7 +230,7 @@ parse_class_file (int, char *argv[])
       goto exit;
     }
 
-  err = parse_const_pool (&class, &loader);
+  err = parse_const_pool (class, &loader);
 
   if (err != 0)
     {
@@ -240,57 +239,57 @@ parse_class_file (int, char *argv[])
       goto exit;
     }
 
-  class.access_flags = loader_u2 (&loader);
-  class.this_class = loader_u2 (&loader);
-  class.super_class = loader_u2 (&loader);
-  class.interfaces_count = loader_u2 (&loader);
-  class.interfaces = my_alloc_array (uint16_t, class.interfaces_count);
+  class->access_flags = loader_u2 (&loader);
+  class->this_class = loader_u2 (&loader);
+  class->super_class = loader_u2 (&loader);
+  class->interfaces_count = loader_u2 (&loader);
+  class->interfaces = my_alloc_array (uint16_t, class->interfaces_count);
 
-  if (class.interfaces == NULL)
+  if (class->interfaces == NULL)
     {
       prerr ("can not malloc data for interfaces");
     }
 
-  for (iterator = 0; iterator < class.interfaces_count; ++iterator)
+  for (iterator = 0; iterator < class->interfaces_count; ++iterator)
     {
-      class.interfaces[iterator] = loader_u2 (&loader);
+      class->interfaces[iterator] = loader_u2 (&loader);
     }
 
-  class.fields_count = loader_u2 (&loader);
+  class->fields_count = loader_u2 (&loader);
 
-  class.fields = my_alloc_array (struct field_info, class.fields_count);
+  class->fields = my_alloc_array (struct field_info, class->fields_count);
 
-  if (class.fields == NULL)
+  if (class->fields == NULL)
     {
       prerr ("can not malloc data for interfaces");
     }
 
-  printf ("DEBUG: Number of fields: %hu \n", class.fields_count);
-  for (iterator = 0; iterator < class.fields_count; ++iterator)
+  printf ("DEBUG: Number of fields: %hu \n", class->fields_count);
+  for (iterator = 0; iterator < class->fields_count; ++iterator)
     {
-      err |= parse_class_fields (&loader, &class, &class.fields[iterator]);
+      err |= parse_class_fields (&loader, class, &class->fields[iterator]);
     }
 
-  class.methods_count = loader_u2 (&loader);
+  class->methods_count = loader_u2 (&loader);
 
-  class.methods = my_alloc_array (struct method_info, class.methods_count);
+  class->methods = my_alloc_array (struct method_info, class->methods_count);
 
-  if (class.methods == NULL)
+  if (class->methods == NULL)
     {
       prerr ("can not malloc data for methods");
     }
 
-  printf ("DEBUG: Number of methods: %hu\n", class.methods_count);
-  for (iterator = 0; iterator < class.methods_count; ++iterator)
+  printf ("DEBUG: Number of methods: %hu\n", class->methods_count);
+  for (iterator = 0; iterator < class->methods_count; ++iterator)
     {
-      err |= parse_class_methods (&loader, &class, &class.methods[iterator]);
+      err |= parse_class_methods (&loader, class, &class->methods[iterator]);
     }
 
-  class.attributes_count = loader_u2 (&loader);
+  class->attributes_count = loader_u2 (&loader);
 
-  printf ("DEBUG: Number of attributes: %hu\n", class.attributes_count);
-  err |= read_attributes (&loader, &class, &class.attributes,
-                          class.attributes_count);
+  printf ("DEBUG: Number of attributes: %hu\n", class->attributes_count);
+  err |= read_attributes (&loader, class, &class->attributes,
+                          class->attributes_count);
 
   if (loader.error)
     {
@@ -302,9 +301,9 @@ parse_class_file (int, char *argv[])
     {
       printf ("\n");
       printf ("Fields: %hu, methods: %hu, attributes: %hu\n",
-              class.fields_count, class.methods_count, class.attributes_count);
-      printf ("Magic: 0x%X, Version: %hu.%hu\n", class.magic,
-              class.major_version, class.minor_version);
+              class->fields_count, class->methods_count, class->attributes_count);
+      printf ("Magic: 0x%X, Version: %hu.%hu\n", class->magic,
+              class->major_version, class->minor_version);
     }
 
 exit:
