@@ -9,4 +9,8 @@
 
 #define prerr(fmt, ...) printf ("ERROR: " fmt "\n", ##__VA_ARGS__)
 
+size_t strlen(const char *str);
+
+void *memcpy(void *dst, const void *src, size_t len);
+
 #endif
