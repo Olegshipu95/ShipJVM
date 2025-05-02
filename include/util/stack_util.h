@@ -24,5 +24,6 @@
     type data[value];                                                         \
     size_t size;                                                              \
   };
-DEFINE_STACK (int)
-DEFINE_STACK (char)
+
+// DEFINE_STACK (int)
+// DEFINE_STACK (char)

@@ -301,7 +301,8 @@ parse_class_file (struct class_file *class, const char *filename)
     {
       printf ("\n");
       printf ("Fields: %hu, methods: %hu, attributes: %hu\n",
-              class->fields_count, class->methods_count, class->attributes_count);
+              class->fields_count, class->methods_count,
+              class->attributes_count);
       printf ("Magic: 0x%X, Version: %hu.%hu\n", class->magic,
               class->major_version, class->minor_version);
     }

@@ -14,14 +14,15 @@ main (int argc, char *argv[])
       return 1;
     }
 
-  struct classloader *classloader = classloader_new();
+  struct classloader *classloader = classloader_new ();
 
-  classloader_init_dir_paths(classloader, argv[1]);
+  classloader_init_dir_paths (classloader, argv[1]);
 
   struct class_file *class;
-  for (int i = 0; i < 50; ++i)
-  {
-    int err = classloader_load_class(classloader, argv[2], &class);
-    if (err) return err;
-  }
+  for (int i = 2; i < 3; ++i)
+    {
+      int err = classloader_load_class (classloader, argv[i], &class);
+      if (err)
+        return err;
+    }
 }
