@@ -21,7 +21,6 @@ struct operand_stack
 struct local_variables
 {
   jvariable *vars; // size of LOCAL_VARS_SIZE
-  uint32_t vars_length;
 };
 
 struct stack_frame
@@ -44,5 +43,10 @@ int opstack_peek (struct operand_stack *opstack, jvariable *value);
 int opstack_is_full (struct operand_stack *opstack);
 
 int opstack_is_empty (struct operand_stack *opstack);
+
+int get_local_var (struct local_variables *, jvariable *value, uint32_t index);
+
+int store_local_var (struct local_variables *, jvariable value,
+                     uint32_t index);
 
 #endif

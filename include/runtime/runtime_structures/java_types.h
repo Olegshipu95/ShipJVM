@@ -1,6 +1,7 @@
 #ifndef SHIP_JVM_JAVA_TYPES_H
 #define SHIP_JVM_JAVA_TYPES_H
 
+#include "util.h"
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -13,10 +14,10 @@ typedef uint16_t jchar;
 typedef int16_t jshort;
 
 typedef int32_t jint;
-typedef int32_t jfloat;
+typedef float jfloat;
 
 typedef int64_t jlong;
-typedef int64_t jdouble;
+typedef double jdouble;
 
 typedef jint jsize;
 
@@ -53,8 +54,7 @@ typedef struct jvariable
   jvalue value;
 } jvariable;
 
-
 jvariable create_variable (java_value_type type);
-
+int check_var_type (jvariable *var, java_value_type type);
 
 #endif

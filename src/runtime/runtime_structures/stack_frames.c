@@ -23,7 +23,6 @@ init_local_vars (struct local_variables *locals)
       prerr ("Can not allocate memory for local vars");
       return ENOMEM;
     }
-  locals->vars_length = 0;
   return 0;
 }
 
@@ -125,5 +124,39 @@ opstack_peek (struct operand_stack *opstack, jvariable *value)
 
   jvariable popped = opstack->stack[opstack->top];
   *value = popped;
+  return 0;
+}
+
+int
+get_local_var (struct local_variables *locals, jvariable *value,
+               uint32_t index)
+{
+  if (index >= LOCAL_VARS_SIZE)
+    {
+      prerr ("Illegal index in get_local_var");
+      return EINVAL;
+    }
+
+  if (value == NULL)
+    {
+      prerr ("Illegal pointer on value in get_local_var");
+      return EINVAL;
+    }
+
+  *value = locals->vars[index];
+  return 0;
+}
+
+int
+store_local_var (struct local_variables *locals, jvariable value,
+                 uint32_t index)
+{
+  if (index >= LOCAL_VARS_SIZE)
+    {
+      prerr ("Illegal index in get_local_var");
+      return EINVAL;
+    }
+
+  locals->vars[index] = value;
   return 0;
 }
