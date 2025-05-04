@@ -28,7 +28,13 @@ MSAN_TARGET = jvm_msan
 # Папки проекта
 SRC_DIR ?= ./src
 
-INCLUDE_DIRS ?= ./include ./include/classfile ./include/runtime ./include/util ./include/runtime/bytecode ./include/runtime/runtime_structures ./include/classloader
+INCLUDE_DIRS ?= ./include \
+ 								./include/classfile \
+ 								./include/runtime \
+  							./include/util \
+	 							./include/runtime/bytecode \
+	  						./include/runtime/runtime_structures \
+								./include/classloader
 
 BUILD_DIR ?= ./build
 

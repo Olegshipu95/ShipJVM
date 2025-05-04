@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "classfile.h"
 #include "classfile_stream.h"
 #include "util.h"
 
@@ -144,7 +143,7 @@ struct package_info
 
 struct cp_info
 {
-  uint8_t tag;
+  enum CONSTANT_POOL_TAG tag;
 
   union
   {

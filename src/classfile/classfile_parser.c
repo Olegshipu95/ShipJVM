@@ -91,8 +91,10 @@ parse_const_pool (struct class_file *class, Loader *loader)
           ++i;
           break;
         case CLASS:
-          printf ("Class\n");
+          printf ("Class, ");
           read_class_info (loader, &(class->constant_pool[i].class_info));
+          printf ("data - %hu\n",
+                  class->constant_pool[i].class_info.name_index);
           break;
         case STRING:
           printf ("String\n");

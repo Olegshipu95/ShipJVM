@@ -17,7 +17,7 @@ public class Aboba implements A {
 
     public static void main(String[] args) {
         addSus(23);
-        int i = 1;
+        int i = -1;
         int i2 = 4;
         int i4 = 4;
         int i5;

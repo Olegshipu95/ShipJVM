@@ -43,9 +43,10 @@ classloader_trie_init (struct classloader_trie *node, const char *classname)
 
   char *name = my_alloc_array (char, len + 1);
 
-  if (name == NULL){
-    PANIC("Can not allocate memory for names in classloader_trie_init");
-  }
+  if (name == NULL)
+    {
+      PANIC ("Can not allocate memory for names in classloader_trie_init");
+    }
 
   memcpy (name, classname, len);
   name[len] = 0;
