@@ -214,19 +214,19 @@
  * Operation: Load reference from array
  * Operand stack: arrayref, index → value
  */
-void opcode_aaload (struct stack_frame* frame); // 50 (0x32)
+void opcode_aaload (struct stack_frame *frame); // 50 (0x32)
 
 /**
  * Operation: Store into reference array
  * Operand stack: arrayref, index, value →
  */
-void opcode_aastore (struct stack_frame* frame); // 83 (0x53)
+void opcode_aastore (struct stack_frame *frame); // 83 (0x53)
 
 /**
  * Operation: Push null reference
  * Operand stack: → null
  */
-void opcode_aconst_null (struct stack_frame* frame); // 1 (0x01)
+void opcode_aconst_null (struct stack_frame *frame); // 1 (0x01)
 
 // aload section
 
@@ -234,49 +234,49 @@ void opcode_aconst_null (struct stack_frame* frame); // 1 (0x01)
  * Operation: Load reference from local variable
  * Operand stack: → objectref
  */
-void opcode_aload (struct stack_frame* frame); // 25 (0x19)
+void opcode_aload (struct stack_frame *frame); // 25 (0x19)
 
 /**
  * Operation: Load reference from local variable 0
  * Operand stack: → objectref
  */
-void opcode_aload_0 (struct stack_frame* frame); // 42 (0x2a)
+void opcode_aload_0 (struct stack_frame *frame); // 42 (0x2a)
 
 /**
  * Operation: Load reference from local variable 1
  * Operand stack: → objectref
  */
-void opcode_aload_1 (struct stack_frame* frame); // 43 (0x2b)
+void opcode_aload_1 (struct stack_frame *frame); // 43 (0x2b)
 
 /**
  * Operation: Load reference from local variable 2
  * Operand stack: → objectref
  */
-void opcode_aload_2 (struct stack_frame* frame); // 44 (0x2c)
+void opcode_aload_2 (struct stack_frame *frame); // 44 (0x2c)
 
 /**
  * Operation: Load reference from local variable 3
  * Operand stack: → objectref
  */
-void opcode_aload_3 (struct stack_frame* frame); // 45 (0x2d)
+void opcode_aload_3 (struct stack_frame *frame); // 45 (0x2d)
 
 /**
  * Operation: Create new array of references
  * Operand stack: count → arrayref
  */
-void opcode_anewarray (struct stack_frame* frame); // 189 (0xbd)
+void opcode_anewarray (struct stack_frame *frame); // 189 (0xbd)
 
 /**
  * Operation: Return reference from method
  * Operand stack: objectref → [empty]
  */
-void opcode_areturn (struct stack_frame* frame); // 176 (0xb0)
+void opcode_areturn (struct stack_frame *frame); // 176 (0xb0)
 
 /**
  * Operation: Get length of array
  * Operand stack: arrayref → length
  */
-void opcode_arraylength (struct stack_frame* frame); // 190 (0xbe)
+void opcode_arraylength (struct stack_frame *frame); // 190 (0xbe)
 
 // astore
 
@@ -284,121 +284,121 @@ void opcode_arraylength (struct stack_frame* frame); // 190 (0xbe)
  * Operation: Store reference into local variable
  * Operand stack: objectref →
  */
-void opcode_astore (struct stack_frame* frame); // 58 (0x3a)
+void opcode_astore (struct stack_frame *frame); // 58 (0x3a)
 
 /**
  * Operation: Store reference into local variable 0
  * Operand stack: objectref →
  */
-void opcode_astore_0 (struct stack_frame* frame); // 75 (0x4b)
+void opcode_astore_0 (struct stack_frame *frame); // 75 (0x4b)
 
 /**
  * Operation: Store reference into local variable 1
  * Operand stack: objectref →
  */
-void opcode_astore_1 (struct stack_frame* frame); // 76 (0x4c)
+void opcode_astore_1 (struct stack_frame *frame); // 76 (0x4c)
 
 /**
  * Operation: Store reference into local variable 2
  * Operand stack: objectref →
  */
-void opcode_astore_2 (struct stack_frame* frame); // 77 (0x4d)
+void opcode_astore_2 (struct stack_frame *frame); // 77 (0x4d)
 
 /**
  * Operation: Store reference into local variable 3
  * Operand stack: objectref →
  */
-void opcode_astore_3 (struct stack_frame* frame); // 78 (0x4e)
+void opcode_astore_3 (struct stack_frame *frame); // 78 (0x4e)
 
 /**
  * Operation: Throw exception or error
  * Operand stack: objectref → [empty], objectref
  */
-void opcode_athrow (struct stack_frame* frame); // 191 (0xbf)
+void opcode_athrow (struct stack_frame *frame); // 191 (0xbf)
 
 /**
  * Operation: Load byte or boolean from array
  * Operand stack: arrayref, index → value
  */
-void opcode_baload (struct stack_frame* frame); // 51 (0x33)
+void opcode_baload (struct stack_frame *frame); // 51 (0x33)
 
 /**
  * Operation: Store into byte or boolean array
  * Operand stack: arrayref, index, value →
  */
-void opcode_bastore (struct stack_frame* frame); // 84 (0x54)
+void opcode_bastore (struct stack_frame *frame); // 84 (0x54)
 
 /**
  * Operation: Push byte as integer
  * Operand stack: → value
  */
-void opcode_bipush (struct stack_frame* frame); // 16 (0x10)
+void opcode_bipush (struct stack_frame *frame); // 16 (0x10)
 
 /**
  * Operation: Load char from array
  * Operand stack: arrayref, index → value
  */
-void opcode_caload (struct stack_frame* frame); // 52 (0x34)
+void opcode_caload (struct stack_frame *frame); // 52 (0x34)
 
 /**
  * Operation: Store into char array
  * Operand stack: arrayref, index, value →
  */
-void opcode_castore (struct stack_frame* frame); // 85 (0x55)
+void opcode_castore (struct stack_frame *frame); // 85 (0x55)
 
 /**
  * Operation: Check whether object is of given type
  * Operand stack: objectref → objectref
  */
-void opcode_checkcast (struct stack_frame* frame); // 192 (0xc0)
+void opcode_checkcast (struct stack_frame *frame); // 192 (0xc0)
 
 /**
  * Operation: Convert double to float
  * Operand stack: value → result
  */
-void opcode_d2f (struct stack_frame* frame); // 144 (0x90)
+void opcode_d2f (struct stack_frame *frame); // 144 (0x90)
 
 /**
  * Operation: Convert double to int
  * Operand stack: value → result
  */
-void opcode_d2i (struct stack_frame* frame); // 142 (0x8e)
+void opcode_d2i (struct stack_frame *frame); // 142 (0x8e)
 
 /**
  * Operation: Convert double to long
  * Operand stack: value → result
  */
-void opcode_d2l (struct stack_frame* frame); // 143 (0x8f)
+void opcode_d2l (struct stack_frame *frame); // 143 (0x8f)
 
 /**
  * Operation: Add two double values
  * Operand stack: value1, value2 → result
  */
-void opcode_dadd (struct stack_frame* frame); // 99 (0x63)
+void opcode_dadd (struct stack_frame *frame); // 99 (0x63)
 
 /**
  * Operation: Load double from array
  * Operand stack: arrayref, index → value
  */
-void opcode_daload (struct stack_frame* frame); // 49 (0x31)
+void opcode_daload (struct stack_frame *frame); // 49 (0x31)
 
 /**
  * Operation: Store into double array
  * Operand stack: arrayref, index, value →
  */
-void opcode_dastore (struct stack_frame* frame); // 82 (0x52)
+void opcode_dastore (struct stack_frame *frame); // 82 (0x52)
 
 /**
  * Operation: Compare double (returns 1 if NaN)
  * Operand stack: value1, value2 → result
  */
-void opcode_dcmpg (struct stack_frame* frame); // 152 (0x98)
+void opcode_dcmpg (struct stack_frame *frame); // 152 (0x98)
 
 /**
  * Operation: Compare double (returns -1 if NaN)
  * Operand stack: value1, value2 → result
  */
-void opcode_dcmpl (struct stack_frame* frame); // 151 (0x97)
+void opcode_dcmpl (struct stack_frame *frame); // 151 (0x97)
 
 // dconst section
 
@@ -406,19 +406,19 @@ void opcode_dcmpl (struct stack_frame* frame); // 151 (0x97)
  * Operation: Push double constant 0.0
  * Operand stack: → 0.0
  */
-void opcode_dconst_0 (struct stack_frame* frame); // 14 (0x0e)
+void opcode_dconst_0 (struct stack_frame *frame); // 14 (0x0e)
 
 /**
  * Operation: Push double constant 1.0
  * Operand stack: → 1.0
  */
-void opcode_dconst_1 (struct stack_frame* frame); // 15 (0x0f)
+void opcode_dconst_1 (struct stack_frame *frame); // 15 (0x0f)
 
 /**
  * Operation: Divide two double values
  * Operand stack: value1, value2 → result
  */
-void opcode_ddiv (struct stack_frame* frame); // 111 (0x6f)
+void opcode_ddiv (struct stack_frame *frame); // 111 (0x6f)
 
 // dload
 
@@ -426,49 +426,49 @@ void opcode_ddiv (struct stack_frame* frame); // 111 (0x6f)
  * Operation: Load double from local variable 0
  * Operand stack: → value
  */
-void opcode_dload_0 (struct stack_frame* frame); // 38 (0x26)
+void opcode_dload_0 (struct stack_frame *frame); // 38 (0x26)
 
 /**
  * Operation: Load double from local variable 1
  * Operand stack: → value
  */
-void opcode_dload_1 (struct stack_frame* frame); // 39 (0x27)
+void opcode_dload_1 (struct stack_frame *frame); // 39 (0x27)
 
 /**
  * Operation: Load double from local variable 2
  * Operand stack: → value
  */
-void opcode_dload_2 (struct stack_frame* frame); // 40 (0x28)
+void opcode_dload_2 (struct stack_frame *frame); // 40 (0x28)
 
 /**
  * Operation: Load double from local variable 3
  * Operand stack: → value
  */
-void opcode_dload_3 (struct stack_frame* frame); // 41 (0x29)
+void opcode_dload_3 (struct stack_frame *frame); // 41 (0x29)
 
 /**
  * Operation: Multiply two double values
  * Operand stack: value1, value2 → result
  */
-void opcode_dmul (struct stack_frame* frame); // 107 (0x6b)
+void opcode_dmul (struct stack_frame *frame); // 107 (0x6b)
 
 /**
  * Operation: Negate double value
  * Operand stack: value → result
  */
-void opcode_dneg (struct stack_frame* frame); // 119 (0x77)
+void opcode_dneg (struct stack_frame *frame); // 119 (0x77)
 
 /**
  * Operation: Get remainder from division of two doubles
  * Operand stack: value1, value2 → result
  */
-void opcode_drem (struct stack_frame* frame); // 115 (0x73)
+void opcode_drem (struct stack_frame *frame); // 115 (0x73)
 
 /**
  * Operation: Return double from method
  * Operand stack: value → [empty]
  */
-void opcode_dreturn (struct stack_frame* frame); // 175 (0xaf)
+void opcode_dreturn (struct stack_frame *frame); // 175 (0xaf)
 
 // dstore section
 
@@ -476,31 +476,31 @@ void opcode_dreturn (struct stack_frame* frame); // 175 (0xaf)
  * Operation: Store double into local variable (index)
  * Operand stack: value →
  */
-void opcode_dstore (struct stack_frame* frame); // 57 (0x39)
+void opcode_dstore (struct stack_frame *frame); // 57 (0x39)
 
 /**
  * Operation: Store double into local variable 1
  * Operand stack: value →
  */
-void opcode_dstore_1 (struct stack_frame* frame); // 72 (0x48)
+void opcode_dstore_1 (struct stack_frame *frame); // 72 (0x48)
 
 /**
  * Operation: Store double into local variable 2
  * Operand stack: value →
  */
-void opcode_dstore_2 (struct stack_frame* frame); // 73 (0x49)
+void opcode_dstore_2 (struct stack_frame *frame); // 73 (0x49)
 
 /**
  * Operation: Store double into local variable 3
  * Operand stack: value →
  */
-void opcode_dstore_3 (struct stack_frame* frame); // 74 (0x4a)
+void opcode_dstore_3 (struct stack_frame *frame); // 74 (0x4a)
 
 /**
  * Operation: Subtract two double values
  * Operand stack: value1, value2 → result
  */
-void opcode_dsub (struct stack_frame* frame); // 103 (0x67)
+void opcode_dsub (struct stack_frame *frame); // 103 (0x67)
 
 // dup section
 
@@ -508,39 +508,39 @@ void opcode_dsub (struct stack_frame* frame); // 103 (0x67)
  * Operation: Duplicate top stack value
  * Operand stack: value → value, value
  */
-void opcode_dup (struct stack_frame* frame); // 89 (0x59)
+void opcode_dup (struct stack_frame *frame); // 89 (0x59)
 
 /**
  * Operation: Duplicate top stack value and insert two values down
  * Operand stack: value2, value1 → value1, value2, value1
  */
-void opcode_dup_x1 (struct stack_frame* frame); // 90 (0x5a)
+void opcode_dup_x1 (struct stack_frame *frame); // 90 (0x5a)
 
 /**
  * Operation: Duplicate top stack value and insert three values down
  * Operand stack: value3, value2, value1 → value1, value3, value2, value1
  */
-void opcode_dup_x2 (struct stack_frame* frame); // 91 (0x5b)
+void opcode_dup_x2 (struct stack_frame *frame); // 91 (0x5b)
 
 /**
  * Operation: Duplicate top two stack values
  * Operand stack: value2, value1 → value2, value1, value2, value1
  */
-void opcode_dup2 (struct stack_frame* frame); // 92 (0x5c)
+void opcode_dup2 (struct stack_frame *frame); // 92 (0x5c)
 
 /**
  * Operation: Duplicate top two values and insert three values down
  * Operand stack: value3, value2, value1 → value2, value1, value3, value2,
  * value1
  */
-void opcode_dup2_x1 (struct stack_frame* frame); // 93 (0x5d)
+void opcode_dup2_x1 (struct stack_frame *frame); // 93 (0x5d)
 
 /**
  * Operation: Duplicate top two values and insert four values down
  * Operand stack: value4, value3, value2, value1 → value2, value1, value4,
  * value3, value2, value1
  */
-void opcode_dup2_x2 (struct stack_frame* frame); // 94 (0x5e)
+void opcode_dup2_x2 (struct stack_frame *frame); // 94 (0x5e)
 
 // float to section
 
@@ -548,19 +548,19 @@ void opcode_dup2_x2 (struct stack_frame* frame); // 94 (0x5e)
  * Operation: Convert float to double
  * Operand stack: value → result
  */
-void opcode_f2d (struct stack_frame* frame); // 141 (0x8d)
+void opcode_f2d (struct stack_frame *frame); // 141 (0x8d)
 
 /**
  * Operation: Convert float to int
  * Operand stack: value → result
  */
-void opcode_f2i (struct stack_frame* frame); // 139 (0x8b)
+void opcode_f2i (struct stack_frame *frame); // 139 (0x8b)
 
 /**
  * Operation: Convert float to long
  * Operand stack: value → result
  */
-void opcode_f2l (struct stack_frame* frame); // 140 (0x8c)
+void opcode_f2l (struct stack_frame *frame); // 140 (0x8c)
 
 // float operations
 
@@ -568,31 +568,31 @@ void opcode_f2l (struct stack_frame* frame); // 140 (0x8c)
  * Operation: Add two float values
  * Operand stack: value1, value2 → result
  */
-void opcode_fadd (struct stack_frame* frame); // 98 (0x62)
+void opcode_fadd (struct stack_frame *frame); // 98 (0x62)
 
 /**
  * Operation: Load float from array
  * Operand stack: arrayref, index → value
  */
-void opcode_faload (struct stack_frame* frame); // 48 (0x30)
+void opcode_faload (struct stack_frame *frame); // 48 (0x30)
 
 /**
  * Operation: Store into float array
  * Operand stack: arrayref, index, value →
  */
-void opcode_fastore (struct stack_frame* frame); // 81 (0x51)
+void opcode_fastore (struct stack_frame *frame); // 81 (0x51)
 
 /**
  * Operation: Compare float (returns 1 if NaN)
  * Operand stack: value1, value2 → result
  */
-void opcode_fcmpg (struct stack_frame* frame); // 150 (0x96)
+void opcode_fcmpg (struct stack_frame *frame); // 150 (0x96)
 
 /**
  * Operation: Compare float (returns -1 if NaN)
  * Operand stack: value1, value2 → result
  */
-void opcode_fcmpl (struct stack_frame* frame); // 149 (0x95)
+void opcode_fcmpl (struct stack_frame *frame); // 149 (0x95)
 
 // float const section
 
@@ -600,25 +600,25 @@ void opcode_fcmpl (struct stack_frame* frame); // 149 (0x95)
  * Operation: Push float constant 0.0f
  * Operand stack: → 0.0f
  */
-void opcode_fconst_0 (struct stack_frame* frame); // 11 (0x0b)
+void opcode_fconst_0 (struct stack_frame *frame); // 11 (0x0b)
 
 /**
  * Operation: Push float constant 1.0f
  * Operand stack: → 1.0f
  */
-void opcode_fconst_1 (struct stack_frame* frame); // 12 (0x0c)
+void opcode_fconst_1 (struct stack_frame *frame); // 12 (0x0c)
 
 /**
  * Operation: Push float constant 2.0f
  * Operand stack: → 2.0f
  */
-void opcode_fconst_2 (struct stack_frame* frame); // 13 (0x0d)
+void opcode_fconst_2 (struct stack_frame *frame); // 13 (0x0d)
 
 /**
  * Operation: Divide two float values
  * Operand stack: value1, value2 → result
  */
-void opcode_fdiv (struct stack_frame* frame); // 110 (0x6e)
+void opcode_fdiv (struct stack_frame *frame); // 110 (0x6e)
 
 // float load section
 
@@ -626,186 +626,186 @@ void opcode_fdiv (struct stack_frame* frame); // 110 (0x6e)
  * Operation: Load float from local variable (index)
  * Operand stack: → value
  */
-void opcode_fload (struct stack_frame* frame); // 23 (0x17)
+void opcode_fload (struct stack_frame *frame); // 23 (0x17)
 
 /**
  * Operation: Load float from local variable 0
  * Operand stack: → value
  */
-void opcode_fload_0 (struct stack_frame* frame); // 34 (0x22)
+void opcode_fload_0 (struct stack_frame *frame); // 34 (0x22)
 
 /**
  * Operation: Load float from local variable 1
  * Operand stack: → value
  */
-void opcode_fload_1 (struct stack_frame* frame); // 35 (0x23)
+void opcode_fload_1 (struct stack_frame *frame); // 35 (0x23)
 
 /**
  * Operation: Load float from local variable 2
  * Operand stack: → value
  */
-void opcode_fload_2 (struct stack_frame* frame); // 36 (0x24)
+void opcode_fload_2 (struct stack_frame *frame); // 36 (0x24)
 
 /**
  * Operation: Load float from local variable 3
  * Operand stack: → value
  */
-void opcode_fload_3 (struct stack_frame* frame); // 37 (0x25)
+void opcode_fload_3 (struct stack_frame *frame); // 37 (0x25)
 
-void opcode_fmul (struct stack_frame* frame);
-void opcode_fneg (struct stack_frame* frame);
-void opcode_frem (struct stack_frame* frame);
-void opcode_freturn (struct stack_frame* frame);
+void opcode_fmul (struct stack_frame *frame);
+void opcode_fneg (struct stack_frame *frame);
+void opcode_frem (struct stack_frame *frame);
+void opcode_freturn (struct stack_frame *frame);
 
-void opcode_fstore (struct stack_frame* frame);
-void opcode_fstore_0 (struct stack_frame* frame);
-void opcode_fstore_1 (struct stack_frame* frame);
-void opcode_fstore_2 (struct stack_frame* frame);
-void opcode_fstore_3 (struct stack_frame* frame);
+void opcode_fstore (struct stack_frame *frame);
+void opcode_fstore_0 (struct stack_frame *frame);
+void opcode_fstore_1 (struct stack_frame *frame);
+void opcode_fstore_2 (struct stack_frame *frame);
+void opcode_fstore_3 (struct stack_frame *frame);
 
-void opcode_fsub (struct stack_frame* frame);
-void opcode_getfield (struct stack_frame* frame);
-void opcode_getstatic (struct stack_frame* frame);
+void opcode_fsub (struct stack_frame *frame);
+void opcode_getfield (struct stack_frame *frame);
+void opcode_getstatic (struct stack_frame *frame);
 
-void opcode_goto (struct stack_frame* frame);
-void opcode_goto_w (struct stack_frame* frame);
+void opcode_goto (struct stack_frame *frame);
+void opcode_goto_w (struct stack_frame *frame);
 
-void opcode_i2b (struct stack_frame* frame);
-void opcode_i2c (struct stack_frame* frame);
-void opcode_i2d (struct stack_frame* frame);
-void opcode_i2f (struct stack_frame* frame);
-void opcode_i2l (struct stack_frame* frame);
-void opcode_i2s (struct stack_frame* frame);
+void opcode_i2b (struct stack_frame *frame);
+void opcode_i2c (struct stack_frame *frame);
+void opcode_i2d (struct stack_frame *frame);
+void opcode_i2f (struct stack_frame *frame);
+void opcode_i2l (struct stack_frame *frame);
+void opcode_i2s (struct stack_frame *frame);
 
-void opcode_iadd (struct stack_frame* frame);
-void opcode_iaload (struct stack_frame* frame);
-void opcode_iand (struct stack_frame* frame);
-void opcode_iastore (struct stack_frame* frame);
+void opcode_iadd (struct stack_frame *frame);
+void opcode_iaload (struct stack_frame *frame);
+void opcode_iand (struct stack_frame *frame);
+void opcode_iastore (struct stack_frame *frame);
 
-void opcode_iconst_m1 (struct stack_frame* frame);
-void opcode_iconst_0 (struct stack_frame* frame);
-void opcode_iconst_1 (struct stack_frame* frame);
-void opcode_iconst_2 (struct stack_frame* frame);
-void opcode_iconst_3 (struct stack_frame* frame);
-void opcode_iconst_4 (struct stack_frame* frame);
-void opcode_iconst_5 (struct stack_frame* frame);
+void opcode_iconst_m1 (struct stack_frame *frame);
+void opcode_iconst_0 (struct stack_frame *frame);
+void opcode_iconst_1 (struct stack_frame *frame);
+void opcode_iconst_2 (struct stack_frame *frame);
+void opcode_iconst_3 (struct stack_frame *frame);
+void opcode_iconst_4 (struct stack_frame *frame);
+void opcode_iconst_5 (struct stack_frame *frame);
 
-void opcode_idiv (struct stack_frame* frame);
+void opcode_idiv (struct stack_frame *frame);
 
-void opcode_if_acmpeq (struct stack_frame* frame);
-void opcode_if_acmpne (struct stack_frame* frame);
-void opcode_if_icmpeq (struct stack_frame* frame);
-void opcode_if_icmpne (struct stack_frame* frame);
-void opcode_if_icmplt (struct stack_frame* frame);
-void opcode_if_icmpge (struct stack_frame* frame);
-void opcode_if_icmpgt (struct stack_frame* frame);
-void opcode_if_icmple (struct stack_frame* frame);
+void opcode_if_acmpeq (struct stack_frame *frame);
+void opcode_if_acmpne (struct stack_frame *frame);
+void opcode_if_icmpeq (struct stack_frame *frame);
+void opcode_if_icmpne (struct stack_frame *frame);
+void opcode_if_icmplt (struct stack_frame *frame);
+void opcode_if_icmpge (struct stack_frame *frame);
+void opcode_if_icmpgt (struct stack_frame *frame);
+void opcode_if_icmple (struct stack_frame *frame);
 
-void opcode_ifeq (struct stack_frame* frame);
-void opcode_ifne (struct stack_frame* frame);
-void opcode_iflt (struct stack_frame* frame);
-void opcode_ifge (struct stack_frame* frame);
-void opcode_ifgt (struct stack_frame* frame);
-void opcode_ifle (struct stack_frame* frame);
+void opcode_ifeq (struct stack_frame *frame);
+void opcode_ifne (struct stack_frame *frame);
+void opcode_iflt (struct stack_frame *frame);
+void opcode_ifge (struct stack_frame *frame);
+void opcode_ifgt (struct stack_frame *frame);
+void opcode_ifle (struct stack_frame *frame);
 
-void opcode_ifnonnull (struct stack_frame* frame);
-void opcode_ifnull (struct stack_frame* frame);
-void opcode_iinc (struct stack_frame* frame);
+void opcode_ifnonnull (struct stack_frame *frame);
+void opcode_ifnull (struct stack_frame *frame);
+void opcode_iinc (struct stack_frame *frame);
 
-void opcode_iload (struct stack_frame* frame);
-void opcode_iload_1 (struct stack_frame* frame);
-void opcode_iload_2 (struct stack_frame* frame);
-void opcode_iload_3 (struct stack_frame* frame);
+void opcode_iload (struct stack_frame *frame);
+void opcode_iload_1 (struct stack_frame *frame);
+void opcode_iload_2 (struct stack_frame *frame);
+void opcode_iload_3 (struct stack_frame *frame);
 
-void opcode_imull (struct stack_frame* frame);
-void opcode_ineg (struct stack_frame* frame);
-void opcode_instanceof (struct stack_frame* frame);
+void opcode_imull (struct stack_frame *frame);
+void opcode_ineg (struct stack_frame *frame);
+void opcode_instanceof (struct stack_frame *frame);
 
-void opcode_invokedynamic (struct stack_frame* frame);
-void opcode_invokeinterface (struct stack_frame* frame);
-void opcode_invokespecial (struct stack_frame* frame);
-void opcode_invokestatic (struct stack_frame* frame);
-void opcode_invokevirtual (struct stack_frame* frame);
+void opcode_invokedynamic (struct stack_frame *frame);
+void opcode_invokeinterface (struct stack_frame *frame);
+void opcode_invokespecial (struct stack_frame *frame);
+void opcode_invokestatic (struct stack_frame *frame);
+void opcode_invokevirtual (struct stack_frame *frame);
 
-void opcode_ior (struct stack_frame* frame);
-void opcode_irem (struct stack_frame* frame);
-void opcode_ireturn (struct stack_frame* frame);
-void opcode_ishl (struct stack_frame* frame);
-void opcode_ishr (struct stack_frame* frame);
+void opcode_ior (struct stack_frame *frame);
+void opcode_irem (struct stack_frame *frame);
+void opcode_ireturn (struct stack_frame *frame);
+void opcode_ishl (struct stack_frame *frame);
+void opcode_ishr (struct stack_frame *frame);
 
-void opcode_istore (struct stack_frame* frame);
-void opcode_istore_0 (struct stack_frame* frame);
-void opcode_istore_1 (struct stack_frame* frame);
-void opcode_istore_2 (struct stack_frame* frame);
-void opcode_istore_3 (struct stack_frame* frame);
+void opcode_istore (struct stack_frame *frame);
+void opcode_istore_0 (struct stack_frame *frame);
+void opcode_istore_1 (struct stack_frame *frame);
+void opcode_istore_2 (struct stack_frame *frame);
+void opcode_istore_3 (struct stack_frame *frame);
 
-void opcode_isub (struct stack_frame* frame);
-void opcode_iushr (struct stack_frame* frame);
-void opcode_ixor (struct stack_frame* frame);
+void opcode_isub (struct stack_frame *frame);
+void opcode_iushr (struct stack_frame *frame);
+void opcode_ixor (struct stack_frame *frame);
 
-void opcode_jsr (struct stack_frame* frame);
-void opcode_jsr_w (struct stack_frame* frame);
+void opcode_jsr (struct stack_frame *frame);
+void opcode_jsr_w (struct stack_frame *frame);
 
-void opcode_l2d (struct stack_frame* frame);
-void opcode_l2f (struct stack_frame* frame);
-void opcode_l2i (struct stack_frame* frame);
+void opcode_l2d (struct stack_frame *frame);
+void opcode_l2f (struct stack_frame *frame);
+void opcode_l2i (struct stack_frame *frame);
 
-void opcode_ladd (struct stack_frame* frame);
-void opcode_laload (struct stack_frame* frame);
-void opcode_land (struct stack_frame* frame);
-void opcode_lastore (struct stack_frame* frame);
-void opcode_lcmp (struct stack_frame* frame);
+void opcode_ladd (struct stack_frame *frame);
+void opcode_laload (struct stack_frame *frame);
+void opcode_land (struct stack_frame *frame);
+void opcode_lastore (struct stack_frame *frame);
+void opcode_lcmp (struct stack_frame *frame);
 
-void opcode_lconst_0 (struct stack_frame* frame);
-void opcode_lconst_1 (struct stack_frame* frame);
+void opcode_lconst_0 (struct stack_frame *frame);
+void opcode_lconst_1 (struct stack_frame *frame);
 
-void opcode_ldc (struct stack_frame* frame);
-void opcode_ldc_w (struct stack_frame* frame);
-void opcode_ldc2_w (struct stack_frame* frame);
+void opcode_ldc (struct stack_frame *frame);
+void opcode_ldc_w (struct stack_frame *frame);
+void opcode_ldc2_w (struct stack_frame *frame);
 
-void opcode_ldiv (struct stack_frame* frame);
+void opcode_ldiv (struct stack_frame *frame);
 
-void opcode_lload (struct stack_frame* frame);
-void opcode_lload_0 (struct stack_frame* frame);
-void opcode_lload_1 (struct stack_frame* frame);
-void opcode_lload_2 (struct stack_frame* frame);
-void opcode_lload_3 (struct stack_frame* frame);
+void opcode_lload (struct stack_frame *frame);
+void opcode_lload_0 (struct stack_frame *frame);
+void opcode_lload_1 (struct stack_frame *frame);
+void opcode_lload_2 (struct stack_frame *frame);
+void opcode_lload_3 (struct stack_frame *frame);
 
-void opcode_lmul (struct stack_frame* frame);
-void opcode_lneg (struct stack_frame* frame);
-void opcode_lookupswitch (struct stack_frame* frame);
-void opcode_lor (struct stack_frame* frame);
-void opcode_lrem (struct stack_frame* frame);
-void opcode_lreturn (struct stack_frame* frame);
-void opcode_lshl (struct stack_frame* frame);
-void opcode_lshr (struct stack_frame* frame);
+void opcode_lmul (struct stack_frame *frame);
+void opcode_lneg (struct stack_frame *frame);
+void opcode_lookupswitch (struct stack_frame *frame);
+void opcode_lor (struct stack_frame *frame);
+void opcode_lrem (struct stack_frame *frame);
+void opcode_lreturn (struct stack_frame *frame);
+void opcode_lshl (struct stack_frame *frame);
+void opcode_lshr (struct stack_frame *frame);
 
-void opcode_lstore (struct stack_frame* frame);
-void opcode_lstore_0 (struct stack_frame* frame);
-void opcode_lstore_1 (struct stack_frame* frame);
-void opcode_lstore_2 (struct stack_frame* frame);
-void opcode_lstore_3 (struct stack_frame* frame);
+void opcode_lstore (struct stack_frame *frame);
+void opcode_lstore_0 (struct stack_frame *frame);
+void opcode_lstore_1 (struct stack_frame *frame);
+void opcode_lstore_2 (struct stack_frame *frame);
+void opcode_lstore_3 (struct stack_frame *frame);
 
-void opcode_lsub (struct stack_frame* frame);
-void opcode_lushr (struct stack_frame* frame);
-void opcode_lxor (struct stack_frame* frame);
-void opcode_monitorenter (struct stack_frame* frame);
-void opcode_monitorexit (struct stack_frame* frame);
-void opcode_multianewarray (struct stack_frame* frame);
-void opcode_new (struct stack_frame* frame);
-void opcode_newarray (struct stack_frame* frame);
-void opcode_nop (struct stack_frame* frame);
-void opcode_pop (struct stack_frame* frame);
-void opcode_pop2 (struct stack_frame* frame);
-void opcode_putfield (struct stack_frame* frame);
-void opcode_putstatic (struct stack_frame* frame);
-void opcode_ret (struct stack_frame* frame);
-void opcode_return (struct stack_frame* frame);
-void opcode_saload (struct stack_frame* frame);
-void opcode_sastore (struct stack_frame* frame);
-void opcode_sipush (struct stack_frame* frame);
-void opcode_swap (struct stack_frame* frame);
-void opcode_tableswitch (struct stack_frame* frame);
-void opcode_wide (struct stack_frame* frame);
+void opcode_lsub (struct stack_frame *frame);
+void opcode_lushr (struct stack_frame *frame);
+void opcode_lxor (struct stack_frame *frame);
+void opcode_monitorenter (struct stack_frame *frame);
+void opcode_monitorexit (struct stack_frame *frame);
+void opcode_multianewarray (struct stack_frame *frame);
+void opcode_new (struct stack_frame *frame);
+void opcode_newarray (struct stack_frame *frame);
+void opcode_nop (struct stack_frame *frame);
+void opcode_pop (struct stack_frame *frame);
+void opcode_pop2 (struct stack_frame *frame);
+void opcode_putfield (struct stack_frame *frame);
+void opcode_putstatic (struct stack_frame *frame);
+void opcode_ret (struct stack_frame *frame);
+void opcode_return (struct stack_frame *frame);
+void opcode_saload (struct stack_frame *frame);
+void opcode_sastore (struct stack_frame *frame);
+void opcode_sipush (struct stack_frame *frame);
+void opcode_swap (struct stack_frame *frame);
+void opcode_tableswitch (struct stack_frame *frame);
+void opcode_wide (struct stack_frame *frame);
 
 #endif

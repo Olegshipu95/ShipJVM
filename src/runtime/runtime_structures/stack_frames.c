@@ -59,6 +59,7 @@ init_stack_frame (struct stack_frame *frame)
     }
 
   frame->pc = 0;
+  return 0;
 }
 
 int
@@ -82,6 +83,7 @@ opstack_push (struct operand_stack *opstack, jvariable value)
       return -1;
     }
   opstack->stack[++(opstack->top)] = value;
+  return 0;
 }
 
 int
@@ -93,10 +95,11 @@ opstack_pop (struct operand_stack *opstack, jvariable *value)
       return -1;
     }
 
-  if (value == NULL){
-    prerr("Pointer on value is NULL");
-    return EINVAL;
-  }
+  if (value == NULL)
+    {
+      prerr ("Pointer on value is NULL");
+      return EINVAL;
+    }
   // Return the top value
   jvariable popped = opstack->stack[opstack->top];
   --(opstack->top);
@@ -108,15 +111,17 @@ opstack_pop (struct operand_stack *opstack, jvariable *value)
 int
 opstack_peek (struct operand_stack *opstack, jvariable *value)
 {
-  if(opstack_is_empty(opstack)){
-    prerr ("Stack underflow");
-    return -1;
-  }
+  if (opstack_is_empty (opstack))
+    {
+      prerr ("Stack underflow");
+      return -1;
+    }
 
-  if (value == NULL){
-    prerr("Pointer on value is NULL");
-    return EINVAL;
-  }
+  if (value == NULL)
+    {
+      prerr ("Pointer on value is NULL");
+      return EINVAL;
+    }
 
   jvariable popped = opstack->stack[opstack->top];
   *value = popped;
