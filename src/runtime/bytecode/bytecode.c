@@ -173,15 +173,32 @@ void opcode_iastore (struct stack_frame *frame);
 void
 opcode_common_iconst (struct stack_frame *frame, jint value)
 {
+  jvariable var =  create_variable(JINT);
+  var.value._int = value;
+  opstack_push(frame->operand_stack, var);
 }
 
-void opcode_iconst_m1 (struct stack_frame *frame);
-void opcode_iconst_0 (struct stack_frame *frame);
-void opcode_iconst_1 (struct stack_frame *frame);
-void opcode_iconst_2 (struct stack_frame *frame);
-void opcode_iconst_3 (struct stack_frame *frame);
-void opcode_iconst_4 (struct stack_frame *frame);
-void opcode_iconst_5 (struct stack_frame *frame);
+void opcode_iconst_m1 (struct stack_frame *frame){
+  opcode_common_iconst(frame, -1);
+}
+void opcode_iconst_0 (struct stack_frame *frame){
+  opcode_common_iconst(frame, 0);
+}
+void opcode_iconst_1 (struct stack_frame *frame){
+  opcode_common_iconst(frame, 1);
+}
+void opcode_iconst_2 (struct stack_frame *frame){
+  opcode_common_iconst(frame, 2);
+}
+void opcode_iconst_3 (struct stack_frame *frame){
+  opcode_common_iconst(frame, 3);
+}
+void opcode_iconst_4 (struct stack_frame *frame){
+  opcode_common_iconst(frame, 4);
+}
+void opcode_iconst_5 (struct stack_frame *frame){
+  opcode_common_iconst(frame, 5);
+}
 
 void opcode_idiv (struct stack_frame *frame);
 

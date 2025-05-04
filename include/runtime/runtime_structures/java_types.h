@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
 
 typedef void *jobject; // Basic reference type
 
@@ -22,15 +23,15 @@ typedef jint jsize;
 // dimension of data types
 typedef union jvalue
 {
-  jboolean z;
-  jbyte b;
-  jchar c;
-  jshort s;
-  jint i;
-  jlong j;
-  jfloat f;
-  jdouble d;
-  jobject l;
+  jboolean _bool;
+  jbyte _byte;
+  jchar _char;
+  jshort _short;
+  jint _int;
+  jlong _long;
+  jfloat _float;
+  jdouble _double;
+  jobject _object;
 } jvalue;
 
 typedef enum java_value_type
@@ -51,5 +52,9 @@ typedef struct jvariable
   java_value_type type;
   jvalue value;
 } jvariable;
+
+
+jvariable create_variable (java_value_type type);
+
 
 #endif
