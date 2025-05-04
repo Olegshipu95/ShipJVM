@@ -43,6 +43,33 @@ create_variable (java_value_type type)
 }
 
 int
+var_computation_type (jvariable *var)
+{
+  switch (var->type)
+    {
+    case JBOOLEAN:
+    case JBYTE:
+    case JCHAR:
+    case JSHORT:
+    case JINT:
+    case JFLOAT:
+    case JOBJECT:
+      return 1;
+      break;
+
+    case JLONG:
+    case JDOUBLE:
+      return 2;
+      break;
+
+    default:
+      prerr ("Unknown type in var_computation_type");
+      return -1;
+      break;
+    }
+}
+
+int
 check_var_type (jvariable *var, java_value_type type)
 {
   if (var->type != type)

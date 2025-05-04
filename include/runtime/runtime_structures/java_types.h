@@ -57,4 +57,12 @@ typedef struct jvariable
 jvariable create_variable (java_value_type type);
 int check_var_type (jvariable *var, java_value_type type);
 
+/*
+Return:
+  1 - Computation type 1;
+  2 - Computation type 2;
+  -1 - Unknown type;
+*/
+int var_computation_type (jvariable *var);
+
 #endif
