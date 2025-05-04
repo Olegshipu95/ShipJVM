@@ -150,6 +150,11 @@ deps:
 		llvm \
 		lcov
 
+# Форматирование кода с помощью clang-format
+format:
+	find . -type f \( -name "*.c" -o -name "*.h" \) \
+		-exec clang-format -i --style=GNU {} \;
+
 .PHONY: all release debug sanitize tsan msan \
         run run_debug run_sanitize run_tsan run_msan \
-        coverage analyze clean deps
+        coverage analyze clean deps format
