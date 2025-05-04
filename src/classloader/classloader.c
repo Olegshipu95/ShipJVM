@@ -42,6 +42,11 @@ classloader_trie_init (struct classloader_trie *node, const char *classname)
     ++len;
 
   char *name = my_alloc_array (char, len + 1);
+
+  if (name == NULL){
+    PANIC("Can not allocate memory for names in classloader_trie_init");
+  }
+
   memcpy (name, classname, len);
   name[len] = 0;
 
@@ -172,6 +177,7 @@ classloader_init_dir_paths (struct classloader *classloader, const char *paths)
       const size_t len = it - prev;
       char *const val = my_alloc_array (char, len + 1);
       memcpy (val, prev, len);
+      val[len] = 0;
 
       classloader->dir_paths[values] = val;
       ++values;

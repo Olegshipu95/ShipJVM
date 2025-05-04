@@ -204,7 +204,7 @@ parse_class_file (struct class_file *class, const char *filename)
   if (!file)
     {
       prerr ("Failed to open file");
-      goto exit;
+      return ENOENT;
     }
   Loader loader = { .file = file, .error = 0 };
   uint16_t iterator;
