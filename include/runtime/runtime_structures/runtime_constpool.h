@@ -12,7 +12,7 @@ struct rt_name_and_type
 
 struct rt_ref_type
 {
-  string class_name;            // Index of CONSTANT_Class_info
+  string class_name; // Index of CONSTANT_Class_info
   struct rt_name_and_type nat;
 };
 struct rt_fieldref
@@ -47,7 +47,7 @@ typedef enum reference_types
 struct rt_method_handle
 {
   reference_types kind;
-  struct rt_ref_type* reference_index;
+  struct rt_ref_type *reference_index;
 };
 
 struct runtime_cp
@@ -56,23 +56,23 @@ struct runtime_cp
 
   union
   {
-    string utf8;                                     // 1
-    jint integer_info;                               // 3
-    jfloat float_info;                               // 4
-    jlong long_info;                                 // 5
-    jdouble double_info;                             // 6
-    string class_name;                               // 7
-    string string_info;                              // 8
-    struct rt_fieldref fieldref;                     // 9
-    struct rt_methodref methodref;                   // 10
-    struct rt_interface_meth_ref interf_meth;        // 11
-    struct rt_name_and_type name_and_type;           // 12
-    struct rt_method_handle method_handle;           // 15
-    string method_type;                              // 16
-    struct dynamic_info dynamic_info;                // 17
-    struct invoke_dynamic_info invoke_dynamic_info;  // 18
-    string module;                                   // 19
-    string package;                                  // 20
+    string utf8;                                    // 1
+    jint integer_info;                              // 3
+    jfloat float_info;                              // 4
+    jlong long_info;                                // 5
+    jdouble double_info;                            // 6
+    string class_name;                              // 7
+    string string_info;                             // 8
+    struct rt_fieldref fieldref;                    // 9
+    struct rt_methodref methodref;                  // 10
+    struct rt_interface_meth_ref interf_meth;       // 11
+    struct rt_name_and_type name_and_type;          // 12
+    struct rt_method_handle method_handle;          // 15
+    string method_type;                             // 16
+    struct dynamic_info dynamic_info;               // 17
+    struct invoke_dynamic_info invoke_dynamic_info; // 18
+    string module;                                  // 19
+    string package;                                 // 20
   };
 };
 

@@ -60,14 +60,116 @@ index_to_string (string *dest, struct cp_info *cp_info,
   return 0;
 }
 
-reference_types uint8_to_reference_type(uint8_t value) {
+reference_types
+uint8_to_reference_type (uint8_t value)
+{
 
-  if (value >= REF_getField && value <= REF_invokeInterface) {
+  if (value >= REF_getField && value <= REF_invokeInterface)
+    {
       return (reference_types)value;
-  }
+    }
 
   prerr ("Invalid reference_type value: %hhu\n", value);
   return REF_INVALID;
+}
+
+void
+print_runtime_cp (struct runtime_cp *cp, uint16_t constant_pool_count)
+{
+  uint16_t iter;
+  printf ("RUNTIME CONSTANT POOL:\n");
+  for (iter = 0; iter < constant_pool_count; iter++)
+    {
+      printf ("%hu, type - ", iter);
+      switch (cp[iter].tag)
+        {
+        case UTF8:
+          printf ("UTF8, data - %s\n", cp[iter].utf8);
+          break;
+
+        case INTEGER:
+          printf ("INTEGER, data - %d\n", cp[iter].integer_info);
+          break;
+
+        case FLOAT:
+          printf ("FLOAT, data - %f\n", cp[iter].float_info);
+          break;
+
+        case LONG:
+          printf ("LONG: data - %ld\n", cp[iter].long_info);
+          break;
+
+        case DOUBLE:
+          printf ("DOUBLE: data - %lf\n", cp[iter].double_info);
+          break;
+
+        case CLASS:
+          printf ("CLASS: data - %s\n", cp[iter].class_name);
+          break;
+
+        case STRING:
+          printf ("STRING: data - %s\n", cp[iter].string_info);
+          break;
+
+        case FIELD_REF:
+          printf ("FIELD_REF: data - classname (%s) name_type (%s || %s)\n",
+                  cp[iter].fieldref.ref.class_name,
+                  cp[iter].fieldref.ref.nat.name,
+                  cp[iter].fieldref.ref.nat.descriptor);
+          break;
+
+        case METHOD_REF:
+          printf ("METHOD_REF: data - classname (%s) name_type (%s || %s)\n",
+                  cp[iter].methodref.ref.class_name,
+                  cp[iter].methodref.ref.nat.name,
+                  cp[iter].methodref.ref.nat.descriptor);
+          break;
+
+        case INTERF_METHOD_REF:
+          printf ("INTERF_METHOD_REF: data - classname (\"%s\") name_type "
+                  "(\"%s\" || \"%s\")\n",
+                  cp[iter].interf_meth.ref.class_name,
+                  cp[iter].interf_meth.ref.nat.name,
+                  cp[iter].interf_meth.ref.nat.descriptor);
+          break;
+
+        case NAME_AND_TYPE:
+          printf ("NAME_AND_TYPE: data - name (\"%s\"), desc (\"%s\")\n",
+                  cp[iter].name_and_type.name,
+                  cp[iter].name_and_type.descriptor);
+          break;
+
+        case METHOD_HANDLE:
+          printf ("METHOD_HANDLE: data - kind %d, ref_name - %s\n",
+                  cp[iter].method_handle.kind,
+                  cp[iter].method_handle.reference_index->class_name);
+          break;
+
+        case METHOD_TYPE:
+          printf("METHOD_TYPE: data - %s\n", cp[iter].method_type);
+          break;
+
+        case DYNAMIC:
+          prerr ("THERE ARE NO DYNAMIC");
+          break;
+
+        case INVOKE_METHOD:
+          prerr ("THERE ARE NO INVOKE_METHOD");
+          break;
+
+        case MODULE:
+          printf ("MODULE: data - %s", cp[iter].module);
+          break;
+
+        case PACKAGE:
+          printf ("PACKAGE: data - %s", cp[iter].package);
+          break;
+
+        default:
+          prerr ("ERROR PARSE, UKNOWN TYPE");
+          break;
+        }
+    }
 }
 
 int
@@ -77,6 +179,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
 {
   uint16_t iter;
   int err;
+
   if (cp_info == NULL)
     {
       prerr ("cp_info is null while making new_array_runtime_constpool");
@@ -96,13 +199,14 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
 
   for (iter = 0; iter < constant_pool_count; ++iter)
     {
-      if (new[iter].tag == 0)
+      if (new[iter].tag != 0)
         {
           continue;
         }
 
       struct cp_info local = cp_info[iter];
       new[iter].tag = local.tag;
+
       switch (local.tag)
         {
         case UTF8:
@@ -256,7 +360,9 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
               }
 
             new[iter].fieldref.ref.nat.name = new[index].name_and_type.name;
-            new[iter].fieldref.ref.nat.descriptor = new[index].name_and_type.descriptor;
+
+            new[iter].fieldref.ref.nat.descriptor
+                = new[index].name_and_type.descriptor;
           }
 
           break;
@@ -267,83 +373,84 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
           METHOD_REF contains two refs -> class and NameTypeInfo
           First we need to check that these fields are already in runtime_cp
           */
-         {
-          // first parse class name
-          uint16_t index;
-          index = local.methodref_info.info.class_index;
-          if (index >= constant_pool_count)
-            {
-              prerr ("Incorrect index in METHOD_REF");
-              return -1;
-            }
-          if (new[index].tag == 0)
-            {
-              new[index].tag = cp_info[index].tag;
+          {
+            // first parse class name
+            uint16_t index;
+            index = local.methodref_info.info.class_index;
+            if (index >= constant_pool_count)
+              {
+                prerr ("Incorrect index in METHOD_REF");
+                return -1;
+              }
+            if (new[index].tag == 0)
+              {
+                new[index].tag = cp_info[index].tag;
 
-              if (cp_info[index].tag != CLASS)
-                {
-                  prerr ("index in METHOD_REF is not class index");
-                  return -1;
-                }
+                if (cp_info[index].tag != CLASS)
+                  {
+                    prerr ("index in METHOD_REF is not class index");
+                    return -1;
+                  }
 
-              err = index_to_string (&new[index].class_name, cp_info,
-                                     constant_pool_count,
-                                     cp_info[index].class_info.name_index);
+                err = index_to_string (&new[index].class_name, cp_info,
+                                       constant_pool_count,
+                                       cp_info[index].class_info.name_index);
 
-              if (err)
-                {
-                  prerr ("Can not parse class tag in METHOD_REF");
-                  return -1;
-                }
-            }
+                if (err)
+                  {
+                    prerr ("Can not parse class tag in METHOD_REF");
+                    return -1;
+                  }
+              }
 
-          new[iter].methodref.ref.class_name = new[index].class_name;
+            new[iter].methodref.ref.class_name = new[index].class_name;
 
-          // after name parse name and type
-          index = local.methodref_info.info.name_and_type_index;
+            // after name parse name and type
+            index = local.methodref_info.info.name_and_type_index;
 
-          if (index >= constant_pool_count)
-            {
-              prerr ("Incorrect index in METHOD_REF");
-              return -1;
-            }
+            if (index >= constant_pool_count)
+              {
+                prerr ("Incorrect index in METHOD_REF");
+                return -1;
+              }
 
-          if (new[index].tag == 0)
-            {
-              new[index].tag = cp_info[index].tag;
+            if (new[index].tag == 0)
+              {
+                new[index].tag = cp_info[index].tag;
 
-              if (cp_info[index].tag != NAME_AND_TYPE)
-                {
-                  prerr ("index in METHOD_REF is not NAME_AND_TYPE index");
-                  return -1;
-                }
+                if (cp_info[index].tag != NAME_AND_TYPE)
+                  {
+                    prerr ("index in METHOD_REF is not NAME_AND_TYPE index");
+                    return -1;
+                  }
 
-              err = index_to_string (
-                  &new[index].name_and_type.name, cp_info,
-                  constant_pool_count,
-                  cp_info[index].name_and_type_info.name_index);
+                err = index_to_string (
+                    &new[index].name_and_type.name, cp_info,
+                    constant_pool_count,
+                    cp_info[index].name_and_type_info.name_index);
 
-              err |= index_to_string (
-                  &new[index].name_and_type.descriptor, cp_info,
-                  constant_pool_count,
-                  cp_info[index].name_and_type_info.descripror_index);
+                err |= index_to_string (
+                    &new[index].name_and_type.descriptor, cp_info,
+                    constant_pool_count,
+                    cp_info[index].name_and_type_info.descripror_index);
 
-              if (err)
-                {
-                  prerr ("Can not convert name_and_type in METHOD_REF");
-                  return -1;
-                }
+                if (err)
+                  {
+                    prerr ("Can not convert name_and_type in METHOD_REF");
+                    return -1;
+                  }
 
-              if (err)
-                {
-                  prerr ("Can not parse class tag in METHOD_REF");
-                  return -1;
-                }
-            }
+                if (err)
+                  {
+                    prerr ("Can not parse class tag in METHOD_REF");
+                    return -1;
+                  }
+              }
 
-          new[iter].methodref.ref.nat.name = new[index].name_and_type.name;
-          new[iter].methodref.ref.nat.descriptor = new[index].name_and_type.descriptor;
-        }
+            new[iter].methodref.ref.nat.name = new[index].name_and_type.name;
+            new[iter].methodref.ref.nat.descriptor
+                = new[index].name_and_type.descriptor;
+          }
           break;
 
         case INTERF_METHOD_REF:
@@ -352,83 +459,86 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
           INTERF_METHOD_REF contains two refs -> class and NameTypeInfo
           First we need to check that these fields are already in runtime_cp
           */
-         {
-          // first parse class name
-          uint16_t index;
-          index = local.interface_meth_ref_info.info.class_index;
-          if (index >= constant_pool_count)
-            {
-              prerr ("Incorrect index in INTERF_METHOD_REF");
-              return -1;
-            }
-          if (new[index].tag == 0)
-            {
-              new[index].tag = cp_info[index].tag;
+          {
+            // first parse class name
+            uint16_t index;
+            index = local.interface_meth_ref_info.info.class_index;
+            if (index >= constant_pool_count)
+              {
+                prerr ("Incorrect index in INTERF_METHOD_REF");
+                return -1;
+              }
+            if (new[index].tag == 0)
+              {
+                new[index].tag = cp_info[index].tag;
 
-              if (cp_info[index].tag != CLASS)
-                {
-                  prerr ("index in INTERF_METHOD_REF is not class index");
-                  return -1;
-                }
+                if (cp_info[index].tag != CLASS)
+                  {
+                    prerr ("index in INTERF_METHOD_REF is not class index");
+                    return -1;
+                  }
 
-              err = index_to_string (&new[index].class_name, cp_info,
-                                     constant_pool_count,
-                                     cp_info[index].class_info.name_index);
+                err = index_to_string (&new[index].class_name, cp_info,
+                                       constant_pool_count,
+                                       cp_info[index].class_info.name_index);
 
-              if (err)
-                {
-                  prerr ("Can not parse class tag in INTERF_METHOD_REF");
-                  return -1;
-                }
-            }
+                if (err)
+                  {
+                    prerr ("Can not parse class tag in INTERF_METHOD_REF");
+                    return -1;
+                  }
+              }
 
-          new[iter].methodref.ref.class_name = new[index].class_name;
+            new[iter].methodref.ref.class_name = new[index].class_name;
 
-          // after name parse name and type
-          index = local.methodref_info.info.name_and_type_index;
+            // after name parse name and type
+            index = local.methodref_info.info.name_and_type_index;
 
-          if (index >= constant_pool_count)
-            {
-              prerr ("Incorrect index in INTERF_METHOD_REF");
-              return -1;
-            }
+            if (index >= constant_pool_count)
+              {
+                prerr ("Incorrect index in INTERF_METHOD_REF");
+                return -1;
+              }
 
-          if (new[index].tag == 0)
-            {
-              new[index].tag = cp_info[index].tag;
+            if (new[index].tag == 0)
+              {
+                new[index].tag = cp_info[index].tag;
 
-              if (cp_info[index].tag != NAME_AND_TYPE)
-                {
-                  prerr ("index in INTERF_METHOD_REF is not NAME_AND_TYPE index");
-                  return -1;
-                }
+                if (cp_info[index].tag != NAME_AND_TYPE)
+                  {
+                    prerr ("index in INTERF_METHOD_REF is not NAME_AND_TYPE "
+                           "index");
+                    return -1;
+                  }
 
-              err = index_to_string (
-                  &new[index].name_and_type.name, cp_info,
-                  constant_pool_count,
-                  cp_info[index].name_and_type_info.name_index);
+                err = index_to_string (
+                    &new[index].name_and_type.name, cp_info,
+                    constant_pool_count,
+                    cp_info[index].name_and_type_info.name_index);
 
-              err |= index_to_string (
-                  &new[index].name_and_type.descriptor, cp_info,
-                  constant_pool_count,
-                  cp_info[index].name_and_type_info.descripror_index);
+                err |= index_to_string (
+                    &new[index].name_and_type.descriptor, cp_info,
+                    constant_pool_count,
+                    cp_info[index].name_and_type_info.descripror_index);
 
-              if (err)
-                {
-                  prerr ("Can not convert name_and_type in INTERF_METHOD_REF");
-                  return -1;
-                }
+                if (err)
+                  {
+                    prerr (
+                        "Can not convert name_and_type in INTERF_METHOD_REF");
+                    return -1;
+                  }
 
-              if (err)
-                {
-                  prerr ("Can not parse class tag in INTERF_METHOD_REF");
-                  return -1;
-                }
-            }
+                if (err)
+                  {
+                    prerr ("Can not parse class tag in INTERF_METHOD_REF");
+                    return -1;
+                  }
+              }
 
-          new[iter].interf_meth.ref.nat.name = new[index].name_and_type.name;
-          new[iter].interf_meth.ref.nat.descriptor = new[index].name_and_type.descriptor;
-        }
+            new[iter].interf_meth.ref.nat.name = new[index].name_and_type.name;
+            new[iter].interf_meth.ref.nat.descriptor
+                = new[index].name_and_type.descriptor;
+          }
           break;
 
         case NAME_AND_TYPE:
@@ -449,12 +559,19 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
 
         case METHOD_HANDLE:
           {
-            new[iter].method_handle.kind = uint8_to_reference_type(local.method_handle_info.reference_kind);
-            if (local.method_handle_info.reference_index >= constant_pool_count)
-            {
-              prerr ("Invalid index in METHOD_HANDLE");
-              return -1;
-            }
+            new[iter].method_handle.kind = uint8_to_reference_type (
+                local.method_handle_info.reference_kind);
+            if (local.method_handle_info.reference_index
+                >= constant_pool_count)
+              {
+                prerr ("Invalid index in METHOD_HANDLE");
+                return -1;
+              }
+            // In fact, there may be something else lying there (not
+            // methodref), but since the internal structure is the same, it
+            // doesn’t matter.
+            new[iter].method_handle.reference_index
+                = &new[local.method_handle_info.reference_index].methodref.ref;
           }
           break;
 
@@ -480,6 +597,8 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
 
         case INVOKE_METHOD:
           {
+            prerr ("Can not parse INVOKE_METHOD");
+            return -1;
           }
           break;
 
@@ -521,5 +640,5 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
     }
 
   *runtime_cp = new;
-  return -1;
+  return 0;
 }
