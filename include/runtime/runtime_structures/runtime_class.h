@@ -5,13 +5,17 @@
 #include <stdlib.h>
 
 #include "classfile.h"
-#include "constant_pool.h"
+#include "runtime_constpool.h"
+
 #include "util.h"
 
 struct jclass
 {
-  uint16_t constant_pool_count;
-  struct cp_info *constant_pool; // size = constant_pool_count
+  uint16_t runtime_cp_count; // constant_pool_count - 1
+  struct runtime_cp *runtime_cp; // size = runtime_cp_count
+  /**
+   * Access flags (ACC_PUBLIC, ACC_FINAL, etc.)
+   */
   uint16_t access_flags;
   string this_class;
   string super_class;
