@@ -67,11 +67,13 @@ struct double_info
   struct abstract_big_primitive info;
 };
 
+// Index of UTF8_info with class name
 struct class_info
 {
   uint16_t name_index;
 };
 
+// Index of UTF8_info with string content
 struct string_info
 {
   uint16_t string_index;
@@ -79,8 +81,8 @@ struct string_info
 
 struct abstract_ref_type
 {
-  uint16_t class_index;
-  uint16_t name_and_type_index;
+  uint16_t class_index;         // Index of CONSTANT_Class_info
+  uint16_t name_and_type_index; // Index of CONSTANT_NameAndType_info
 };
 
 struct fieldref_info
@@ -100,15 +102,17 @@ struct interface_meth_ref_info
 
 struct name_and_type_info
 {
-  uint16_t name_index;
-  uint16_t descripror_index;
+  uint16_t name_index;       // Index of UTF8_info with name
+  uint16_t descripror_index; // Index of UTF8_info with descriptor
 };
 
 struct method_handle_info
 {
   uint8_t reference_kind;
-  uint16_t reference_index;
+  uint16_t reference_index; // index of abstract_ref_type
 };
+
+// Index of UTF8_info with method descriptor
 
 struct method_type_info
 {
@@ -117,6 +121,11 @@ struct method_type_info
 
 struct absract_dynamic_info
 {
+  /*
+  There must be exactly one BootstrapMethods attribute in the attributes table
+  of a ClassFile structure if the constant_pool table of the ClassFile
+  structure has at least one CONSTANT_InvokeDynamic_info entry
+  */
   uint16_t bootstrap_method_attr_index;
   uint16_t name_and_type_index;
 };
@@ -131,10 +140,14 @@ struct invoke_dynamic_info
   struct absract_dynamic_info info;
 };
 
+// Index of UTF8_info with module name
+
 struct module_info
 {
   uint16_t name_index;
 };
+
+// Index of UTF8_info with package name
 
 struct package_info
 {

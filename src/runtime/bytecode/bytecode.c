@@ -1305,37 +1305,6 @@ opcode_lor (struct stack_frame *frame)
 void
 opcode_lrem (struct stack_frame *frame)
 {
-  jvariable dividend, divisor;
-  int err = 0;
-
-  err |= opstack_pop (frame->operand_stack, &divisor);
-  err |= opstack_pop (frame->operand_stack, &dividend);
-
-  // Type checking
-  err |= check_var_type (&dividend, JLONG);
-  err |= check_var_type (&divisor, JLONG);
-
-  if (err)
-    {
-      prerr ("LREM operation failed");
-      return;
-    }
-
-  if (divisor.value._long == 0LL)
-    {
-      prerr ("Division by zero in LREM");
-      return;
-    }
-
-  jvariable result = create_variable (JLONG);
-  result.value._long = dividend.value._long % divisor.value._long;
-
-  if (result.value._long != 0LL
-      && ((dividend.value._long < 0LL) != (divisor.value._long < 0LL)))
-    {
-      result.value._long += divisor.value._long;
-    }
-
   jvariable value1, value2;
 
   if (opstack_pop (frame->operand_stack, &value2)
