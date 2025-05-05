@@ -1,1 +1,7 @@
 .vscode
+build
+jvm
+jvm_debug
+jvm_sanitize
+jvm_tsan
+jvm_msan
