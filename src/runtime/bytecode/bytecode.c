@@ -133,11 +133,115 @@ void opcode_castore (struct stack_frame *frame);
 
 void opcode_checkcast (struct stack_frame *frame);
 
-void opcode_d2f (struct stack_frame *frame);
+void
+opcode_d2f (struct stack_frame *frame)
+{
+  jvariable op1;
 
-void opcode_d2i (struct stack_frame *frame);
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in D2F");
+      return;
+    }
 
-void opcode_d2l (struct stack_frame *frame);
+  if (check_var_type (&op1, JDOUBLE))
+    {
+      prerr ("Type mismatch in D2F: expected double");
+      return;
+    }
+
+  jvariable result = create_variable (JFLOAT);
+  result.value._float = (jfloat)op1.value._double;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in D2F");
+    }
+}
+
+void
+opcode_d2i (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in D2I");
+      return;
+    }
+
+  if (check_var_type (&op1, JDOUBLE))
+    {
+      prerr ("Type mismatch in D2I: expected double");
+      return;
+    }
+
+  jvariable result = create_variable (JINT);
+
+  if (op1.value._double != op1.value._double)
+    {
+      result.value._int = 0;
+    }
+  else if (op1.value._double >= INT32_MAX)
+    {
+      result.value._int = INT32_MAX;
+    }
+  else if (op1.value._double <= INT32_MIN)
+    {
+      result.value._int = INT32_MIN;
+    }
+  else
+    {
+      result.value._int = (jint)op1.value._double;
+    }
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in D2I");
+    }
+}
+
+void
+opcode_d2l (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in D2L");
+      return;
+    }
+
+  if (check_var_type (&op1, JDOUBLE))
+    {
+      prerr ("Type mismatch in D2L: expected double");
+      return;
+    }
+
+  jvariable result = create_variable (JLONG);
+
+  if (op1.value._double != op1.value._double)
+    {
+      result.value._long = 0;
+    }
+  else if (op1.value._double >= INT64_MAX)
+    {
+      result.value._long = INT64_MAX;
+    }
+  else if (op1.value._double <= INT64_MIN)
+    {
+      result.value._long = INT64_MIN;
+    }
+  else
+    {
+      result.value._long = (jlong)op1.value._double;
+    }
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in D2L");
+    }
+}
 
 void
 opcode_dadd (struct stack_frame *frame)
@@ -462,11 +566,115 @@ void opcode_dup2_x1 (struct stack_frame *frame);
 
 void opcode_dup2_x2 (struct stack_frame *frame);
 
-void opcode_f2d (struct stack_frame *frame);
+void
+opcode_f2d (struct stack_frame *frame)
+{
+  jvariable op1;
 
-void opcode_f2i (struct stack_frame *frame);
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in F2D");
+      return;
+    }
 
-void opcode_f2l (struct stack_frame *frame);
+  if (check_var_type (&op1, JFLOAT))
+    {
+      prerr ("Type mismatch in F2D: expected float");
+      return;
+    }
+
+  jvariable result = create_variable (JDOUBLE);
+  result.value._double = (jdouble)op1.value._float;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in F2D");
+    }
+}
+
+void
+opcode_f2i (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in F2I");
+      return;
+    }
+
+  if (check_var_type (&op1, JFLOAT))
+    {
+      prerr ("Type mismatch in F2I: expected float");
+      return;
+    }
+
+  jvariable result = create_variable (JINT);
+
+  if (op1.value._float != op1.value._float)
+    {
+      result.value._int = 0;
+    }
+  else if (op1.value._float >= INT32_MAX)
+    {
+      result.value._int = INT32_MAX;
+    }
+  else if (op1.value._float <= INT32_MIN)
+    {
+      result.value._int = INT32_MIN;
+    }
+  else
+    {
+      result.value._int = (jint)op1.value._float;
+    }
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in F2I");
+    }
+}
+
+void
+opcode_f2l (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in F2L");
+      return;
+    }
+
+  if (check_var_type (&op1, JFLOAT))
+    {
+      prerr ("Type mismatch in F2L: expected float");
+      return;
+    }
+
+  jvariable result = create_variable (JLONG);
+
+  if (op1.value._float != op1.value._float)
+    {
+      result.value._long = 0;
+    }
+  else if (op1.value._float >= INT64_MAX)
+    {
+      result.value._long = INT64_MAX;
+    }
+  else if (op1.value._float <= INT64_MIN)
+    {
+      result.value._long = INT64_MIN;
+    }
+  else
+    {
+      result.value._long = (jlong)op1.value._float;
+    }
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in F2L");
+    }
+}
 
 void
 opcode_fadd (struct stack_frame *frame)
@@ -698,12 +906,161 @@ void opcode_getstatic (struct stack_frame *frame);
 void opcode_goto (struct stack_frame *frame);
 void opcode_goto_w (struct stack_frame *frame);
 
-void opcode_i2b (struct stack_frame *frame);
-void opcode_i2c (struct stack_frame *frame);
-void opcode_i2d (struct stack_frame *frame);
-void opcode_i2f (struct stack_frame *frame);
-void opcode_i2l (struct stack_frame *frame);
-void opcode_i2s (struct stack_frame *frame);
+void
+opcode_i2b (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in I2B");
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in I2B: expected int");
+      return;
+    }
+
+  jvariable result = create_variable (JBYTE);
+  result.value._byte = (jbyte)op1.value._int;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in I2B");
+    }
+}
+
+void
+opcode_i2c (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in I2C");
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in I2C: expected int");
+      return;
+    }
+
+  jvariable result = create_variable (JCHAR);
+  result.value._char = (jchar)op1.value._int;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in I2C");
+    }
+}
+
+void
+opcode_i2d (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in I2D");
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in I2D: expected int");
+      return;
+    }
+
+  jvariable result = create_variable (JDOUBLE);
+  result.value._double = (jdouble)op1.value._int;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in I2D");
+    }
+}
+
+void
+opcode_i2f (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in I2F");
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in I2F: expected int");
+      return;
+    }
+
+  jvariable result = create_variable (JFLOAT);
+  result.value._float = (jfloat)op1.value._int;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in I2F");
+    }
+}
+
+void
+opcode_i2l (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in I2L");
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in I2L: expected int");
+      return;
+    }
+
+  jvariable result = create_variable (JLONG);
+  result.value._long = (jlong)op1.value._int;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in I2L");
+    }
+}
+
+void
+opcode_i2s (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in I2S");
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in I2S: expected int");
+      return;
+    }
+
+  jvariable result = create_variable (JSHORT);
+  result.value._short = (jshort)op1.value._int;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in I2S");
+    }
+}
 
 void
 opcode_iadd (struct stack_frame *frame)
@@ -1111,9 +1468,83 @@ void opcode_jsr (struct stack_frame *frame);
 
 void opcode_jsr_w (struct stack_frame *frame);
 
-void opcode_l2d (struct stack_frame *frame);
-void opcode_l2f (struct stack_frame *frame);
-void opcode_l2i (struct stack_frame *frame);
+void
+opcode_l2d (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in L2D");
+      return;
+    }
+
+  if (check_var_type (&op1, JLONG))
+    {
+      prerr ("Type mismatch in L2D: expected long");
+      return;
+    }
+
+  jvariable result = create_variable (JDOUBLE);
+  result.value._double = (jdouble)op1.value._long;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in L2D");
+    }
+}
+
+void
+opcode_l2f (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in L2F");
+      return;
+    }
+
+  if (check_var_type (&op1, JLONG))
+    {
+      prerr ("Type mismatch in L2F: expected long");
+      return;
+    }
+
+  jvariable result = create_variable (JFLOAT);
+  result.value._float = (jfloat)op1.value._long;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in L2F");
+    }
+}
+
+void
+opcode_l2i (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in L2I");
+      return;
+    }
+
+  if (check_var_type (&op1, JLONG))
+    {
+      prerr ("Type mismatch in L2I: expected long");
+      return;
+    }
+
+  jvariable result = create_variable (JINT);
+  result.value._int = (jint)op1.value._long;
+
+  if (opstack_push (frame->operand_stack, result))
+    {
+      prerr ("Stack overflow in L2I");
+    }
+}
 
 void
 opcode_ladd (struct stack_frame *frame)
@@ -1163,7 +1594,37 @@ opcode_land (struct stack_frame *frame)
 }
 
 void opcode_lastore (struct stack_frame *frame);
-void opcode_lcmp (struct stack_frame *frame);
+
+void
+opcode_lcmp (struct stack_frame *frame)
+{
+  jvariable value1, value2;
+
+  if (opstack_pop (frame->operand_stack, &value2)
+      || opstack_pop (frame->operand_stack, &value1))
+    {
+      prerr ("Stack underflow in LCMP");
+      return;
+    }
+
+  if (check_var_type (&value1, JLONG) || check_var_type (&value2, JLONG))
+    {
+      prerr ("Type mismatch in LCMP: expected long");
+      return;
+    }
+
+  if (value1.value._long > value2.value._long)
+    {
+      _common_iconst (frame, 1);
+      return;
+    }
+  else if (value1.value._long == value2.value._long)
+    {
+      _common_iconst (frame, 0);
+      return;
+    }
+  _common_iconst (frame, -1);
+};
 
 void
 _common_lconst (struct stack_frame *frame, jlong value)
@@ -1531,7 +1992,34 @@ opcode_pop (struct stack_frame *frame)
   opstack_pop (frame->operand_stack, &var);
 }
 
-void opcode_pop2 (struct stack_frame *frame);
+void
+opcode_pop2 (struct stack_frame *frame)
+{
+  jvariable var1, var2;
+
+  if (opstack_pop (frame->operand_stack, &var1))
+    {
+      prerr ("Stack underflow in POP2");
+      return;
+    }
+
+  if (var_computation_type (&var1) == 2)
+    {
+      return;
+    }
+
+  if (opstack_pop (frame->operand_stack, &var2))
+    {
+      prerr ("Stack underflow in POP2");
+      return;
+    }
+
+  if (var_computation_type (&var2) != 1)
+    {
+      prerr ("Arg 2 is not category 1 computational type in POP2");
+      return;
+    }
+}
 void opcode_putfield (struct stack_frame *frame);
 void opcode_putstatic (struct stack_frame *frame);
 void opcode_ret (struct stack_frame *frame);
