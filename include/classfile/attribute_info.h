@@ -960,7 +960,7 @@ struct localvar_target
     uint16_t start_pc; /* Start of scope (bytecode offset) */
     uint16_t length;   /* Scope length */
     uint16_t index;    /* Local variable index */
-  } * table;           /* Array of scope entries */
+  } *table;            /* Array of scope entries */
 };
 
 /**
@@ -998,7 +998,7 @@ struct type_path
   {
     uint8_t type_path_kind;      /* Path step kind (0=array,1=inner,etc) */
     uint8_t type_argument_index; /* For parameterized types */
-  } * path;                      /* Array of path steps */
+  } *path;                       /* Array of path steps */
 };
 
 /**
@@ -1086,7 +1086,7 @@ struct type_annotation
      * The element value
      */
     struct element_value value;
-  } * element_value_pairs; /* array of size num_element_value_pairs */
+  } *element_value_pairs; /* array of size num_element_value_pairs */
 };
 
 /**
