@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "util.h"
-
+#include "bytecodes.h"
 // /* Verification type tags */
 // #define ITEM_Top 0
 // #define ITEM_Integer 1
@@ -107,7 +107,7 @@
 
 struct rt_attribute
 {
-  string attribute_name_index;
+  string name;
   uint32_t attribute_length;
 };
 
@@ -125,13 +125,13 @@ struct rt_attribute
 //   uint16_t catch_type;
 // };
 
-struct rt_Code_attribute
+struct rt_code_attribute
 {
-  struct rt_attribute info;
+  struct rt_attribute header;
   uint16_t max_stack;
   uint16_t max_locals;
   uint32_t code_length;
-  uint8_t *code; /* size = code_length */
+  struct runtime_opcode *code; /* size = code_length */
   uint16_t exception_table_length;
   struct exception_table *table; /* size = exception_table_length */
   uint16_t attributes_count;

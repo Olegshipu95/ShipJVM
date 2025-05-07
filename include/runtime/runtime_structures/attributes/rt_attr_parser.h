@@ -4,6 +4,7 @@
 #include "attribute_info.h"
 #include "runtime_attribute.h"
 #include "runtime_constpool.h"
+#include "bytecodes.h"
 
 int parse_single_rt_attr (struct runtime_cp *rt_cp,
                           struct rt_attribute **attribute,

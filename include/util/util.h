@@ -26,6 +26,8 @@ void *memcpy (void *dst, const void *src, size_t len);
 void *memset (void *dst, int c, size_t len);
 int memcmp (const void *buffer1, const void *buffer2, size_t count);
 
-int is_string_match (uint8_t *str, size_t len, const char *expected);
+int is_utf8_match (uint8_t *str, size_t len, const char *expected);
+
+int strcmp (const char *string1, const char *string2);
 
 #endif

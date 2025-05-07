@@ -52,7 +52,7 @@ opcode_aconst_null (struct stack_frame *frame)
     }
 };
 
-void opcode_aload (struct stack_frame *frame, uint32_t index);
+void opcode_aload (struct stack_frame *frame);
 
 void
 opcode_aload_0 (struct stack_frame *frame)
@@ -187,6 +187,9 @@ opcode_dconst_1 (struct stack_frame *frame)
 }
 
 void opcode_ddiv (struct stack_frame *frame);
+
+void
+opcode_dload (struct stack_frame *frame);
 
 void
 opcode_dload_0 (struct stack_frame *frame)

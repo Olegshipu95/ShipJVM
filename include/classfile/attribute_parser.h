@@ -4,10 +4,10 @@
 #include <stdlib.h>
 
 #include "attribute_info.h"
+#include "classfile.h"
 #include "classfile_stream.h"
 #include "constant_pool.h"
 #include "util.h"
-#include "classfile.h"
 
 struct attribute_info *parse_attribute (Loader *loader,
                                         struct class_file *class);

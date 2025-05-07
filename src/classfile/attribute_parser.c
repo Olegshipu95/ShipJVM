@@ -25,7 +25,7 @@ parse_attribute (Loader *loader, struct class_file *class)
       prerr ("UTF8 string is NULL or invalid!");
     }
 
-  if (is_string_match (UTF8->bytes, UTF8->lenght, "ConstantValue"))
+  if (is_utf8_match (UTF8->bytes, UTF8->lenght, "ConstantValue"))
     {
       struct ConstantValue_attribute *attr
           = my_alloc (struct ConstantValue_attribute);
@@ -45,7 +45,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "Code"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "Code"))
     {
       struct Code_attribute *attr = my_alloc (struct Code_attribute);
       if (attr == NULL)
@@ -65,7 +65,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "StackMapTable"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "StackMapTable"))
     {
       struct StackMapTable_attribute *attr
           = my_alloc (struct StackMapTable_attribute);
@@ -88,7 +88,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "BootstrapMethods"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "BootstrapMethods"))
     {
       struct BootstrapMethods_attribute *attr
           = my_alloc (struct BootstrapMethods_attribute);
@@ -114,7 +114,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestHost"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "NestHost"))
     {
       struct NestHost_attribute *attr = my_alloc (struct NestHost_attribute);
 
@@ -138,7 +138,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "NestMembers"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "NestMembers"))
     {
       struct NestMembers_attribute *attr
           = my_alloc (struct NestMembers_attribute);
@@ -168,7 +168,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "PermittedSubclasses"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "PermittedSubclasses"))
     {
       struct PermittedSubclasses_attribute *attr
           = my_alloc (struct PermittedSubclasses_attribute);
@@ -194,7 +194,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "Exceptions"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "Exceptions"))
     {
       struct Exceptions_attribute *attr
           = my_alloc (struct Exceptions_attribute);
@@ -219,7 +219,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "InnerClasses"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "InnerClasses"))
     {
       struct InnerClasses_attribute *attr
           = my_alloc (struct InnerClasses_attribute);
@@ -244,7 +244,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "EnclosingMethod"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "EnclosingMethod"))
     {
 
       struct EnclosingMethod_attribute *attr
@@ -270,7 +270,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "Synthetic"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "Synthetic"))
     {
       struct Synthetic_attribute *attr = my_alloc (struct Synthetic_attribute);
 
@@ -294,7 +294,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "Signature"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "Signature"))
     {
       struct Signature_attribute *attr = my_alloc (struct Signature_attribute);
 
@@ -317,7 +317,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "Record"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "Record"))
     {
       struct Record_attribute *attr = my_alloc (struct Record_attribute);
 
@@ -340,7 +340,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "SourceFile"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "SourceFile"))
     {
       struct SourceFile_attribute *attr
           = my_alloc (struct SourceFile_attribute);
@@ -363,7 +363,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "LineNumberTable"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "LineNumberTable"))
     {
       struct LineNumberTable_attribute *attr
           = my_alloc (struct LineNumberTable_attribute);
@@ -386,7 +386,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "LocalVariableTable"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "LocalVariableTable"))
     {
       struct LocalVariableTable_attribute *attr
           = my_alloc (struct LocalVariableTable_attribute);
@@ -410,8 +410,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "LocalVariableTypeTable"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "LocalVariableTypeTable"))
     {
       struct LocalVariableTypeTable_attribute *attr
           = my_alloc (struct LocalVariableTypeTable_attribute);
@@ -436,7 +435,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "SourceDebugExtension"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "SourceDebugExtension"))
     {
       struct SourceDebugExtension_attribute *attr
           = my_alloc (struct SourceDebugExtension_attribute);
@@ -460,7 +459,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "Deprecated"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "Deprecated"))
     {
       struct Deprecated_attribute *attr
           = my_alloc (struct Deprecated_attribute);
@@ -484,8 +483,8 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeVisibleAnnotations"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght,
+                          "RuntimeVisibleAnnotations"))
     {
       struct RuntimeVisibleAnnotations_attribute *attr
           = my_alloc (struct RuntimeVisibleAnnotations_attribute);
@@ -510,8 +509,8 @@ parse_attribute (Loader *loader, struct class_file *class)
 
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeInvisibleAnnotations"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght,
+                          "RuntimeInvisibleAnnotations"))
     {
       struct RuntimeInvisibleAnnotations_attribute *attr
           = my_alloc (struct RuntimeInvisibleAnnotations_attribute);
@@ -534,8 +533,8 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeVisibleParameterAnnotations"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght,
+                          "RuntimeVisibleParameterAnnotations"))
     {
       struct RuntimeVisibleParameterAnnotations_attribute *attr = malloc (
           sizeof (struct RuntimeVisibleParameterAnnotations_attribute));
@@ -559,8 +558,8 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeInvisibleParameterAnnotations"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght,
+                          "RuntimeInvisibleParameterAnnotations"))
     {
       struct RuntimeInvisibleParameterAnnotations_attribute *attr = malloc (
           sizeof (struct RuntimeInvisibleParameterAnnotations_attribute));
@@ -585,8 +584,8 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeVisibleTypeAnnotations"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght,
+                          "RuntimeVisibleTypeAnnotations"))
     {
       struct RuntimeVisibleTypeAnnotations_attribute *attr
           = my_alloc (struct RuntimeVisibleTypeAnnotations_attribute);
@@ -610,8 +609,8 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght,
-                            "RuntimeInvisibleTypeAnnotations"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght,
+                          "RuntimeInvisibleTypeAnnotations"))
     {
       struct RuntimeInvisibleTypeAnnotations_attribute *attr
           = my_alloc (struct RuntimeInvisibleTypeAnnotations_attribute);
@@ -634,7 +633,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "AnnotationDefault"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "AnnotationDefault"))
     {
       // TODO
       struct AnnotationDefault_attribute *attr
@@ -659,7 +658,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "MethodParameters"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "MethodParameters"))
     {
       struct MethodParameters_attribute *attr
           = my_alloc (struct MethodParameters_attribute);
@@ -681,7 +680,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "Module"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "Module"))
     {
       struct Module_attribute *attr = my_alloc (struct Module_attribute);
       if (attr == NULL)
@@ -702,7 +701,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "ModulePackages"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "ModulePackages"))
     {
       struct ModulePackages_attribute *attr
           = my_alloc (struct ModulePackages_attribute);
@@ -724,7 +723,7 @@ parse_attribute (Loader *loader, struct class_file *class)
         }
       return (struct attribute_info *)attr;
     }
-  else if (is_string_match (UTF8->bytes, UTF8->lenght, "ModuleMainClass"))
+  else if (is_utf8_match (UTF8->bytes, UTF8->lenght, "ModuleMainClass"))
     {
       struct ModuleMainClass_attribute *attr
           = my_alloc (struct ModuleMainClass_attribute);

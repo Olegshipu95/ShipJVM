@@ -1,7 +1,7 @@
 #include "util.h"
 
 int
-is_string_match (uint8_t *buff, size_t len, const char *expected)
+is_utf8_match (uint8_t *buff, size_t len, const char *expected)
 {
   const char *str = (const char *)buff;
   if (len != strlen (expected))
