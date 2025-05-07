@@ -11,8 +11,8 @@
 struct field_info
 {
   uint16_t access_flags;
-  uint16_t name_index;
-  uint16_t descriptor_index;
+  uint16_t name_index;       // CONSTANT_Utf8_info
+  uint16_t descriptor_index; // CONSTANT_Utf8_info
   uint16_t attributes_count;
   struct attribute_info **attributes; // size = attributes_count
 };

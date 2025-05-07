@@ -19,6 +19,5 @@
 #include "util.h"
 
 int parse_class_file (struct class_file *class, const char *filename);
-int is_string_match (uint8_t *str, size_t len, const char *expected);
 
 #endif

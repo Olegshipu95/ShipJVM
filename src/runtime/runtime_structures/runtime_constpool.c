@@ -2,7 +2,7 @@
 
 int
 get_UTF8 (struct cp_info *cp_info, struct UTF8_info *utf8,
-          uint16_t constant_pool_count, uint16_t index)
+          uint16_t runtime_cp_count, uint16_t index)
 {
   if (!cp_info)
     {
@@ -10,7 +10,7 @@ get_UTF8 (struct cp_info *cp_info, struct UTF8_info *utf8,
       return EINVAL;
     }
 
-  if (index == 0 || index > constant_pool_count)
+  if (index == 0 || index > runtime_cp_count)
     {
       prerr ("Can't take constant by that adress in runtime_cp");
       return EINVAL;
@@ -44,12 +44,12 @@ utf8_to_string (struct UTF8_info *utf8, string *dest)
 
 int
 index_to_string (string *dest, struct cp_info *cp_info,
-                 uint16_t constant_pool_count, uint16_t index)
+                 uint16_t runtime_cp_count, uint16_t index)
 {
   int err;
   struct UTF8_info utf8;
 
-  err = get_UTF8 (cp_info, &utf8, constant_pool_count, index);
+  err = get_UTF8 (cp_info, &utf8, runtime_cp_count, index);
   if (err)
     {
       prerr ("can not convert index to string");
@@ -74,11 +74,11 @@ uint8_to_reference_type (uint8_t value)
 }
 
 void
-print_runtime_cp (struct runtime_cp *cp, uint16_t constant_pool_count)
+print_runtime_cp (struct runtime_cp *cp, uint16_t runtime_cp_count)
 {
   uint16_t iter;
   printf ("RUNTIME CONSTANT POOL:\n");
-  for (iter = 0; iter < constant_pool_count; iter++)
+  for (iter = 0; iter < runtime_cp_count; iter++)
     {
       printf (" I - %-3hu, tag is - %-3hhu, type - ", iter + 1, cp[iter].tag);
       switch (cp[iter].tag)
@@ -146,7 +146,7 @@ print_runtime_cp (struct runtime_cp *cp, uint16_t constant_pool_count)
           break;
 
         case METHOD_TYPE:
-          printf("METHOD_TYPE: data - %s\n", cp[iter].method_type);
+          printf ("METHOD_TYPE: data - %s\n", cp[iter].method_type);
           break;
 
         case DYNAMIC:
@@ -175,7 +175,7 @@ print_runtime_cp (struct runtime_cp *cp, uint16_t constant_pool_count)
 int
 new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                              struct cp_info *cp_info,
-                             uint16_t constant_pool_count)
+                             uint16_t runtime_cp_count)
 {
   uint16_t iter;
   int err;
@@ -187,7 +187,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
     }
 
   struct runtime_cp *new
-      = my_alloc_array (struct runtime_cp, constant_pool_count);
+      = my_alloc_array (struct runtime_cp, runtime_cp_count);
 
   if (new == NULL)
     {
@@ -195,9 +195,9 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
       return ENOMEM;
     }
 
-  memset (new, 0, sizeof (struct runtime_cp) * constant_pool_count);
+  memset (new, 0, sizeof (struct runtime_cp) * runtime_cp_count);
 
-  for (iter = 0; iter < constant_pool_count; iter++)
+  for (iter = 0; iter < runtime_cp_count; iter++)
     {
       if (new[iter].tag != 0)
         {
@@ -258,7 +258,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
         case CLASS:
           {
             err = index_to_string (&new[iter].class_name, cp_info,
-                                   constant_pool_count,
+                                   runtime_cp_count,
                                    local.class_info.name_index);
 
             if (err)
@@ -272,7 +272,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
         case STRING:
           {
             err = index_to_string (&new[iter].string_info, cp_info,
-                                   constant_pool_count,
+                                   runtime_cp_count,
                                    local.string_info.string_index);
 
             if (err)
@@ -293,7 +293,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             // first parse class name
             uint16_t index;
             index = local.fieldref_info.info.class_index - 1;
-            if (index >= constant_pool_count)
+            if (index >= runtime_cp_count)
               {
                 prerr ("Incorrect index in field ref");
                 return -1;
@@ -309,7 +309,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (&new[index].class_name, cp_info,
-                                       constant_pool_count,
+                                       runtime_cp_count,
                                        cp_info[index].class_info.name_index);
 
                 if (err)
@@ -324,7 +324,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             // after name parse name and type
             index = local.fieldref_info.info.name_and_type_index - 1;
 
-            if (index >= constant_pool_count)
+            if (index >= runtime_cp_count)
               {
                 prerr ("Incorrect index in field ref");
                 return -1;
@@ -341,13 +341,12 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (
-                    &new[index].name_and_type.name, cp_info,
-                    constant_pool_count,
+                    &new[index].name_and_type.name, cp_info, runtime_cp_count,
                     cp_info[index].name_and_type_info.name_index);
 
                 err |= index_to_string (
                     &new[index].name_and_type.descriptor, cp_info,
-                    constant_pool_count,
+                    runtime_cp_count,
                     cp_info[index].name_and_type_info.descripror_index);
 
                 if (err)
@@ -381,7 +380,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             // first parse class name
             uint16_t index;
             index = local.methodref_info.info.class_index - 1;
-            if (index >= constant_pool_count)
+            if (index >= runtime_cp_count)
               {
                 prerr ("Incorrect index in METHOD_REF");
                 return -1;
@@ -398,7 +397,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (&new[index].class_name, cp_info,
-                                       constant_pool_count,
+                                       runtime_cp_count,
                                        cp_info[index].class_info.name_index);
 
                 if (err)
@@ -413,7 +412,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             // after name parse name and type
             index = local.methodref_info.info.name_and_type_index - 1;
 
-            if (index >= constant_pool_count)
+            if (index >= runtime_cp_count)
               {
                 prerr ("Incorrect index in METHOD_REF");
                 return -1;
@@ -430,13 +429,12 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (
-                    &new[index].name_and_type.name, cp_info,
-                    constant_pool_count,
+                    &new[index].name_and_type.name, cp_info, runtime_cp_count,
                     cp_info[index].name_and_type_info.name_index);
 
                 err |= index_to_string (
                     &new[index].name_and_type.descriptor, cp_info,
-                    constant_pool_count,
+                    runtime_cp_count,
                     cp_info[index].name_and_type_info.descripror_index);
 
                 if (err)
@@ -468,7 +466,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             // first parse class name
             uint16_t index;
             index = local.interface_meth_ref_info.info.class_index - 1;
-            if (index >= constant_pool_count)
+            if (index >= runtime_cp_count)
               {
                 prerr ("Incorrect index in INTERF_METHOD_REF");
                 return -1;
@@ -484,7 +482,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (&new[index].class_name, cp_info,
-                                       constant_pool_count,
+                                       runtime_cp_count,
                                        cp_info[index].class_info.name_index);
 
                 if (err)
@@ -499,7 +497,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             // after name parse name and type
             index = local.methodref_info.info.name_and_type_index - 1;
 
-            if (index >= constant_pool_count)
+            if (index >= runtime_cp_count)
               {
                 prerr ("Incorrect index in INTERF_METHOD_REF");
                 return -1;
@@ -517,13 +515,12 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (
-                    &new[index].name_and_type.name, cp_info,
-                    constant_pool_count,
+                    &new[index].name_and_type.name, cp_info, runtime_cp_count,
                     cp_info[index].name_and_type_info.name_index);
 
                 err |= index_to_string (
                     &new[index].name_and_type.descriptor, cp_info,
-                    constant_pool_count,
+                    runtime_cp_count,
                     cp_info[index].name_and_type_info.descripror_index);
 
                 if (err)
@@ -549,10 +546,10 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
         case NAME_AND_TYPE:
           {
             err = index_to_string (&new[iter].name_and_type.name, cp_info,
-                                   constant_pool_count,
+                                   runtime_cp_count,
                                    local.name_and_type_info.name_index);
             err |= index_to_string (&new[iter].name_and_type.descriptor,
-                                    cp_info, constant_pool_count,
+                                    cp_info, runtime_cp_count,
                                     local.name_and_type_info.descripror_index);
             if (err)
               {
@@ -567,8 +564,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             new[iter].method_handle.kind = uint8_to_reference_type (
                 local.method_handle_info.reference_kind);
 
-            if (local.method_handle_info.reference_index
-                > constant_pool_count)
+            if (local.method_handle_info.reference_index > runtime_cp_count)
               {
                 prerr ("Invalid index in METHOD_HANDLE");
                 return -1;
@@ -577,14 +573,15 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             // methodref), but since the internal structure is the same, it
             // doesn’t matter.
             new[iter].method_handle.reference_index
-                = &new[local.method_handle_info.reference_index - 1].methodref.ref;
+                = &new[local.method_handle_info.reference_index - 1]
+                       .methodref.ref;
           }
           break;
 
         case METHOD_TYPE:
           {
             err = index_to_string (&new[iter].method_type, cp_info,
-                                   constant_pool_count,
+                                   runtime_cp_count,
                                    local.method_type_info.descriptor_index);
             if (err)
               {
@@ -614,7 +611,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
 
             uint16_t index = local.module_info.name_index;
             struct UTF8_info utf8;
-            err = get_UTF8 (cp_info, &utf8, constant_pool_count, index);
+            err = get_UTF8 (cp_info, &utf8, runtime_cp_count, index);
             if (err)
               {
                 prerr ("can not take utf while parsing module const");
@@ -630,7 +627,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
 
             uint16_t index = local.package_info.name_index;
             struct UTF8_info utf8;
-            err = get_UTF8 (cp_info, &utf8, constant_pool_count, index);
+            err = get_UTF8 (cp_info, &utf8, runtime_cp_count, index);
             if (err)
               {
                 prerr ("can not take utf while parsing package const");
@@ -646,5 +643,47 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
     }
 
   *runtime_cp = new;
+  return 0;
+}
+
+int
+parse_rt_index_to_string (struct runtime_cp *rt_cp, string *new_string,
+                          uint16_t index, uint16_t runtime_cp_count)
+{
+  uint16_t local_ind = index - 1;
+  if (local_ind > runtime_cp_count)
+    {
+      prerr ("Index in interface is invalid");
+      return EINVAL;
+    }
+
+  if (rt_cp[local_ind].tag != UTF8)
+    {
+      prerr ("runtime cp[%hu] is not UTF8", local_ind);
+      return EINVAL;
+    }
+
+  *new_string = rt_cp[local_ind].class_name;
+  return 0;
+}
+
+int
+parse_rt_classname (struct runtime_cp *rt_cp, string *new_class_name,
+                    uint16_t index, uint16_t runtime_cp_count)
+{
+  uint16_t local_ind = index - 1;
+  if (local_ind > runtime_cp_count)
+    {
+      prerr ("Index in interface is invalid");
+      return EINVAL;
+    }
+
+  if (rt_cp[local_ind].tag != CLASS)
+    {
+      prerr ("runtime cp[%hu] is not CLASS", local_ind);
+      return EINVAL;
+    }
+
+  *new_class_name = rt_cp[local_ind].class_name;
   return 0;
 }

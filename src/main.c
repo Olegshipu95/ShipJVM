@@ -2,8 +2,9 @@
 
 #include "classfile_parser.h"
 #include "classloader.h"
-#include "util.h"
+#include "runtime_class.h"
 #include "runtime_constpool.h"
+#include "util.h"
 
 // Пример использования
 int
@@ -28,13 +29,13 @@ main (int argc, char *argv[])
         return err;
     }
 
-  printf("\n\nStart trying convert cp\n");
+  printf ("\n\nStart trying convert cp\n");
 
-  struct runtime_cp* cp;
-  int err = new_array_runtime_constpool(&cp, class->constant_pool, class->constant_pool_count);
-  if (err){
-    prerr ("Error while converting cp to rt");
-    return err;
-  }
-  print_runtime_cp(cp, class->constant_pool_count);
+  struct jclass *new_class = 0;
+  int err = jclass_new (&new_class, class);
+  if (err)
+    {
+      prerr ("Error while converting class to rt");
+      return err;
+    }
 }

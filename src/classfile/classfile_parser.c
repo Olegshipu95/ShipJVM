@@ -159,17 +159,6 @@ parse_const_pool (struct class_file *class, Loader *loader)
 }
 
 int
-is_string_match (uint8_t *buff, size_t len, const char *expected)
-{
-  const char *str = (const char *)buff;
-  if (len != strlen (expected))
-    {
-      return 0;
-    }
-  return memcmp (str, expected, len) == 0;
-}
-
-int
 parse_class_fields (Loader *loader, struct class_file *class,
                     struct field_info *fields)
 {
@@ -187,7 +176,6 @@ int
 parse_class_methods (Loader *loader, struct class_file *class,
                      struct method_info *method)
 {
-  printf ("DEBUG METH\n");
   int error = 0;
   method->access_flags = loader_u2 (loader);
   method->name_index = loader_u2 (loader);

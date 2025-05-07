@@ -80,16 +80,19 @@ int runtime_constant_new (struct runtime_cp **runtime_cp,
                           struct cp_info *cp_info,
                           uint16_t constant_pool_count);
 
-
 void print_runtime_cp (struct runtime_cp *cp, uint16_t constant_pool_count);
 
-int
-new_array_runtime_constpool (struct runtime_cp **runtime_cp,
-                             struct cp_info *cp_info,
-                             uint16_t constant_pool_count);
+int new_array_runtime_constpool (struct runtime_cp **runtime_cp,
+                                 struct cp_info *cp_info,
+                                 uint16_t constant_pool_count);
 
-int
-index_to_string (string *dest, struct cp_info *cp_info,
-                 uint16_t constant_pool_count, uint16_t index);
+int index_to_string (string *dest, struct cp_info *cp_info,
+                     uint16_t constant_pool_count, uint16_t index);
+
+int parse_rt_index_to_string (struct runtime_cp *rt_cp, string *new_string,
+                              uint16_t index, uint16_t runtime_cp_count);
+
+int parse_rt_classname (struct runtime_cp *rt_cp, string *new_class_name,
+                        uint16_t index, uint16_t runtime_cp_count);
 
 #endif

@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#include "classfile.h"
 #include "util.h"
 
 /* Verification type tags */
