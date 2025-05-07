@@ -379,8 +379,10 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
           {
             // first parse class name
             uint16_t index;
+
             index = local.methodref_info.info.class_index - 1;
             if (index >= runtime_cp_count)
+
               {
                 prerr ("Incorrect index in METHOD_REF");
                 return -1;
@@ -390,6 +392,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                 enum CONSTANT_POOL_TAG tag = cp_info[index].tag;
                 new[index].tag = tag;
 
+
                 if (cp_info[index].tag != CLASS)
                   {
                     prerr ("index in METHOD_REF is not class index");
@@ -398,6 +401,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
 
                 err = index_to_string (&new[index].class_name, cp_info,
                                        runtime_cp_count,
+
                                        cp_info[index].class_info.name_index);
 
                 if (err)
@@ -413,6 +417,7 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             index = local.methodref_info.info.name_and_type_index - 1;
 
             if (index >= runtime_cp_count)
+
               {
                 prerr ("Incorrect index in METHOD_REF");
                 return -1;
@@ -429,12 +434,16 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (
+
                     &new[index].name_and_type.name, cp_info, runtime_cp_count,
+
                     cp_info[index].name_and_type_info.name_index);
 
                 err |= index_to_string (
                     &new[index].name_and_type.descriptor, cp_info,
+
                     runtime_cp_count,
+
                     cp_info[index].name_and_type_info.descripror_index);
 
                 if (err)
@@ -465,8 +474,10 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
           {
             // first parse class name
             uint16_t index;
+
             index = local.interface_meth_ref_info.info.class_index - 1;
             if (index >= runtime_cp_count)
+
               {
                 prerr ("Incorrect index in INTERF_METHOD_REF");
                 return -1;
@@ -482,7 +493,9 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (&new[index].class_name, cp_info,
+
                                        runtime_cp_count,
+
                                        cp_info[index].class_info.name_index);
 
                 if (err)
@@ -495,9 +508,11 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             new[iter].methodref.ref.class_name = new[index].class_name;
 
             // after name parse name and type
+
             index = local.methodref_info.info.name_and_type_index - 1;
 
             if (index >= runtime_cp_count)
+
               {
                 prerr ("Incorrect index in INTERF_METHOD_REF");
                 return -1;
@@ -515,12 +530,16 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                   }
 
                 err = index_to_string (
+
                     &new[index].name_and_type.name, cp_info, runtime_cp_count,
+
                     cp_info[index].name_and_type_info.name_index);
 
                 err |= index_to_string (
                     &new[index].name_and_type.descriptor, cp_info,
+
                     runtime_cp_count,
+
                     cp_info[index].name_and_type_info.descripror_index);
 
                 if (err)
@@ -569,12 +588,14 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                 prerr ("Invalid index in METHOD_HANDLE");
                 return -1;
               }
+
             // In fact, there may be something else lying there (not
             // methodref), but since the internal structure is the same, it
             // doesn’t matter.
             new[iter].method_handle.reference_index
                 = &new[local.method_handle_info.reference_index - 1]
                        .methodref.ref;
+
           }
           break;
 
