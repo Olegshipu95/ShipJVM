@@ -392,7 +392,6 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
                 enum CONSTANT_POOL_TAG tag = cp_info[index].tag;
                 new[index].tag = tag;
 
-
                 if (cp_info[index].tag != CLASS)
                   {
                     prerr ("index in METHOD_REF is not class index");
@@ -595,7 +594,6 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
             new[iter].method_handle.reference_index
                 = &new[local.method_handle_info.reference_index - 1]
                        .methodref.ref;
-
           }
           break;
 
