@@ -34,6 +34,7 @@ INCLUDE_DIRS ?= ./include \
   							./include/util \
 	 							./include/runtime/bytecode \
 	  						./include/runtime/runtime_structures \
+								./include/runtime/runtime_structures/attributes \
 								./include/classloader
 
 BUILD_DIR ?= ./build
@@ -161,6 +162,33 @@ format:
 	find . -type f \( -name "*.c" -o -name "*.h" \) \
 		-exec clang-format -i --style=GNU {} \;
 
+check_circular_includes:
+	@echo "Checking for circular includes..."
+	@mkdir -p $(BUILD_DIR)/deps
+	@found_circular=0; \
+	for file in $(shell find $(INCLUDE_DIRS) -name '*.h'); do \
+		grep -o '#include *["<][^">]*[">]' $$file | \
+		sed -e 's/#include *["<]//' -e 's/[">]//' | \
+		while read included; do \
+			inc_file=$$(find $(INCLUDE_DIRS) -name "$$included" -print -quit); \
+			if [ -f "$$inc_file" ]; then \
+				if grep -q "#include.*\"$$(basename $$file)\"" "$$inc_file"; then \
+					echo "Circular include detected between:"; \
+					echo "  $$file"; \
+					echo "  $$inc_file"; \
+					echo; \
+					found_circular=1; \
+				fi; \
+			fi; \
+		done; \
+	done; \
+	if [ $$found_circular -eq 0 ]; then \
+		echo "No circular includes found."; \
+	else \
+		echo "Error: Circular includes detected!"; \
+		exit 1; \
+	fi
+
 .PHONY: all release debug sanitize tsan msan \
         run run_debug run_sanitize run_tsan run_msan \
-        coverage analyze clean deps format
+        coverage analyze clean deps format check_circular_includes
