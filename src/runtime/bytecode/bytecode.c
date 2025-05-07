@@ -188,8 +188,7 @@ opcode_dconst_1 (struct stack_frame *frame)
 
 void opcode_ddiv (struct stack_frame *frame);
 
-void
-opcode_dload (struct stack_frame *frame);
+void opcode_dload (struct stack_frame *frame);
 
 void
 opcode_dload_0 (struct stack_frame *frame)

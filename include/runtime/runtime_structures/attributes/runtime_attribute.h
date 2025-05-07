@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#include "util.h"
 #include "bytecodes.h"
+#include "util.h"
 // /* Verification type tags */
 // #define ITEM_Top 0
 // #define ITEM_Integer 1

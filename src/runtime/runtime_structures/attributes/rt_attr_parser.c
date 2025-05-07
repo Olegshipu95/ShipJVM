@@ -1,62 +1,65 @@
 #include "rt_attr_parser.h"
 
-#define PARSE_ATTRIBUTE_BASE(TYPE, NAME, LENGTH) \
-    TYPE *attr = my_alloc(TYPE);            \
-    if (attr == NULL) {                          \
-        prerr("Cannot allocate memory for attribute %s", NAME); \
-        return -1;                               \
-    }                                           \
-    attr->header.name = NAME;                   \
-    attr->header.attribute_length = LENGTH
+#define PARSE_ATTRIBUTE_BASE(TYPE, NAME, LENGTH)                              \
+  TYPE *attr = my_alloc (TYPE);                                               \
+  if (attr == NULL)                                                           \
+    {                                                                         \
+      prerr ("Cannot allocate memory for attribute %s", NAME);                \
+      return -1;                                                              \
+    }                                                                         \
+  attr->header.name = NAME;                                                   \
+  attr->header.attribute_length = LENGTH
 
-#define CHECK_ERROR_AND_SET(err, msg, new_attribute, attribute) \
-    do { \
-        if (err) { \
-            prerr("Parse %s failed", msg); \
-            if (new_attribute) *new_attribute = NULL; \
-            return -1; \
-        } \
-        if (new_attribute) *new_attribute = (struct rt_attribute *) attribute; \
-    } while (0)
+#define CHECK_ERROR_AND_SET(err, msg, new_attribute, attribute)               \
+  do                                                                          \
+    {                                                                         \
+      if (err)                                                                \
+        {                                                                     \
+          prerr ("Parse %s failed", msg);                                     \
+          if (new_attribute)                                                  \
+            *new_attribute = NULL;                                            \
+          return -1;                                                          \
+        }                                                                     \
+      if (new_attribute)                                                      \
+        *new_attribute = (struct rt_attribute *)attribute;                    \
+    }                                                                         \
+  while (0)
 
-int parse_rt_code_attribute(struct runtime_cp *, struct rt_code_attribute* attr, struct Code_attribute* old_attr, uint16_t )
+int
+parse_rt_code_attribute (struct runtime_cp *, struct rt_code_attribute *attr,
+                         struct Code_attribute *old_attr, uint16_t)
 {
   uint32_t code_iter;
   attr->max_stack = old_attr->max_stack;
   attr->max_locals = old_attr->max_locals;
   attr->code_length = old_attr->code_length;
-  attr->code = my_alloc_array(struct runtime_opcode, attr->code_length);
+  attr->code = my_alloc_array (struct runtime_opcode, attr->code_length);
 
   if (attr->code == NULL)
-  {
-    prerr ("can not allocate memory for code");
-    return ENOMEM;
-  }
+    {
+      prerr ("can not allocate memory for code");
+      return ENOMEM;
+    }
 
   for (code_iter = 0; code_iter < attr->code_length; ++code_iter)
-  {
-    uint8_t opcode = old_attr->code[code_iter];
-    if (OPCODE_TABLE[opcode].handler)
     {
-      attr->code[code_iter] = OPCODE_TABLE[opcode];
-      printf("Opcode - %s", attr->code[code_iter].name);
+      uint8_t opcode = old_attr->code[code_iter];
+      if (OPCODE_TABLE[opcode].handler)
+        {
+          attr->code[code_iter] = OPCODE_TABLE[opcode];
+          printf ("Opcode - %s", attr->code[code_iter].name);
+        }
+      else
+        {
+          attr->code[code_iter]
+              = (struct runtime_opcode){ .name = "UNKNOWN", .handler = NULL };
+          prerr ("Can not parse opcode %hhu", opcode);
+          return -1;
+        }
     }
-    else
-    {
-      attr->code[code_iter] = (struct runtime_opcode){
-        .name = "UNKNOWN",
-        .handler = NULL
-      };
-      prerr ("Can not parse opcode %hhu", opcode);
-      return -1;
-    }
-  }
 
   return 0;
-
-
 }
-
 
 int
 parse_single_rt_attr (struct runtime_cp *rt_cp,
@@ -76,19 +79,21 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
       return err;
     }
   printf ("Attribute name : %s\n", name);
-  if (strcmp(name, "Code"))
-  {
-    PARSE_ATTRIBUTE_BASE(struct rt_code_attribute, name, attribute_length);
-    struct Code_attribute* original_attr = (struct Code_attribute*) old_attribute;
-    err = parse_rt_code_attribute(rt_cp, attr, original_attr, runtime_cp_count);
+  if (strcmp (name, "Code"))
+    {
+      PARSE_ATTRIBUTE_BASE (struct rt_code_attribute, name, attribute_length);
+      struct Code_attribute *original_attr
+          = (struct Code_attribute *)old_attribute;
+      err = parse_rt_code_attribute (rt_cp, attr, original_attr,
+                                     runtime_cp_count);
 
-    CHECK_ERROR_AND_SET(err, name, new_attribute, attr);
-  }
+      CHECK_ERROR_AND_SET (err, name, new_attribute, attr);
+    }
   else
-  {
-    prerr ("Attribute %s is not supported", name);
-    return -1;
-  }
+    {
+      prerr ("Attribute %s is not supported", name);
+      return -1;
+    }
   return 0;
 }
 
