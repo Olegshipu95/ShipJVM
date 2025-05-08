@@ -1,6 +1,7 @@
 #ifndef SHIP_JVM_UTIL_H
 #define SHIP_JVM_UTIL_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 

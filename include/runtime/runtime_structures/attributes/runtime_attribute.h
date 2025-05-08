@@ -105,6 +105,11 @@
 // struct ModulePackages_attribute;
 // struct ModuleMainClass_attribute;
 
+struct possible_string
+{
+  bool is_present;
+  string data;
+};
 struct rt_attribute
 {
   string name;
@@ -430,13 +435,15 @@ struct rt_inner_class_entries
    * Index into the constant pool of a CONSTANT_Class_info
    * representing the outer class (0 if not member)
    */
+  // If not member than value is 'NONE'
   string outer_class;
 
   /**
    * Index into the constant pool of a CONSTANT_Utf8_info
    * representing the original name of the inner class (0 if anonymous)
    */
-  string inner_name_index;
+  // If anonymous than value is 'NONE'
+  string inner_name;
 
   /**
    * Access flags of the inner class (ACC_PUBLIC, ACC_PRIVATE, etc.)

@@ -25,6 +25,62 @@
     }                                                                         \
   while (0)
 
+// ---- InnerClasses attribute ----
+
+int
+parse_rt_innerClasses_attribute (struct runtime_cp *rt_cp,
+                                 struct rt_innerClasses_attribute *attr,
+                                 struct InnerClasses_attribute *old_attr,
+                                 uint16_t runtime_cp_count)
+{
+  int err;
+  uint16_t iter;
+  attr->number_of_classes = old_attr->number_of_classes;
+  attr->classes = my_alloc_array (struct rt_inner_class_entries,
+                                  attr->number_of_classes);
+
+  for (iter = 0; iter < attr->number_of_classes; ++iter)
+    {
+      err |= parse_rt_classname (
+          rt_cp, &attr->classes[iter].inner_class,
+          old_attr->classes[iter].inner_class_info_index, runtime_cp_count);
+      // if not member
+      if (old_attr->classes[iter].outer_class_info_index == 0)
+        {
+          attr->classes[iter].outer_class = "NONE";
+        }
+      else
+        {
+          err |= parse_rt_classname (
+              rt_cp, &attr->classes[iter].outer_class,
+              old_attr->classes[iter].outer_class_info_index,
+              runtime_cp_count);
+        }
+      // if anonymous
+      if (old_attr->classes[iter].inner_name_index == 0)
+        {
+          attr->classes[iter].inner_name = "NONE";
+        }
+      else
+        {
+          err |= parse_rt_index_to_string (
+              rt_cp, &attr->classes[iter].inner_name,
+              old_attr->classes[iter].inner_name_index, runtime_cp_count);
+        }
+      if (err)
+        {
+          prerr ("Can not parse innerClasses");
+          return -1;
+        }
+      attr->classes[iter].inner_class_access_flags
+          = old_attr->classes[iter].inner_class_access_flags;
+      printf ("  inner_cl: %s, outer_cl: %s, inner_name: %s\n",
+              attr->classes[iter].inner_class, attr->classes[iter].outer_class,
+              attr->classes[iter].inner_name);
+    }
+  return 0;
+}
+
 // ---- SourceFile attribute ----
 
 int
@@ -622,6 +678,17 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
                                           runtime_cp_count);
       CHECK_ERROR_AND_SET (err, name, new_attribute, attr);
     }
+  else if (strcmp (name, "InnerClasses") == 0)
+    // start converting InnerClasses
+    {
+      PARSE_ATTRIBUTE_BASE (struct rt_innerClasses_attribute, name,
+                            attribute_length);
+      struct InnerClasses_attribute *original_attr
+          = (struct InnerClasses_attribute *)old_attribute;
+      err = parse_rt_innerClasses_attribute (rt_cp, attr, original_attr,
+                                           runtime_cp_count);
+      CHECK_ERROR_AND_SET (err, name, new_attribute, attr);
+    }
     else if (strcmp (name, "SourceFile") == 0)
     // start converting SourceFile
     {
@@ -630,7 +697,7 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
       struct SourceFile_attribute *original_attr
           = (struct SourceFile_attribute *)old_attribute;
       err = parse_rt_sourceFile_attribute (rt_cp, attr, original_attr,
-                                          runtime_cp_count);
+                                           runtime_cp_count);
       CHECK_ERROR_AND_SET (err, name, new_attribute, attr);
     }
   else
