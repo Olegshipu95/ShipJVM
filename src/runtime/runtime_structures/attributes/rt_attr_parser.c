@@ -686,10 +686,10 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
       struct InnerClasses_attribute *original_attr
           = (struct InnerClasses_attribute *)old_attribute;
       err = parse_rt_innerClasses_attribute (rt_cp, attr, original_attr,
-                                           runtime_cp_count);
+                                             runtime_cp_count);
       CHECK_ERROR_AND_SET (err, name, new_attribute, attr);
     }
-    else if (strcmp (name, "SourceFile") == 0)
+  else if (strcmp (name, "SourceFile") == 0)
     // start converting SourceFile
     {
       PARSE_ATTRIBUTE_BASE (struct rt_sourceFile_attribute, name,
