@@ -47,7 +47,7 @@ parse_rt_code_attribute (struct runtime_cp *, struct rt_code_attribute *attr,
       if (OPCODE_TABLE[opcode].handler)
         {
           attr->code[code_iter] = OPCODE_TABLE[opcode];
-          printf ("Opcode - %s", attr->code[code_iter].name);
+          printf ("   #%-3u - %s\n", code_iter, attr->code[code_iter].name);
         }
       else
         {
@@ -79,7 +79,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
       return err;
     }
   printf ("Attribute name : %s\n", name);
-  if (strcmp (name, "Code"))
+  printf("name size - %zu\n", strlen(name));
+  if (strcmp (name, "Code") == 0)
     {
       PARSE_ATTRIBUTE_BASE (struct rt_code_attribute, name, attribute_length);
       struct Code_attribute *original_attr
@@ -114,7 +115,6 @@ parse_rt_attributes (struct runtime_cp *rt_cp,
     }
   for (iter = 0; iter < attributes_count; iter++)
     {
-      printf ("Iteration %hu :", iter);
       err |= parse_single_rt_attr (rt_cp, &new_attributes[iter],
                                    old_attributes[iter], runtime_cp_count);
     }
