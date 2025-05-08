@@ -6,7 +6,7 @@ CFLAGS = -std=c11 -Wall -Wextra -Werror -fstack-protector-strong
 LDFLAGS = 
 
 # Флаги для разных сборок
-RELEASE_FLAGS = -O2 -DNDEBUG -flto
+RELEASE_FLAGS = -O2 -DNDEBUG -flto=6
 DEBUG_FLAGS = -g3 -O0 -DDEBUG -fno-omit-frame-pointer
 SANITIZE_FLAGS = -fsanitize=address,undefined,leak \
                  -fsanitize=float-divide-by-zero \

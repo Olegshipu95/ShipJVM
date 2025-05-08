@@ -206,10 +206,37 @@
 #define OPC_IFNONNULL 199
 #define OPC_GOTO_W 200
 #define OPC_JSR_W 201
+#define OPC_NUM_OPCODES 256
+
+// Illegal instructions
 #define OPC_BREAKPOINT 202
+#define OPC_LDC_QUICK 203
+#define OPC_LDC_W_QUICK 204
+#define OPC_LDC2_W_QUICK 205
+#define OPC_GETFIELD_QUICK 206
+#define OPC_PUTFIELD_QUICK 207
+#define OPC_GETFIELD2_QUICK 208
+#define OPC_PUTFIELD2_QUICK 209
+#define OPC_GETSTATIC_QUICK 210
+#define OPC_PUTSTATIC_QUICK 211
+#define OPC_GETSTATIC2_QUICK 212
+#define OPC_PUTSTATIC2_QUICK 213
+#define OPC_INVOKEVIRTUAL_QUICK 214
+#define OPC_INVOKENONVIRTUAL_QUICK 215
+#define OPC_INVOKESUPER_QUICK 216
+#define OPC_INVOKESTATIC_QUICK 217
+#define OPC_INVOKEINTERFACE_QUICK 218
+#define OPC_INVOKEVIRTUALOBJECT_QUICK 219
+#define OPC_NEW_QUICK 221
+#define OPC_ANEWARRAY_QUICK 222
+#define OPC_MULTIANEWARRAY_QUICK 223
+#define OPC_CHECKCAST_QUICK 224
+#define OPC_INSTANCEOF_QUICK 225
+#define OPC_INVOKEVIRTUAL_QUICK_W 226
+#define OPC_GETFIELD_QUICK_W 227
+#define OPC_PUTFIELD_QUICK_W 228
 #define OPC_IMPDEP1 254
 #define OPC_IMPDEP2 255
-#define OPC_NUM_OPCODES 256
 
 typedef void (*opcode_handler) (struct stack_frame *);
 
@@ -1477,6 +1504,8 @@ void opcode_tableswitch (struct stack_frame *frame); // 170 (0xaa)
  */
 void opcode_wide (struct stack_frame *frame); // 196 (0xc4)
 
+void opcode_error (struct stack_frame *);
+
 static const struct runtime_opcode OPCODE_TABLE[OPCODES_NUMBER] = {
   [OPC_NOP] = { "nop", opcode_nop },
   [OPC_ACONST_NULL] = { "aconst_null", opcode_aconst_null },
@@ -1680,10 +1709,36 @@ static const struct runtime_opcode OPCODE_TABLE[OPCODES_NUMBER] = {
   [OPC_IFNONNULL] = { "ifnonnull", opcode_ifnonnull },
   [OPC_GOTO_W] = { "goto_w", opcode_goto_w },
   [OPC_JSR_W] = { "jsr_w", opcode_jsr_w },
-  // [OPC_BREAKPOINT] = {"opc_breakpoint", opcode_breakpoint},
-  // [OPC_IMPDEP1] = {"opc_impdep1", opcode_impdep1},
-  // [OPC_IMPDEP2] = {"opc_impdep2", opcode_impdep2},
-  // [OPC_NUM_OPCODES] = {"opc_num_opcodes", opcode_num_opcodes},
+  [OPC_BREAKPOINT] = { "OPC_BREAKPOINT", opcode_error },
+  [OPC_LDC_QUICK] = { "OPC_LDC_QUICK", opcode_error },
+  [OPC_LDC_W_QUICK] = { "OPC_LDC_W_QUICK", opcode_error },
+  [OPC_LDC2_W_QUICK] = { "OPC_LDC2_W_QUICK", opcode_error },
+  [OPC_GETFIELD_QUICK] = { "OPC_GETFIELD_QUICK", opcode_error },
+  [OPC_PUTFIELD_QUICK] = { "OPC_PUTFIELD_QUICK", opcode_error },
+  [OPC_GETFIELD2_QUICK] = { "OPC_GETFIELD2_QUICK", opcode_error },
+  [OPC_PUTFIELD2_QUICK] = { "OPC_PUTFIELD2_QUICK", opcode_error },
+  [OPC_GETSTATIC_QUICK] = { "OPC_GETSTATIC_QUICK", opcode_error },
+  [OPC_PUTSTATIC_QUICK] = { "OPC_PUTSTATIC_QUICK", opcode_error },
+  [OPC_GETSTATIC2_QUICK] = { "OPC_GETSTATIC2_QUICK", opcode_error },
+  [OPC_PUTSTATIC2_QUICK] = { "OPC_PUTSTATIC2_QUICK", opcode_error },
+  [OPC_INVOKEVIRTUAL_QUICK] = { "OPC_INVOKEVIRTUAL_QUICK", opcode_error },
+  [OPC_INVOKENONVIRTUAL_QUICK]
+  = { "OPC_INVOKENONVIRTUAL_QUICK", opcode_error },
+  [OPC_INVOKESUPER_QUICK] = { "OPC_INVOKESUPER_QUICK", opcode_error },
+  [OPC_INVOKESTATIC_QUICK] = { "OPC_INVOKESTATIC_QUICK", opcode_error },
+  [OPC_INVOKEINTERFACE_QUICK] = { "OPC_INVOKEINTERFACE_QUICK", opcode_error },
+  [OPC_INVOKEVIRTUALOBJECT_QUICK]
+  = { "OPC_INVOKEVIRTUALOBJECT_QUICK", opcode_error },
+  [OPC_NEW_QUICK] = { "OPC_NEW_QUICK", opcode_error },
+  [OPC_ANEWARRAY_QUICK] = { "OPC_ANEWARRAY_QUICK", opcode_error },
+  [OPC_MULTIANEWARRAY_QUICK] = { "OPC_MULTIANEWARRAY_QUICK", opcode_error },
+  [OPC_CHECKCAST_QUICK] = { "OPC_CHECKCAST_QUICK", opcode_error },
+  [OPC_INSTANCEOF_QUICK] = { "OPC_INSTANCEOF_QUICK", opcode_error },
+  [OPC_INVOKEVIRTUAL_QUICK_W] = { "OPC_INVOKEVIRTUAL_QUICK_W", opcode_error },
+  [OPC_GETFIELD_QUICK_W] = { "OPC_GETFIELD_QUICK_W", opcode_error },
+  [OPC_PUTFIELD_QUICK_W] = { "OPC_PUTFIELD_QUICK_W", opcode_error },
+  [OPC_IMPDEP1] = { "OPC_IMPDEP1", opcode_error },
+  [OPC_IMPDEP2] = { "OPC_IMPDEP2", opcode_error }
 };
 
 #endif

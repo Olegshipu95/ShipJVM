@@ -18,7 +18,7 @@ parse_attribute (Loader *loader, struct class_file *class)
 
   if (UTF8 && UTF8->bytes)
     {
-      printf ("ATTRIBUTE IS - %.*s\n", UTF8->lenght, UTF8->bytes);
+      // printf ("ATTRIBUTE IS - %.*s\n", UTF8->lenght, UTF8->bytes);
     }
   else
     {
@@ -915,7 +915,7 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
 
       entry->chop_frame.offset_delta = loader_u2 (loader);
     }
-  else if (entry->frame_type == 250)
+  else if (entry->frame_type == 251)
     { // SAME_FRAME_EXTENDED
 
       entry->same_frame_extended.offset_delta = loader_u2 (loader);
@@ -946,9 +946,8 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
       entry->full_frame.offset_delta = loader_u2 (loader);
       entry->full_frame.number_of_locals = loader_u2 (loader);
 
-      entry->full_frame.locals
-          = malloc ((size_t)(entry->full_frame.number_of_locals)
-                    * sizeof (union verification_type_info));
+      entry->full_frame.locals = my_alloc_array (
+          union verification_type_info, entry->full_frame.number_of_locals);
 
       if (entry->full_frame.locals == NULL)
         {
@@ -966,10 +965,10 @@ stack_map_frame_parser (Loader *loader, union stack_map_frame *entry)
           = malloc ((size_t)(entry->full_frame.number_of_stack_items)
                     * sizeof (union verification_type_info));
 
-      if (entry->full_frame.locals == NULL)
+      if (entry->full_frame.stack == NULL)
         {
           prerr ("Can not allocate memory for "
-                 "entry->full_frame.number_of_stack_items");
+                 "entry->full_frame.stack");
           return ENOMEM;
         }
 

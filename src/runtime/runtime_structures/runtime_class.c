@@ -194,6 +194,17 @@ jclass_new (struct jclass **jclass, struct class_file *class_file)
   err = parse_rt_methods (new->runtime_cp, &new->methods, class_file->methods,
                           class_file->methods_count, new->runtime_cp_count);
 
+  if (err)
+    {
+      prerr ("can not convert methods");
+      return -1;
+    }
+
+  new->attributes_count = class_file->attributes_count;
+  err = parse_rt_attributes (new->runtime_cp, &new->attributes,
+                             class_file->attributes, new->attributes_count,
+                             new->runtime_cp_count);
+
   *jclass = new;
   return 0;
 }

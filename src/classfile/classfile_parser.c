@@ -28,124 +28,125 @@ parse_const_pool (struct class_file *class, Loader *loader)
       return ENOMEM;
     }
 
-  printf ("CONSTANT POOL:\n");
+  // printf ("CONSTANT POOL:\n");
 
   for (i = 0; i < pool_count - 1; i++)
     {
       tag = loader_u1 (loader);
       class->constant_pool[i].tag = tag;
-      printf (" I - %-3hu, tag is - %-3hhu, type - ", i + 1, tag);
+      // printf (" I - %-3hu, tag is - %-3hhu, type - ", i + 1, tag);
 
       switch (tag)
         {
         case UTF8:
-          printf ("Utf8, ");
+          // printf ("Utf8, ");
           read_utf8_info (loader, &(class->constant_pool[i].utf8_info));
-          printf ("data - %.*s\n", class->constant_pool[i].utf8_info.lenght,
-                  class->constant_pool[i].utf8_info.bytes);
+          // printf ("data - %.*s\n", class->constant_pool[i].utf8_info.lenght,
+          // class->constant_pool[i].utf8_info.bytes);
           break;
         case INTEGER:
-          printf ("Integer\n");
+          // printf ("Integer\n");
           read_primitive_info (loader,
                                &(class->constant_pool[i].integer_info.info));
           break;
         case FLOAT:
-          printf ("Float\n");
+          // printf ("Float\n");
           read_primitive_info (loader,
                                &(class->constant_pool[i].float_info.info));
           break;
         case LONG:
-          printf ("Long, ");
+          // printf ("Long, ");
           read_big_primitive_info (loader,
                                    &(class->constant_pool[i].long_info.info));
           class->constant_pool[i + 1].long_info.info
               = class->constant_pool[i].long_info.info;
 
-          {
-            // for print
-            int64_t combined
-                = ((int64_t) class->constant_pool[i].long_info.info.high_bytes
-                   << 32)
-                  | class->constant_pool[i].long_info.info.low_bytes;
-            printf ("data - %ldl\n", combined);
-          }
+          // {
+          // for print
+          //   int64_t combined
+          //       = ((int64_t)
+          //       class->constant_pool[i].long_info.info.high_bytes
+          //          << 32)
+          //         | class->constant_pool[i].long_info.info.low_bytes;
+          //   // printf ("data - %ldl\n", combined);
+          // }
           ++i;
           break;
         case DOUBLE:
-          printf ("Double, ");
+          // printf ("Double, ");
           read_big_primitive_info (
               loader, &(class->constant_pool[i].double_info.info));
           class->constant_pool[i + 1].double_info.info
               = class->constant_pool[i].double_info.info;
 
-          {
-            uint64_t combined
-                = ((uint64_t) class->constant_pool[i]
-                       .double_info.info.high_bytes
-                   << 32)
-                  | class->constant_pool[i].double_info.info.low_bytes;
-            double result;
-            memcpy (&result, &combined, sizeof (double));
-            printf ("data - %f\n", result);
-          }
+          // {
+          //   uint64_t combined
+          //       = ((uint64_t) class->constant_pool[i]
+          //              .double_info.info.high_bytes
+          //          << 32)
+          //         | class->constant_pool[i].double_info.info.low_bytes;
+          //   double result;
+          //   memcpy (&result, &combined, sizeof (double));
+          // printf ("data - %f\n", result);
+          // }
           ++i;
           break;
         case CLASS:
-          printf ("Class, ");
+          // printf ("Class, ");
           read_class_info (loader, &(class->constant_pool[i].class_info));
-          printf ("data - %hu\n",
-                  class->constant_pool[i].class_info.name_index);
+          // printf ("data - %hu\n",
+          // class->constant_pool[i].class_info.name_index);
           break;
         case STRING:
-          printf ("String\n");
+          // printf ("String\n");
           read_string_info (loader, &(class->constant_pool[i].string_info));
           break;
         case FIELD_REF:
-          printf ("Fieldref\n");
+          // printf ("Fieldref\n");
           read_ref_type_info (loader,
                               &(class->constant_pool[i].fieldref_info.info));
           break;
         case METHOD_REF:
-          printf ("Methodref\n");
+          // printf ("Methodref\n");
           read_ref_type_info (loader,
                               &(class->constant_pool[i].methodref_info.info));
           break;
         case INTERF_METHOD_REF:
-          printf ("IntegerMethod\n");
+          // printf ("IntegerMethod\n");
           read_ref_type_info (
               loader, &(class->constant_pool[i].interface_meth_ref_info.info));
           break;
         case NAME_AND_TYPE:
-          printf ("NameAndType\n");
+          // printf ("NameAndType\n");
           read_name_and_type_info (
               loader, &(class->constant_pool[i].name_and_type_info));
           break;
         case METHOD_HANDLE:
-          printf ("MethodHandle\n");
+          // printf ("MethodHandle\n");
           read_method_handle_info (
               loader, &(class->constant_pool[i].method_handle_info));
           break;
         case METHOD_TYPE:
-          printf ("MethodType\n");
+          // printf ("MethodType\n");
           read_method_type_info (loader,
                                  &(class->constant_pool[i].method_type_info));
           break;
         case DYNAMIC:
-          printf ("Dynamic\n");
+          // printf ("Dynamic\n");
           read_dynamic_info (loader,
                              &(class->constant_pool[i].dynamic_info.info));
           break;
         case INVOKE_METHOD:
-          printf ("InvokeMethod\n");
+          // printf ("InvokeMethod\n");
           read_dynamic_info (
               loader, &(class->constant_pool[i].invoke_dynamic_info.info));
           break;
         case MODULE:
-          printf ("Module\n");
+          // printf ("Module\n");
           read_module_info (loader, &(class->constant_pool[i].module_info));
           break;
         case PACKAGE:
-          printf ("Package\n");
+          // printf ("Package\n");
           read_package_info (loader, &(class->constant_pool[i].package_info));
           break;
         default:

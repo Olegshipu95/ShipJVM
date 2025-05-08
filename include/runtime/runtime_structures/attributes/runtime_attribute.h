@@ -113,17 +113,19 @@ struct rt_attribute
 
 // struct ConstantValue_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 //   uint16_t constant_value_index;
 // };
 
-// struct exception_table
-// {
-//   uint16_t start_pc;
-//   uint16_t end_pc;
-//   uint16_t handler_pc;
-//   uint16_t catch_type;
-// };
+struct rt_exception_table
+{
+  // he exception handler must be active while the program counter is within
+  // the interval [start_pc, end_pc).
+  uint16_t start_pc;
+  uint16_t end_pc;
+  uint16_t handler_pc; // start of the exception handler
+  string catch_type;   // constant_class
+};
 
 struct rt_code_attribute
 {
@@ -133,168 +135,168 @@ struct rt_code_attribute
   uint32_t code_length;
   struct runtime_opcode *code; /* size = code_length */
   uint16_t exception_table_length;
-  struct exception_table *table; /* size = exception_table_length */
+  struct rt_exception_table *table; /* size = exception_table_length */
   uint16_t attributes_count;
-  struct attribute_info **attributes; /* size = attributes_count */
+  struct rt_attribute **attributes; /* size = attributes_count */
 };
 
-// /**
-//  * Union representing verification type info in StackMapTable
-//  * Uses tag byte to determine which type is actually stored
-//  */
-// union verification_type_info
-// {
-//   uint8_t tag;
-//   struct
-//   {
-//     uint8_t tag; // = ITEM_Top (0)
-//   } Top_variable_info;
+/**
+ * Union representing verification type info in StackMapTable
+ * Uses tag byte to determine which type is actually stored
+ */
+union rt_verification_type_info
+{
+  uint8_t tag;
+  struct
+  {
+    uint8_t tag; // = ITEM_Top (0)
+  } Top_variable_info;
 
-//   struct
-//   {
-//     uint8_t tag; // = ITEM_Integer (1)
-//   } Integer_variable_info;
+  struct
+  {
+    uint8_t tag; // = ITEM_Integer (1)
+  } Integer_variable_info;
 
-//   struct
-//   {
-//     uint8_t tag; // = ITEM_Float (2)
-//   } Float_variable_info;
+  struct
+  {
+    uint8_t tag; // = ITEM_Float (2)
+  } Float_variable_info;
 
-//   struct
-//   {
-//     uint8_t tag; // = ITEM_Long (4)
-//   } Long_variable_info;
+  struct
+  {
+    uint8_t tag; // = ITEM_Long (4)
+  } Long_variable_info;
 
-//   struct
-//   {
-//     uint8_t tag; // = ITEM_Double (3)
-//   } Double_variable_info;
+  struct
+  {
+    uint8_t tag; // = ITEM_Double (3)
+  } Double_variable_info;
 
-//   struct
-//   {
-//     uint8_t tag; // = ITEM_Null (5)
-//   } Null_variable_info;
+  struct
+  {
+    uint8_t tag; // = ITEM_Null (5)
+  } Null_variable_info;
 
-//   struct
-//   {
-//     uint8_t tag; // = ITEM_UninitializedThis (6)
-//   } UninitializedThis_variable_info;
+  struct
+  {
+    uint8_t tag; // = ITEM_UninitializedThis (6)
+  } UninitializedThis_variable_info;
 
-//   struct
-//   {
-//     uint8_t tag;          // = ITEM_Object (7)
-//     uint16_t cpool_index; // Constant pool index
-//   } Object_variable_info;
+  struct
+  {
+    uint8_t tag;  // = ITEM_Object (7)
+    string cpool; // class info
+  } Object_variable_info;
 
-//   struct
-//   {
-//     uint8_t tag;     // = ITEM_Uninitialized (8)
-//     uint16_t offset; // Bytecode offset
-//   } Uninitialized_variable_info;
-// };
+  struct
+  {
+    uint8_t tag;     // = ITEM_Uninitialized (8)
+    uint16_t offset; // Bytecode offset
+  } Uninitialized_variable_info;
+};
 
-// /**
-//  * Union representing different stack map frame types
-//  */
-// union stack_map_frame
-// {
-//   uint8_t frame_type;
-//   /**
-//    * Frame type where the frame has exactly the same locals as the previous
-//    * frame and the operand stack is empty (frame_type = 0-63)
-//    */
-//   struct
-//   {
-//     uint8_t frame_type; /* SAME (0-63) */
-//   } same_frame;
+/**
+ * Union representing different stack map frame types
+ */
+union rt_stack_map_frame
+{
+  uint8_t frame_type;
+  /**
+   * Frame type where the frame has exactly the same locals as the previous
+   * frame and the operand stack is empty (frame_type = 0-63)
+   */
+  struct
+  {
+    uint8_t frame_type; /* SAME (0-63) */
+  } same_frame;
 
-//   /**
-//    * Frame type where the frame has exactly the same locals as the previous
-//    * frame and the operand stack has one entry (frame_type = 64-127)
-//    */
-//   struct
-//   {
-//     uint8_t frame_type; /* SAME_LOCALS_1_STACK_ITEM (64-127) */
-//     union verification_type_info *stack; // size = 1
-//   } same_locals_1_stack_item_frame;
+  /**
+   * Frame type where the frame has exactly the same locals as the previous
+   * frame and the operand stack has one entry (frame_type = 64-127)
+   */
+  struct
+  {
+    uint8_t frame_type; /* SAME_LOCALS_1_STACK_ITEM (64-127) */
+    union rt_verification_type_info *stack; // size = 1
+  } same_locals_1_stack_item_frame;
 
-//   /**
-//    * Frame type where the frame has exactly the same locals as the previous
-//    * frame except one additional verification type on the stack, with
-//    explicit
-//    * offset delta
-//    */
-//   struct
-//   {
-//     uint8_t frame_type; /* SAME_LOCALS_1_STACK_ITEM_EXTENDED (247) */
-//     uint16_t offset_delta;
-//     union verification_type_info *stack; // size = 1
-//   } same_locals_1_stack_item_frame_extended;
+  /**
+   * Frame type where the frame has exactly the same locals as the previous
+   * frame except one additional verification type on the stack, with
+   explicit
+   * offset delta
+   */
+  struct
+  {
+    uint8_t frame_type; /* SAME_LOCALS_1_STACK_ITEM_EXTENDED (247) */
+    uint16_t offset_delta;
+    union rt_verification_type_info *stack; // size = 1
+  } same_locals_1_stack_item_frame_extended;
 
-//   /**
-//    * Frame type where the frame has the same locals as the previous frame
-//    * except that the last k locals are absent (frame_type = 248-250)
-//    */
-//   struct
-//   {
-//     uint8_t frame_type; /* CHOP (248-250) */
-//     uint16_t offset_delta;
-//   } chop_frame;
+  /**
+   * Frame type where the frame has the same locals as the previous frame
+   * except that the last k locals are absent (frame_type = 248-250)
+   */
+  struct
+  {
+    uint8_t frame_type; /* CHOP (248-250) */
+    uint16_t offset_delta;
+  } chop_frame;
 
-//   /**
-//    * Frame type that has exactly the same locals as the previous frame and
-//    * the operand stack is empty, with explicit offset delta
-//    */
-//   struct
-//   {
-//     uint8_t frame_type; /* SAME_FRAME_EXTENDED (251) */
-//     uint16_t offset_delta;
-//   } same_frame_extended;
+  /**
+   * Frame type that has exactly the same locals as the previous frame and
+   * the operand stack is empty, with explicit offset delta
+   */
+  struct
+  {
+    uint8_t frame_type; /* SAME_FRAME_EXTENDED (251) */
+    uint16_t offset_delta;
+  } same_frame_extended;
 
-//   /**
-//    * Frame type where the frame has the same locals as the previous frame
-//    * except that k additional locals are defined (frame_type = 252-254)
-//    */
-//   struct
-//   {
-//     uint8_t frame_type; /* APPEND (252-254) */
-//     uint16_t offset_delta;
-//     union verification_type_info *locals; /* size = frame_type - 251 */
-//   } append_frame;
+  /**
+   * Frame type where the frame has the same locals as the previous frame
+   * except that k additional locals are defined (frame_type = 252-254)
+   */
+  struct
+  {
+    uint8_t frame_type; /* APPEND (252-254) */
+    uint16_t offset_delta;
+    union rt_verification_type_info *locals; /* size = frame_type - 251 */
+  } append_frame;
 
-//   /**
-//    * Complete frame data with explicit locals and stack info
-//    */
-//   struct
-//   {
-//     uint8_t frame_type; /* FULL_FRAME (255) */
-//     uint16_t offset_delta;
-//     uint16_t number_of_locals;
-//     union verification_type_info *locals; /* size = number_of_locals */
-//     uint16_t number_of_stack_items;
-//     union verification_type_info *stack; /* size = number_of_stack_items */
-//   } full_frame;
-// };
+  /**
+   * Complete frame data with explicit locals and stack info
+   */
+  struct
+  {
+    uint8_t frame_type; /* FULL_FRAME (255) */
+    uint16_t offset_delta;
+    uint16_t number_of_locals;
+    union rt_verification_type_info *locals; /* size = number_of_locals */
+    uint16_t number_of_stack_items;
+    union rt_verification_type_info *stack; /* size = number_of_stack_items */
+  } full_frame;
+};
 
-// /**
-//  * StackMapTable attribute structure as defined in JVM specification
-//  */
-// struct StackMapTable_attribute
-// {
-//   struct attribute_info info;
+/**
+ * StackMapTable attribute structure as defined in JVM specification
+ */
+struct rt_stackMapTable_attribute
+{
+  struct rt_attribute header;
 
-//   /**
-//    * Number of stack map frame entries in this attribute
-//    */
-//   uint16_t number_of_entries;
+  /**
+   * Number of stack map frame entries in this attribute
+   */
+  uint16_t number_of_entries;
 
-//   /**
-//    * Array of stack map frames describing the state of
-//    * the local variables and operand stack at specific
-//    * bytecode offsets
-//    */
-//   union stack_map_frame *entries; /* array of size number_of_entries */
-// };
+  /**
+   * Array of stack map frames describing the state of
+   * the local variables and operand stack at specific
+   * bytecode offsets
+   */
+  union rt_stack_map_frame *entries; /* array of size number_of_entries */
+};
 
 // struct bootstrap_methods
 // {
@@ -322,7 +324,7 @@ struct rt_code_attribute
 //  */
 // struct BootstrapMethods_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of bootstrap methods in this attribute
@@ -343,7 +345,7 @@ struct rt_code_attribute
 //  */
 // struct NestHost_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Index into the constant pool of a CONSTANT_Class_info
@@ -352,26 +354,26 @@ struct rt_code_attribute
 //   uint16_t host_class_index;
 // };
 
-// /**
-//  * NestMembers attribute structure (Java 11+)
-//  * Lists all classes that are members of the nest hosted by the current
-//  class
-//  */
-// struct NestMembers_attribute
-// {
-//   struct attribute_info info;
+/**
+ * NestMembers attribute structure (Java 11+)
+ * Lists all classes that are members of the nest hosted by the current
+ class
+ */
+struct rt_nestMembers_attribute
+{
+  struct rt_attribute header;
 
-//   /**
-//    * Number of classes in the nest
-//    */
-//   uint16_t number_of_classes;
+  /**
+   * Number of classes in the nest
+   */
+  uint16_t number_of_classes;
 
-//   /**
-//    * Array of constant pool indices (each a CONSTANT_Class_info)
-//    * representing the nest member classes
-//    */
-//   uint16_t *classes; /* array of size number_of_classes */
-// };
+  /**
+   * Array of constant pool indices (each a CONSTANT_Class_info)
+   * representing the nest member classes
+   */
+  string *classes; /* array of size number_of_classes */
+};
 
 // /**
 //  * PermittedSubclasses attribute structure (Java 17+)
@@ -379,7 +381,7 @@ struct rt_code_attribute
 //  */
 // struct PermittedSubclasses_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of permitted subclasses
@@ -393,70 +395,70 @@ struct rt_code_attribute
 //   uint16_t *classes; /* array of size number_of_classes */
 // };
 
-// /**
-//  * Exceptions attribute structure
-//  * Lists checked exceptions that may be thrown by a method
-//  */
-// struct Exceptions_attribute
-// {
-//   struct attribute_info info;
+/**
+ * Exceptions attribute structure
+ * Lists checked exceptions that may be thrown by a method
+ */
+struct rt_exceptions_attribute
+{
+  struct rt_attribute header;
 
-//   /**
-//    * Number of exceptions in the exception table
-//    */
-//   uint16_t number_of_exceptions;
+  /**
+   * Number of exceptions in the exception table
+   */
+  uint16_t number_of_exceptions;
 
-//   /**
-//    * Array of constant pool indices (each a CONSTANT_Class_info)
-//    * representing the exception classes
-//    */
-//   uint16_t *exception_index_table; /* array of size number_of_exceptions */
-// };
+  /**
+   * Array of constant pool indices (each a CONSTANT_Class_info)
+   * representing the exception classes
+   */
+  string *exception_table; /* array of size number_of_exceptions */
+};
 
-// /**
-//  * Array of inner class entries
-//  */
-// struct inner_class_entries
-// {
-//   /**
-//    * Index into the constant pool of a CONSTANT_Class_info
-//    * representing the inner class
-//    */
-//   uint16_t inner_class_info_index;
+/**
+ * Array of inner class entries
+ */
+struct rt_inner_class_entries
+{
+  /**
+   * Index into the constant pool of a CONSTANT_Class_info
+   * representing the inner class
+   */
+  string inner_class;
 
-//   /**
-//    * Index into the constant pool of a CONSTANT_Class_info
-//    * representing the outer class (0 if not member)
-//    */
-//   uint16_t outer_class_info_index;
+  /**
+   * Index into the constant pool of a CONSTANT_Class_info
+   * representing the outer class (0 if not member)
+   */
+  string outer_class;
 
-//   /**
-//    * Index into the constant pool of a CONSTANT_Utf8_info
-//    * representing the original name of the inner class (0 if anonymous)
-//    */
-//   uint16_t inner_name_index;
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the original name of the inner class (0 if anonymous)
+   */
+  string inner_name_index;
 
-//   /**
-//    * Access flags of the inner class (ACC_PUBLIC, ACC_PRIVATE, etc.)
-//    */
-//   uint16_t inner_class_access_flags;
-// };
+  /**
+   * Access flags of the inner class (ACC_PUBLIC, ACC_PRIVATE, etc.)
+   */
+  uint16_t inner_class_access_flags;
+};
 
-// /**
-//  * InnerClasses attribute structure
-//  * Contains information about inner classes of a class
-//  */
-// struct InnerClasses_attribute
-// {
-//   struct attribute_info info;
+/**
+ * InnerClasses attribute structure
+ * Contains information about inner classes of a class
+ */
+struct rt_innerClasses_attribute
+{
+  struct rt_attribute header;
 
-//   /**
-//    * Number of entries in the classes table
-//    */
-//   uint16_t number_of_classes;
+  /**
+   * Number of entries in the classes table
+   */
+  uint16_t number_of_classes;
 
-//   struct inner_class_entries *classes; /* array of size number_of_classes */
-// };
+  struct rt_inner_class_entries *classes; /* array of size number_of_classes */
+};
 
 // /**
 //  * EnclosingMethod attribute structure
@@ -464,7 +466,7 @@ struct rt_code_attribute
 //  */
 // struct EnclosingMethod_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Index into the constant pool of a CONSTANT_Class_info
@@ -486,23 +488,23 @@ struct rt_code_attribute
 //  */
 // struct Synthetic_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 // };
 
-// /**
-//  * Signature attribute structure
-//  * Stores generic type information for classes, methods, and fields
-//  */
-// struct Signature_attribute
-// {
-//   struct attribute_info info;
+/**
+ * Signature attribute structure
+ * Stores generic type information for classes, methods, and fields
+ */
+struct rt_signature_attribute
+{
+  struct rt_attribute header;
 
-//   /**
-//    * Index into the constant pool of a CONSTANT_Utf8_info
-//    * containing the generic signature string
-//    */
-//   uint16_t signature_index;
-// };
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * containing the generic signature string
+   */
+  string signature;
+};
 
 // /**
 //  * Record component information structure
@@ -539,7 +541,7 @@ struct rt_code_attribute
 //  */
 // struct Record_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of components in this record
@@ -553,56 +555,57 @@ struct rt_code_attribute
 //       *components; /* array of size components_count */
 // };
 
-// /**
-//  * SourceFile attribute structure
-//  * Records the source file from which this class was compiled
-//  */
-// struct SourceFile_attribute
-// {
-//   struct attribute_info info;
+/**
+ * SourceFile attribute structure
+ * Records the source file from which this class was compiled
+ */
+struct rt_sourceFile_attribute
+{
+  struct rt_attribute header;
 
-//   /**
-//    * Index into the constant pool of a CONSTANT_Utf8_info
-//    * representing the source file name
-//    */
-//   uint16_t sourcefile_index;
-// };
+  /**
+   * Index into the constant pool of a CONSTANT_Utf8_info
+   * representing the source file name
+   */
+  string sourcefile;
+};
 
-// /**
-//  * Array of line number entries
-//  */
-// struct line_number_table
-// {
-//   /**
-//    * Bytecode offset (program counter) where this line starts
-//    */
-//   uint16_t start_pc;
+/**
+ * Array of line number entries
+ */
+struct rt_line_number_table
+{
+  /**
+   * Bytecode offset (program counter) where this line starts
+   */
+  uint16_t start_pc;
 
-//   /**
-//    * Corresponding source file line number
-//    */
-//   uint16_t line_number;
-// };
+  /**
+   * Corresponding source file line number
+   */
+  uint16_t line_number;
+};
 
-// /**
-//  * LineNumberTable attribute structure
-//  * Maps bytecode offsets to source code line numbers
-//  */
-// struct LineNumberTable_attribute
-// {
-//   struct attribute_info info;
+/**
+ * LineNumberTable attribute structure
+ * Maps bytecode offsets to source code line numbers
+ */
 
-//   /**
-//    * Number of entries in the line number table
-//    */
-//   uint16_t line_number_table_length;
+struct rt_lineNumberTable_attribute
+{
+  struct rt_attribute header;
 
-//   /**
-//    * Array of line number entries
-//    */
-//   struct line_number_table *table; /* array of size line_number_table_length
-//   */
-// };
+  /**
+   * Number of entries in the line number table
+   */
+  uint16_t line_number_table_length;
+
+  /**
+   * Array of line number entries
+   */
+  struct rt_line_number_table *table; /* array of size line_number_table_length
+                                       */
+};
 
 // /**
 //  * Array of local variable entries
@@ -643,7 +646,7 @@ struct rt_code_attribute
 //  */
 // struct LocalVariableTable_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of entries in the local variable table
@@ -695,7 +698,7 @@ struct rt_code_attribute
 //  */
 // struct LocalVariableTypeTable_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of entries in the local variable type table
@@ -715,7 +718,7 @@ struct rt_code_attribute
 //  */
 // struct SourceDebugExtension_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Array of bytes containing implementation-specific debug information
@@ -729,7 +732,7 @@ struct rt_code_attribute
 //  */
 // struct Deprecated_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 // };
 
 // struct element_value_pairs;
@@ -838,7 +841,7 @@ struct rt_code_attribute
 //  */
 // struct RuntimeVisibleAnnotations_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of annotations
@@ -857,7 +860,7 @@ struct rt_code_attribute
 //  */
 // struct RuntimeInvisibleAnnotations_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of annotations
@@ -892,7 +895,7 @@ struct rt_code_attribute
 //  */
 // struct RuntimeVisibleParameterAnnotations_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of method parameters
@@ -1010,7 +1013,7 @@ struct rt_code_attribute
 //  */
 // struct RuntimeInvisibleParameterAnnotations_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of method parameters
@@ -1097,7 +1100,7 @@ struct rt_code_attribute
 //  */
 // struct RuntimeVisibleTypeAnnotations_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of type annotations
@@ -1117,7 +1120,7 @@ struct rt_code_attribute
 //  */
 // struct RuntimeInvisibleTypeAnnotations_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of type annotations
@@ -1136,7 +1139,7 @@ struct rt_code_attribute
 //  */
 // struct AnnotationDefault_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * The default value for this annotation element
@@ -1164,7 +1167,7 @@ struct rt_code_attribute
 //  */
 // struct MethodParameters_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of parameter entries
@@ -1213,7 +1216,7 @@ struct rt_code_attribute
 //  */
 // struct Module_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /* Module basic info */
 //   uint16_t module_name_index;    /* CONSTANT_Module_info index */
@@ -1247,7 +1250,7 @@ struct rt_code_attribute
 //  */
 // struct ModulePackages_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Number of packages in this module
@@ -1267,7 +1270,7 @@ struct rt_code_attribute
 //  */
 // struct ModuleMainClass_attribute
 // {
-//   struct attribute_info info;
+//   struct rt_attribute header;
 
 //   /**
 //    * Index into the constant pool of a CONSTANT_Class_info
