@@ -616,6 +616,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     // start converting Code
     {
       PARSE_ATTRIBUTE_BASE (struct rt_code_attribute, name, attribute_length);
+      attr->header.type = ATTRIBUTE_Code;
+
       struct Code_attribute *original_attr
           = (struct Code_attribute *)old_attribute;
       err = parse_rt_code_attribute (rt_cp, attr, original_attr,
@@ -628,6 +630,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     {
       PARSE_ATTRIBUTE_BASE (struct rt_lineNumberTable_attribute, name,
                             attribute_length);
+      attr->header.type = ATTRIBUTE_LineNumberTable;
+
       struct LineNumberTable_attribute *original_attr
           = (struct LineNumberTable_attribute *)old_attribute;
       err = parse_rt_lineNumberTable_attribute (rt_cp, attr, original_attr,
@@ -639,6 +643,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     {
       PARSE_ATTRIBUTE_BASE (struct rt_stackMapTable_attribute, name,
                             attribute_length);
+      attr->header.type = ATTRIBUTE_StackMapTable;
+
       struct StackMapTable_attribute *original_attr
           = (struct StackMapTable_attribute *)old_attribute;
       err = parse_rt_stackMapTable_attribute (rt_cp, attr, original_attr,
@@ -650,6 +656,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     {
       PARSE_ATTRIBUTE_BASE (struct rt_nestMembers_attribute, name,
                             attribute_length);
+      attr->header.type = ATTRIBUTE_NestHost;
+
       struct NestMembers_attribute *original_attr
           = (struct NestMembers_attribute *)old_attribute;
       err = parse_rt_nestMembers_attribute (rt_cp, attr, original_attr,
@@ -661,6 +669,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     {
       PARSE_ATTRIBUTE_BASE (struct rt_exceptions_attribute, name,
                             attribute_length);
+      attr->header.type = ATTRIBUTE_Exceptions;
+
       struct Exceptions_attribute *original_attr
           = (struct Exceptions_attribute *)old_attribute;
       err = parse_rt_exceptions_attribute (rt_cp, attr, original_attr,
@@ -672,6 +682,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     {
       PARSE_ATTRIBUTE_BASE (struct rt_signature_attribute, name,
                             attribute_length);
+      attr->header.type = ATTRIBUTE_Signature;
+
       struct Signature_attribute *original_attr
           = (struct Signature_attribute *)old_attribute;
       err = parse_rt_signature_attribute (rt_cp, attr, original_attr,
@@ -683,6 +695,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     {
       PARSE_ATTRIBUTE_BASE (struct rt_innerClasses_attribute, name,
                             attribute_length);
+      attr->header.type = ATTRIBUTE_InnerClasses;
+
       struct InnerClasses_attribute *original_attr
           = (struct InnerClasses_attribute *)old_attribute;
       err = parse_rt_innerClasses_attribute (rt_cp, attr, original_attr,
@@ -694,6 +708,8 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     {
       PARSE_ATTRIBUTE_BASE (struct rt_sourceFile_attribute, name,
                             attribute_length);
+      attr->header.type = ATTRIBUTE_SourceFile;
+
       struct SourceFile_attribute *original_attr
           = (struct SourceFile_attribute *)old_attribute;
       err = parse_rt_sourceFile_attribute (rt_cp, attr, original_attr,
@@ -736,4 +752,19 @@ parse_rt_attributes (struct runtime_cp *rt_cp,
 
   *attributes = new_attributes;
   return 0;
+}
+
+struct rt_attribute *
+find_attribute (struct rt_attribute **attributes, uint16_t attributes_count,
+                attr_type type)
+{
+  uint16_t iter;
+  for (iter = 0; iter < attributes_count; ++iter)
+    {
+      if (attributes[iter]->type == type)
+        {
+          return attributes[iter];
+        }
+    }
+  return NULL;
 }

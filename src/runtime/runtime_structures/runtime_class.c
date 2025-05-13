@@ -1,7 +1,5 @@
 #include "runtime_class.h"
 
-
-
 int
 parse_rt_interfaces (struct runtime_cp *rt_cp, string **new_interfaces,
                      uint16_t *old_interfaces, uint16_t interfaces_count,
@@ -79,60 +77,68 @@ parse_rt_fields (struct runtime_cp *rt_cp, struct rt_field **rt_fields,
 }
 
 int
-search_static_native_methods (struct rt_methods_data* methods_data)
+search_static_native_methods (struct rt_methods_data *methods_data)
 {
   uint16_t iter;
   uint16_t static_counter = 0;
   uint16_t native_counter = 0;
 
-  methods_data->native_methods = my_alloc_array(struct rt_method *, methods_data->native_methods_count);
+  methods_data->native_methods = my_alloc_array (
+      struct rt_method *, methods_data->native_methods_count);
   if (methods_data->native_methods == NULL)
-  {
-    prerr ("Can not allocate memory for methods for native methods");
-    return ENOMEM;
-  }
+    {
+      prerr ("Can not allocate memory for methods for native methods");
+      return ENOMEM;
+    }
 
-  methods_data->static_methods = my_alloc_array(struct rt_method *, methods_data->static_methods_count);
+  methods_data->static_methods = my_alloc_array (
+      struct rt_method *, methods_data->static_methods_count);
   if (methods_data->static_methods == NULL)
-  {
-    prerr ("Can not allocate memory for methods for static methods");
-    return ENOMEM;
-  }
+    {
+      prerr ("Can not allocate memory for methods for static methods");
+      return ENOMEM;
+    }
 
   for (iter = 0; iter < methods_data->methods_count; ++iter)
-  {
-    uint16_t is_static = methods_data->methods[iter].access_flags & ACC_STATIC;
-    uint16_t is_native = methods_data->methods[iter].access_flags & ACC_NATIVE;
-    if (is_static)
     {
-      if (static_counter == methods_data->static_methods_count){
-        prerr ("Mismatch in number of static methods");
-        return -1;
-      }
-      methods_data->static_methods[static_counter] = &methods_data->methods[iter];
-      ++static_counter;
+      uint16_t is_static
+          = methods_data->methods[iter].access_flags & ACC_STATIC;
+      uint16_t is_native
+          = methods_data->methods[iter].access_flags & ACC_NATIVE;
+      if (is_static)
+        {
+          if (static_counter == methods_data->static_methods_count)
+            {
+              prerr ("Mismatch in number of static methods");
+              return -1;
+            }
+          methods_data->static_methods[static_counter]
+              = &methods_data->methods[iter];
+          ++static_counter;
+        }
+      if (is_native)
+        {
+          if (native_counter == methods_data->native_methods_count)
+            {
+              prerr ("Mismatch in number of native methods");
+              return -1;
+            }
+          methods_data->native_methods[static_counter]
+              = &methods_data->methods[iter];
+          ++static_counter;
+        }
     }
-    if (is_native)
-    {
-      if (native_counter == methods_data->native_methods_count){
-        prerr ("Mismatch in number of native methods");
-        return -1;
-      }
-      methods_data->native_methods[static_counter] = &methods_data->methods[iter];
-      ++static_counter;
-    }
-  }
   return 0;
 }
 
 int
-parse_rt_methods (struct runtime_cp *rt_cp, struct rt_methods_data *methods_data,
-                  struct method_info *old_method,
-                  uint16_t runtime_cp_count)
+parse_rt_methods (struct runtime_cp *rt_cp,
+                  struct rt_methods_data *methods_data,
+                  struct method_info *old_method, uint16_t runtime_cp_count)
 {
   uint16_t methods_count = methods_data->methods_count;
-  uint16_t* static_methods_count = &methods_data->static_methods_count;
-  uint16_t* native_methods_count = &methods_data->native_methods_count;
+  uint16_t *static_methods_count = &methods_data->static_methods_count;
+  uint16_t *native_methods_count = &methods_data->native_methods_count;
   uint16_t iter;
   int err = 0;
 
@@ -154,8 +160,12 @@ parse_rt_methods (struct runtime_cp *rt_cp, struct rt_methods_data *methods_data
     {
       uint16_t is_native;
       uint16_t is_static;
+      uint16_t is_abstract;
+
       printf ("Method #%-3hu: ", iter);
       new_method[iter].access_flags = old_method[iter].access_flags;
+
+      // check access flags
       printf ("access: %hu, ", new_method[iter].access_flags);
       is_native = new_method[iter].access_flags & ACC_NATIVE;
       if (is_native)
@@ -167,18 +177,22 @@ parse_rt_methods (struct runtime_cp *rt_cp, struct rt_methods_data *methods_data
         {
           *static_methods_count = *static_methods_count + 1;
         }
-      err |= parse_rt_index_to_string (rt_cp, &new_method->name,
+      is_abstract = new_method[iter].access_flags & ACC_ABSTRACT;
+
+      // parse method name
+      err |= parse_rt_index_to_string (rt_cp, &new_method[iter].name,
                                        old_method[iter].name_index,
                                        runtime_cp_count);
+      printf ("Method name: %s, ", new_method[iter].name);
 
-      printf ("Method name: %s, ", new_method->name);
-      err |= parse_rt_index_to_string (rt_cp, &new_method->descriptor,
+      // parse method descriptor
+      err |= parse_rt_index_to_string (rt_cp, &new_method[iter].descriptor,
                                        old_method[iter].descriptor_index,
                                        runtime_cp_count);
+      printf ("descriptor: %s, ", new_method[iter].descriptor);
 
-      printf ("descriptor: %s, ", new_method->descriptor);
+      // parse attributes
       new_method[iter].attributes_count = old_method[iter].attributes_count;
-
       printf ("attr count: %hu \n", new_method[iter].attributes_count);
       err |= parse_rt_attributes (
           rt_cp, &new_method[iter].attributes, old_method[iter].attributes,
@@ -189,9 +203,23 @@ parse_rt_methods (struct runtime_cp *rt_cp, struct rt_methods_data *methods_data
           prerr ("can not parse rt fields");
           return err;
         }
-      if (is_native && !is_static)
+
+      // parse Code attribute
+      new_method[iter].code_attr = (struct rt_code_attribute *)find_attribute (
+          new_method[iter].attributes, new_method[iter].attributes_count,
+          ATTRIBUTE_Code);
+      if ((is_native || is_abstract))
         {
-          prerr (" Method %s must be static", new_method->name);
+          if (new_method[iter].code_attr != NULL)
+          {
+            prerr ("Method %s is abstract/native, but have Code attr",
+                  new_method[iter].name);
+            return -1;
+          }
+        }
+      else if (new_method[iter].code_attr == NULL)
+        {
+          prerr ("Method %s must have Code attr", new_method[iter].name);
           return -1;
         }
     }
@@ -270,7 +298,8 @@ jclass_new (struct jclass **jclass, struct class_file *class_file)
 
   new->methods_data.methods_count = class_file->methods_count;
 
-  err = parse_rt_methods (new->runtime_cp, &new->methods_data, class_file->methods, new->runtime_cp_count);
+  err = parse_rt_methods (new->runtime_cp, &new->methods_data,
+                          class_file->methods, new->runtime_cp_count);
 
   if (err)
     {
@@ -278,15 +307,16 @@ jclass_new (struct jclass **jclass, struct class_file *class_file)
       return -1;
     }
 
-  err = search_static_native_methods(&new->methods_data);
+  err = search_static_native_methods (&new->methods_data);
   if (err)
-  {
-    prerr ("can not correctly find static and native methods");
-    return -1;
-  }
+    {
+      prerr ("can not correctly find static and native methods");
+      return -1;
+    }
 
   printf (" Static methods counter: %hu, native: %hu\n ",
-          new->methods_data.static_methods_count, new->methods_data.native_methods_count);
+          new->methods_data.static_methods_count,
+          new->methods_data.native_methods_count);
 
   new->attributes_count = class_file->attributes_count;
   err = parse_rt_attributes (new->runtime_cp, &new->attributes,

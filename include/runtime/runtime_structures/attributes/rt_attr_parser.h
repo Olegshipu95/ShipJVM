@@ -16,4 +16,8 @@ int parse_rt_attributes (struct runtime_cp *rt_cp,
                          struct attribute_info **old_attributes,
                          uint16_t attributes_count, uint16_t runtime_cp_count);
 
+struct rt_attribute *find_attribute (struct rt_attribute **attributes,
+                                     uint16_t attributes_count,
+                                     attr_type type);
+
 #endif

@@ -46,32 +46,37 @@
 // #define ACC_ANNOTATION 0x2000
 // #define ACC_ENUM 0x4000
 
-// #define ATTRIBUTE_ConstantValue 0
-// #define ATTRIBUTE_Code 1
-// #define ATTRIBUTE_StackMapTable 2
-// #define ATTRIBUTE_Exceptions 3
-// #define ATTRIBUTE_InnerClasses 4
-// #define ATTRIBUTE_EnclosingMethod 5
-// #define ATTRIBUTE_Synthetic 6
-// #define ATTRIBUTE_Signature 7
-// #define ATTRIBUTE_SourceFile 8
-// #define ATTRIBUTE_SourceDebugExtension 9
-// #define ATTRIBUTE_LineNumberTable 10
-// #define ATTRIBUTE_LocalVariableTable 11
-// #define ATTRIBUTE_LocalVariableTypeTable 12
-// #define ATTRIBUTE_Deprecated 13
-// #define ATTRIBUTE_RuntimeVisibleAnnotations 14
-// #define ATTRIBUTE_RuntimeInvisibleAnnotations 15
-// #define ATTRIBUTE_RuntimeVisibleParameterAnnotations 16
-// #define ATTRIBUTE_RuntimeInvisibleParameterAnnotations 17
-// #define ATTRIBUTE_RuntimeVisibleTypeAnnotations 18
-// #define ATTRIBUTE_RuntimeInvisibleTypeAnnotations 19
-// #define ATTRIBUTE_AnnotationDefault 20
-// #define ATTRIBUTE_BootstrapMethods 21
-// #define ATTRIBUTE_MethodParameters 22
-
-// #define ATTRIBUTE_INVALID 99
-
+typedef enum attr_type
+{
+  ATTRIBUTE_ConstantValue = 0,
+  ATTRIBUTE_Code = 1,
+  ATTRIBUTE_StackMapTable = 2,
+  ATTRIBUTE_Exceptions = 3,
+  ATTRIBUTE_InnerClasses = 4,
+  ATTRIBUTE_EnclosingMethod = 5,
+  ATTRIBUTE_Synthetic = 6,
+  ATTRIBUTE_Signature = 7,
+  ATTRIBUTE_SourceFile = 8,
+  ATTRIBUTE_SourceDebugExtension = 9,
+  ATTRIBUTE_LineNumberTable = 10,
+  ATTRIBUTE_LocalVariableTable = 11,
+  ATTRIBUTE_LocalVariableTypeTable = 12,
+  ATTRIBUTE_Deprecated = 13,
+  ATTRIBUTE_RuntimeVisibleAnnotations = 14,
+  ATTRIBUTE_RuntimeInvisibleAnnotations = 15,
+  ATTRIBUTE_RuntimeVisibleParameterAnnotations = 16,
+  ATTRIBUTE_RuntimeInvisibleParameterAnnotations = 17,
+  ATTRIBUTE_RuntimeVisibleTypeAnnotations = 18,
+  ATTRIBUTE_RuntimeInvisibleTypeAnnotations = 19,
+  ATTRIBUTE_AnnotationDefault = 20,
+  ATTRIBUTE_BootstrapMethods = 21,
+  ATTRIBUTE_MethodParameters = 22,
+  ATTRIBUTE_Module = 23,
+  ATTRIBUTE_ModulePackages = 24,
+  ATTRIBUTE_ModuleMainClass = 25,
+  ATTRIBUTE_NestHost = 26,
+  ATTRIBUTE_INVALID = 99
+} attr_type;
 // // All attributes
 
 // struct ConstantValue_attribute;
@@ -112,6 +117,7 @@ struct possible_string
 };
 struct rt_attribute
 {
+  attr_type type;
   string name;
   uint32_t attribute_length;
 };

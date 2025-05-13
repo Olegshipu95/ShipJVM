@@ -25,14 +25,18 @@ struct local_variables
 
 struct stack_frame
 {
-  struct local_variables *local_vars;
-  struct operand_stack *operand_stack;
-  uint32_t pc;
+  struct jclass *class;           // current class
+  struct rt_method *method;       // current method
+  struct stack_frame *caller;     // The frame that called this (NULL for main)
+  uint32_t pc;                    // Program counter (index in code[])
+  struct local_variables *local_vars; // Local variables
+  struct operand_stack *operand_stack;    // Operand stack
+  uint8_t *code; // Байткод метода (из Code_attribute)
 };
 
 int init_operand_stack (struct operand_stack *);
 int init_local_vars (struct local_variables *);
-int init_stack_frame (struct stack_frame *);
+int init_stack_frame (struct stack_frame *); // TODO
 
 int opstack_push (struct operand_stack *opstack, jvariable value);
 
