@@ -211,11 +211,11 @@ parse_rt_methods (struct runtime_cp *rt_cp,
       if ((is_native || is_abstract))
         {
           if (new_method[iter].code_attr != NULL)
-          {
-            prerr ("Method %s is abstract/native, but have Code attr",
-                  new_method[iter].name);
-            return -1;
-          }
+            {
+              prerr ("Method %s is abstract/native, but have Code attr",
+                     new_method[iter].name);
+              return -1;
+            }
         }
       else if (new_method[iter].code_attr == NULL)
         {
@@ -331,4 +331,45 @@ jclass_new (struct jclass **jclass, struct class_file *class_file)
 
   *jclass = new;
   return 0;
+}
+
+int
+find_method_in_current_class (struct jclass *class,
+                              struct rt_method **find_method, const char *name,
+                              const char *descriptor)
+{
+  if (!class || !name || !descriptor)
+    {
+      *find_method = NULL;
+      return EINVAL;
+    }
+
+  // Ищем в методах текущего класса
+  for (uint16_t i = 0; i < class->methods_data.methods_count; i++)
+    {
+      struct rt_method *method = &class->methods_data.methods[i];
+
+      if (strcmp (method->name, name) == 0
+          && strcmp (method->descriptor, descriptor) == 0)
+        {
+          *find_method = method;
+          return 0;
+        }
+    }
+
+  // // Если не нашли в текущем классе, ищем в суперклассах
+  // if (class->super_class != NULL && strcmp (class->super_class, "") != 0)
+  //   {
+  //     struct jclass *super_class = load_class (class->super_class);
+  //     if (super_class)
+  //       {
+  //         return find_method (super_class, name, descriptor);
+  //       }
+  //   }
+
+  // Метод не найден
+  printf ("Can not find method %s:%s in class %s", name, descriptor,
+          class->this_class);
+  *find_method = NULL;
+  return -1;
 }

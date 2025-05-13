@@ -1,10 +1,5 @@
 #include "classloader.h"
 
-#include <stdio.h>
-
-#include "classfile_parser.h"
-#include "util.h"
-
 struct classloader_trie
 {
 
@@ -22,7 +17,7 @@ struct classloader_trie
   // both "children" and "value" makes sense to be presented simultaneously
   // because of this, we may always hold only zero or one node with the same
   // name on a same level
-  struct class_file *value;
+  struct jclass *value;
 };
 
 // TODO: обработка ошибок выделения памяти (в ядре malloc может кинуть NULL при
@@ -56,7 +51,7 @@ classloader_trie_init (struct classloader_trie *node, const char *classname)
 }
 
 // find node in trie and create it if needed
-struct class_file **
+struct jclass **
 classloader_trie_find (struct classloader_trie **root, const char *classname,
                        int create)
 {
@@ -211,21 +206,30 @@ classloader_build_path (const char *path, const char *classname)
 
 int
 _classloader_load_class (struct classloader *classloader, const char *path,
-                         const char *classname, struct class_file **result)
+                         const char *classname, struct jclass **result)
 {
   (void)classloader;
+  int err;
   char *class_path = classloader_build_path (path, classname);
 
   printf ("Built path to class: %s\n", class_path);
 
   struct class_file class;
-  const int err = parse_class_file (&class, class_path);
+  err = parse_class_file (&class, class_path);
   if (err)
-    return err;
-
-  struct class_file *entry = my_alloc (struct class_file);
-  *entry = class;
-
+    {
+      prerr ("Can not parse class file in classloader");
+      return err;
+    }
+  struct class_file *classfile = my_alloc (struct class_file);
+  *classfile = class;
+  struct jclass *entry = 0;
+  err = jclass_new (&entry, classfile);
+  if (err)
+    {
+      prerr ("Can not convert class file to rt class in classloader");
+      return err;
+    }
   *classloader_trie_find (&classloader->classes, classname, 1) = entry;
   *result = entry;
   return 0;
@@ -233,9 +237,9 @@ _classloader_load_class (struct classloader *classloader, const char *path,
 
 int
 classloader_load_class (struct classloader *classloader, const char *classname,
-                        struct class_file **result)
+                        struct jclass **result)
 {
-  struct class_file **const found
+  struct jclass **const found
       = classloader_trie_find (&classloader->classes, classname, 0);
   if (found)
     {

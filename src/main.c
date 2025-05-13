@@ -2,6 +2,7 @@
 
 #include "classfile_parser.h"
 #include "classloader.h"
+#include "runtime.h"
 #include "runtime_class.h"
 #include "runtime_constpool.h"
 #include "util.h"
@@ -10,6 +11,7 @@
 int
 main (int argc, char *argv[])
 {
+  int err = 0;
   printf ("\n");
   if (argc < 3)
     {
@@ -17,25 +19,19 @@ main (int argc, char *argv[])
       return 1;
     }
 
-  struct classloader *classloader = classloader_new ();
+  struct jvm *jvm = new_jvm ();
 
-  classloader_init_dir_paths (classloader, argv[1]);
+  jvm->classloader = classloader_new ();
 
-  struct class_file *class;
+  classloader_init_dir_paths (jvm->classloader, argv[1]);
+
   for (int i = 0; i < 50; ++i)
     {
-      int err = classloader_load_class (classloader, argv[2], &class);
+      err = classloader_load_class (jvm->classloader, argv[2],
+                                        &jvm->main_class);
       if (err)
         return err;
     }
-
-  printf ("\n\nStart trying convert cp\n");
-
-  struct jclass *new_class = 0;
-  int err = jclass_new (&new_class, class);
-  if (err)
-    {
-      prerr ("Error while converting class to rt");
-      return err;
-    }
+  err = run_jvm(jvm);
+  return err;
 }

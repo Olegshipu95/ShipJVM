@@ -1,7 +1,13 @@
-#pragma once
+#ifndef SHIP_JVM_CLASSLOADER_H
+#define SHIP_JVM_CLASSLOADER_H
+
+#include <stdio.h>
 
 #include "classfile.h"
+#include "runtime_class.h"
 
+#include "classfile_parser.h"
+#include "util.h"
 struct classloader;
 
 /**
@@ -50,4 +56,6 @@ void classloader_init_dir_paths (struct classloader *classloader,
  * managed by the class loader's lifetime.
  */
 int classloader_load_class (struct classloader *classloader,
-                            const char *classname, struct class_file **result);
+                            const char *classname, struct jclass **result);
+
+#endif

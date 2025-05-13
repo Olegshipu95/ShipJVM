@@ -75,5 +75,8 @@ struct jclass
 };
 
 int jclass_new (struct jclass **jclass, struct class_file *class_file);
+int find_method_in_current_class (struct jclass *class,
+                                  struct rt_method **find_method,
+                                  const char *name, const char *descriptor);
 
 #endif
