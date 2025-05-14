@@ -23,11 +23,11 @@ create_empty_args_variable ()
 int
 run_jvm (struct jvm *jvm)
 {
-  if (ensure_class_initialized (jvm, jvm->main_class))
-    {
-      prerr ("Failed to initialize main class");
-      return EINVAL;
-    }
+  if (new_call_stack (&jvm->call_stack))
+  {
+    prerr ("Call stack creation failed");
+    return -1;
+  }
 
   struct rt_method *main_method = NULL;
   if (find_method_in_current_class (jvm->main_class, &main_method, "main",
@@ -37,9 +37,9 @@ run_jvm (struct jvm *jvm)
       return -1;
     }
 
-  if (new_call_stack (&jvm->call_stack))
+  if (ensure_class_initialized (jvm, jvm->main_class))
     {
-      prerr ("Call stack creation failed");
+      prerr ("Failed to initialize main class (<clinit> failed)");
       return -1;
     }
 

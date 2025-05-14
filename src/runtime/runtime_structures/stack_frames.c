@@ -9,7 +9,7 @@ init_operand_stack (struct operand_stack *opstack, uint16_t max_stack)
       prerr ("Can not allocate memory for operand stack");
       return ENOMEM;
     }
-
+  opstack->max_stack = max_stack;
   opstack->top = -1;
   return 0;
 }
@@ -23,6 +23,7 @@ init_local_vars (struct local_variables *locals, uint16_t size)
       prerr ("Can not allocate memory for local vars");
       return ENOMEM;
     }
+  locals->max_locals = size;
   return 0;
 }
 
@@ -62,7 +63,7 @@ init_stack_frame (struct jclass *class, struct rt_method *method,
       return NULL;
     }
   err = init_operand_stack (frame->operand_stack,
-                            method->code_attr->max_locals);
+                            method->code_attr->max_stack);
   if (err)
     {
       prerr ("init_operand_stack return error - %d", err);
@@ -140,6 +141,19 @@ opstack_peek (struct operand_stack *opstack, jvariable *value)
 
   jvariable popped = opstack->stack[opstack->top];
   *value = popped;
+  return 0;
+}
+
+int
+opstack_peek_nth(struct operand_stack *stack, int n, jvariable *out)
+{
+  if (!stack || !out || n < 0)
+    return EINVAL;
+
+  if (stack->top <= n)
+    return EINVAL; // недостаточно элементов в стеке
+
+  *out = stack->stack[stack->top - 1 - n];
   return 0;
 }
 
@@ -344,66 +358,124 @@ copy_single_arg (struct stack_frame *caller, struct stack_frame *callee,
   return 0;
 }
 
-/**
- * Копирует аргументы из стека вызывающего фрейма в локальные переменные
- * вызываемого фрейма
- * @param caller Фрейм вызывающего метода
- * @param callee Фрейм вызываемого метода
- * @param descriptor Дескриптор метода (формата (Аргументы)ВозвращаемыйТип)
- * @return 0 при успехе, код ошибки при неудаче
- */
-int
-copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
-                const char *descriptor)
-{
-  const char *p = descriptor;
-  int local_index = 0;
-  int err;
+int count_arguments_in_descriptor(const char *descriptor) {
+  if (!descriptor || *descriptor != '(')
+    return -1;
 
-  // 1. Validate descriptor
-  if ((err = validate_descriptor (p)))
-    return err;
-  p++;
+  int count = 0;
+  const char *p = descriptor + 1;
 
-  // 2. Parse arguments
-  while (*p != ')')
-    {
-      int array_depth, is_wide;
-      char base_type;
-      java_value_type expected_type;
+  while (*p && *p != ')') {
+    while (*p == '[') // массивы
+      p++;
 
-      // Parse type
-      if ((err = parse_arg_type (&p, &array_depth, &base_type)))
-        {
-          prerr ("can not parse arg type in copy_args");
-          return err;
-        }
-      // Determine expected type
-      determine_expected_type (base_type, array_depth, &expected_type,
-                               &is_wide);
-
-      // Copy argument
-      if ((err = copy_single_arg (caller, callee, local_index, expected_type)))
-        {
-          return err;
-        }
-
-      // Wide types take two slots
-      local_index += is_wide ? 2 : 1;
+    if (*p == 'L') { // объектный тип
+      while (*p && *p != ';')
+        p++;
+      if (*p == ';')
+        p++;
+      else
+        return -1;
+    } else if (strchr("BCDFIJSZ", *p)) {
+      count++;
+      p++;
+    } else {
+      return -1; // ошибка
     }
 
-  // 3. Skip return type
-  p++;
+    count++;
+  }
 
-  // 4. Verify stack is empty
-  if (!opstack_is_empty (caller->operand_stack))
-    {
-      prerr ("Extra arguments on stack after parsing descriptor");
+  if (*p != ')')
+    return -1;
+
+  return count;
+}
+
+
+int
+copy_arguments(struct stack_frame *caller,
+               struct stack_frame *callee,
+               const char *descriptor,
+               int has_this)
+{
+  const char *p = descriptor;
+  int err;
+  int local_index = 0;
+
+  // 1. Validate descriptor
+  if ((err = validate_descriptor(p)))
+    return err;
+  p++; // Пропускаем '('
+
+  // 2. Пропарсим все аргументы в массив типов
+  typedef struct {
+    java_value_type type;
+    int is_wide;
+  } arg_info;
+
+  arg_info args[MAX_ARG_COUNT];
+  int arg_count = 0;
+
+  while (*p != ')') {
+    int array_depth, is_wide;
+    char base_type;
+    java_value_type expected_type;
+
+    if ((err = parse_arg_type(&p, &array_depth, &base_type)))
+      return err;
+
+    determine_expected_type(base_type, array_depth, &expected_type, &is_wide);
+
+    if (arg_count >= MAX_ARG_COUNT) {
+      prerr("Too many method arguments");
+      return E2BIG;
+    }
+
+    args[arg_count].type = expected_type;
+    args[arg_count].is_wide = is_wide;
+    arg_count++;
+  }
+
+  // 3. Начинаем с this-объекта, если метод нестатический
+  if (has_this) {
+    jvariable this_ref;
+    if (opstack_pop(caller->operand_stack, &this_ref)) {
+      prerr("Stack underflow while copying 'this'");
+      return EINVAL;
+    }
+    if (this_ref.type != JOBJECT) {
+      prerr("'this' is not an object reference");
+      return EINVAL;
+    }
+    if ((err = store_local_var(callee->local_vars, this_ref, local_index)))
+      return err;
+    local_index++;
+  }
+
+  // 4. Копируем аргументы в локальные переменные в обратном порядке
+  for (int i = arg_count - 1; i >= 0; i--) {
+    jvariable arg;
+    if (opstack_pop(caller->operand_stack, &arg)) {
+      prerr("Stack underflow while copying argument %d", i);
       return EINVAL;
     }
 
+    if (arg.type != args[i].type) {
+      prerr("Type mismatch in argument %d (expected %d, got %d)",
+            i, args[i].type, arg.type);
+      return EINVAL;
+    }
+
+    if ((err = store_local_var(callee->local_vars, arg, local_index)))
+      return err;
+
+    local_index += args[i].is_wide ? 2 : 1;
+  }
+
   return 0;
 }
+
 
 int
 execute_frame (struct jvm *jvm, struct stack_frame *frame)
@@ -481,4 +553,36 @@ ensure_class_initialized (struct jvm *jvm, struct jclass *cls)
   cls->initialized = true;
 
   return 0;
+}
+
+int find_method_in_hierarchy(struct jvm* jvm, struct jclass *start,
+                             struct rt_method **out_method,
+                             const char *name,
+                             const char *descriptor)
+{
+  struct jclass *cls = start;
+
+  while (cls) {
+    for (int i = 0; i < cls->methods_data.methods_count; i++) {
+      struct rt_method *m = &cls->methods_data.methods[i];
+
+      if (strcmp(m->name, name) == 0 &&
+          strcmp(m->descriptor, descriptor) == 0) {
+        *out_method = m;
+        return 0;
+      }
+    }
+
+    // Переход к суперклассу
+    if (!cls->super_class)
+      break;
+
+    struct jclass *super;
+    if (classloader_load_class(jvm->classloader, cls->super_class, &super))
+      return ENOENT;
+
+    cls = super;
+  }
+
+  return ENOENT;
 }

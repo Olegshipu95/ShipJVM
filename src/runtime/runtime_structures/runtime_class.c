@@ -40,6 +40,48 @@ print_rt_interfaces (string *interf, uint16_t count)
 }
 
 int
+set_field_type_from_descriptor(struct rt_field *field)
+{
+  const char *desc = field->descriptor;
+
+  // Если массив, то это объект
+  if (desc[0] == '[')
+    {
+      field->data.type = JOBJECT;
+      return 0;
+    }
+
+  switch (desc[0])
+    {
+    case 'I':
+    case 'B':
+    case 'S':
+    case 'C':
+    case 'Z':
+      field->data = create_variable(JINT);
+      break;
+    case 'J':
+      field->data = create_variable(JLONG);
+      break;
+    case 'F':
+      field->data = create_variable(JFLOAT);
+      break;
+    case 'D':
+      field->data = create_variable(JDOUBLE);
+      break;
+    case 'L':
+      field->data = create_variable(JOBJECT);
+      break;
+    default:
+      prerr("Unknown field descriptor: %s", desc);
+      field->data = create_variable(JINT); // fail-safe
+      return -1;
+      break;
+    }
+    return 0;
+}
+
+int
 parse_rt_fields (struct runtime_cp *rt_cp, struct rt_field **rt_fields,
                  struct field_info *old_field, uint16_t fields_count,
                  uint16_t runtime_cp_count)
@@ -71,6 +113,12 @@ parse_rt_fields (struct runtime_cp *rt_cp, struct rt_field **rt_fields,
           prerr ("can not parse rt fields");
           return err;
         }
+      err = set_field_type_from_descriptor(&new_fieds[iter]);
+      if (err)
+      {
+        prerr ("can not parse field type");
+        return -1;
+      }
     }
   *rt_fields = new_fieds;
   return 0;
@@ -287,6 +335,8 @@ jclass_new (struct jclass **jclass, struct class_file *class_file)
 
   print_rt_interfaces (new->interfaces, new->interfaces_count);
 
+  new->fields_count = class_file->fields_count;
+
   err = parse_rt_fields (new->runtime_cp, &new->fields, class_file->fields,
                          class_file->fields_count, new->runtime_cp_count);
 
@@ -372,4 +422,30 @@ find_method_in_current_class (struct jclass *class,
           class->this_class);
   *find_method = NULL;
   return -1;
+}
+
+int
+find_field_in_current_class(struct jclass *cls,
+                            struct rt_field **out_field,
+                            const char *name,
+                            const char *descriptor)
+{
+  if (!cls || !out_field || !name || !descriptor)
+    return EINVAL;
+
+  for (int i = 0; i < cls->fields_count; i++)
+    {
+      struct rt_field *field = &cls->fields[i];
+      if (!field)
+        continue;
+
+      if (strcmp(field->name, name) == 0 &&
+          strcmp(field->descriptor, descriptor) == 0)
+        {
+          *out_field = field;
+          return 0; // Найдено
+        }
+    }
+
+  return ENOENT; // Поле не найдено
 }

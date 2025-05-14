@@ -1,9 +1,12 @@
 #ifndef SHIP_JVM_STACK_FRAMES_H
 #define SHIP_JVM_STACK_FRAMES_H
 
+#define MAX_ARG_COUNT 64
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
+#include<unistd.h>
+
 
 #include "java_types.h"
 #include "runtime.h"
@@ -18,7 +21,8 @@
 #define JVM_INVALID_BYTECODE 1001
 #define JVM_STACK_OVERFLOW 1002
 #define JVM_ILLEGAL_LOCAL_INDEX 1003
-#define JVM_ILLEGAL_BRANCH_JUMP 1004 // sry idk
+#define JVM_ILLEGAL_BRANCH_JUMP 1004
+#define JVM_NULL_POINTER 1005
 
 struct jvm;
 
@@ -69,6 +73,9 @@ int opstack_pop (struct operand_stack *opstack, jvariable *value);
 
 int opstack_peek (struct operand_stack *opstack, jvariable *value);
 
+int
+opstack_peek_nth(struct operand_stack *stack, int n, jvariable *out);
+
 int opstack_is_full (struct operand_stack *opstack);
 
 int opstack_is_empty (struct operand_stack *opstack);
@@ -84,11 +91,22 @@ struct stack_frame *call_stack_pop (struct call_stack *stack);
 struct stack_frame *call_stack_peek (struct call_stack *stack);
 int call_stack_is_empty (struct call_stack *stack);
 
-int copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
-                    const char *descriptor);
+int count_arguments_in_descriptor(const char *descriptor);
+
+int
+copy_arguments(struct stack_frame *caller,
+               struct stack_frame *callee,
+               const char *descriptor,
+               int has_this);
 
 int execute_frame (struct jvm *jvm, struct stack_frame *frame);
 
 int ensure_class_initialized (struct jvm *jvm, struct jclass *cls);
+
+int find_method_in_hierarchy(struct jvm* jvm, struct jclass *start,
+                             struct rt_method **out_method,
+                             const char *name,
+                             const char *descriptor);
+
 
 #endif
