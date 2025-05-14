@@ -1184,8 +1184,9 @@ opcode_getstatic (struct stack_frame *)
 }
 
 void
-opcode_goto (struct stack_frame *)
+opcode_goto (struct stack_frame *frame)
 {
+  _common_load_2branchbytes_and_jump (frame);
 }
 // TODO
 void
@@ -1519,87 +1520,497 @@ opcode_idiv (struct stack_frame *frame)
   result.value._int = op1.value._int / op2.value._int;
   opstack_push (frame->operand_stack, result);
 }
-// TODO
-void
-opcode_if_acmpeq (struct stack_frame *)
+
+static void
+_common_load_2branchbytes_and_jump (struct stack_frame *frame)
 {
-}
-// TODO
-void
-opcode_if_acmpne (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmpeq (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmpne (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmplt (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmpge (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmpgt (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmple (struct stack_frame *)
-{
+  if (frame->pc + 2 >= frame->code_length)
+    {
+      prerr ("Truncated bytecode: missing two byte operand");
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  int16_t branchoffset = (frame->code[frame->pc + 1].raw_byte << 8)
+                         | frame->code[frame->pc + 2].raw_byte;
+  frame->pc += branchoffset;
+  if (frame->pc >= frame->code_length)
+    {
+      prerr ("Illegal jump: out of range");
+      frame->error = JVM_ILLEGAL_BRANCH_JUMP;
+    }
 }
 
-// TODO
 void
-opcode_ifeq (struct stack_frame *)
+opcode_if_acmpeq (struct stack_frame *frame)
 {
-}
-// TODO
-void
-opcode_ifne (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_iflt (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_ifge (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_ifgt (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_ifle (struct stack_frame *)
-{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ACMPEQ");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JOBJECT) || check_var_type (&op2, JOBJECT))
+    {
+      prerr ("Type mismatch in ACMPEQ: expected reference");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._object == op2.value._object)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
 }
 
-// TODO
 void
-opcode_ifnonnull (struct stack_frame *)
+opcode_if_acmpne (struct stack_frame *frame)
 {
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ACMPNE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JOBJECT) || check_var_type (&op2, JOBJECT))
+    {
+      prerr ("Type mismatch in ACMPNE: expected reference");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._object != op2.value._object)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
 }
-// TODO
+
 void
-opcode_ifnull (struct stack_frame *)
+opcode_if_icmpeq (struct stack_frame *frame)
 {
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPEQ");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPEQ: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int == op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_if_icmpne (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPNE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPNE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int != op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_if_icmplt (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPLT");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPLT: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int < op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_if_icmpge (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPGE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPGE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int >= op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_if_icmpgt (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPGT");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPGT: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int > op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_if_icmple (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPLE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPLE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int <= op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_ifeq (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFEQ");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFEQ: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int == 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_ifne (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFNE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFNE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int != 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_iflt (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFLT");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFLT: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int < 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_ifge (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFGE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFGE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int >= 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_ifgt (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFGT");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFGT: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int > 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_ifle (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFLE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFLE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int <= 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_ifnonnull (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op2))
+    {
+      prerr ("Stack underflow in IFNONNULL");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JOBJECT))
+    {
+      prerr ("Type mismatch in IFNONNULL: expected reference");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._object != 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
+}
+
+void
+opcode_ifnull (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op2))
+    {
+      prerr ("Stack underflow in IFNULL");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JOBJECT))
+    {
+      prerr ("Type mismatch in IFNULL: expected reference");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._object == 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3
+    }
 }
 // TODO
 void
@@ -1966,9 +2377,8 @@ opcode_invokeinterface (struct stack_frame *)
   // 4. Получение Methodref из пула констант
   struct cp_interfacemethodref *imethodref;
   if (get_interfacemethodref(frame->class->runtime_cp, methodref_idx,
-  &imethodref)) { prerr("Invalid interface methodref index %d", methodref_idx);
-      frame->error = EINVAL;
-      return;
+  &imethodref)) { prerr("Invalid interface methodref index %d",
+  methodref_idx); frame->error = EINVAL; return;
   }
 
   // 5. Загрузка интерфейса
@@ -2021,9 +2431,8 @@ opcode_invokeinterface (struct stack_frame *)
 
   // 10. Проверка доступности метода
   if (!check_interface_access(frame->class, target_class, method)) {
-      prerr("Illegal access to interface method %s", imethodref->method_name);
-      frame->error = EACCES;
-      return;
+      prerr("Illegal access to interface method %s",
+  imethodref->method_name); frame->error = EACCES; return;
   }
 
   // 11. Создание нового фрейма
@@ -2989,9 +3398,8 @@ opcode_new (struct stack_frame *)
 
   // 5. Проверка, что класс может быть инстанцирован
   if (target_class->access_flags & (ACC_ABSTRACT | ACC_INTERFACE)) {
-      prerr("Cannot instantiate abstract class/interface %s", class_ref->name);
-      frame->error = EACCES;
-      return;
+      prerr("Cannot instantiate abstract class/interface %s",
+  class_ref->name); frame->error = EACCES; return;
   }
 
   // 6. Выделение памяти для объекта
