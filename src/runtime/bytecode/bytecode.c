@@ -22,11 +22,11 @@ _common_store (struct stack_frame *frame, java_value_type type, uint32_t index)
 
   err = store_local_var (frame->local_vars, var, index);
   if (err)
-  {
-    prerr ("STORE: can not store local var");
-    frame->error = ENOMEM;
-    return;
-  }
+    {
+      prerr ("STORE: can not store local var");
+      frame->error = ENOMEM;
+      return;
+    }
 }
 
 void
@@ -38,12 +38,15 @@ _common_load (struct stack_frame *frame, java_value_type type, uint32_t index)
   if (var.type != type)
     {
       prerr ("Type mismatch in load: expected %d", type);
+      frame->error = EINVAL;
       return;
     }
 
   if (opstack_push (frame->operand_stack, var))
     {
       prerr ("Failed to push variable to stack");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -66,6 +69,8 @@ opcode_aconst_null (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in ACONST_NULL");
+      frame->error = EINVAL;
+      return;
     }
 };
 
@@ -168,7 +173,7 @@ void
 opcode_bastore (struct stack_frame *)
 {
 }
-// TODO
+
 void
 opcode_bipush (struct stack_frame *frame)
 {
@@ -218,12 +223,14 @@ opcode_d2f (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in D2F");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JDOUBLE))
     {
       prerr ("Type mismatch in D2F: expected double");
+      frame->error = EINVAL;
       return;
     }
 
@@ -233,6 +240,8 @@ opcode_d2f (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in D2F");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -244,12 +253,14 @@ opcode_d2i (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in D2I");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JDOUBLE))
     {
       prerr ("Type mismatch in D2I: expected double");
+      frame->error = EINVAL;
       return;
     }
 
@@ -275,6 +286,8 @@ opcode_d2i (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in D2I");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -286,12 +299,14 @@ opcode_d2l (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in D2L");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JDOUBLE))
     {
       prerr ("Type mismatch in D2L: expected double");
+      frame->error = EINVAL;
       return;
     }
 
@@ -317,6 +332,8 @@ opcode_d2l (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in D2L");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -332,6 +349,7 @@ opcode_dadd (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Take incorrect data from opstack in dadd");
+      frame->error = EINVAL;
       return;
     }
   jvariable result = create_variable (JDOUBLE);
@@ -427,12 +445,14 @@ opcode_dmul (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in DMUL");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JDOUBLE) || check_var_type (&op2, JDOUBLE))
     {
       prerr ("Type mismatch in DMUL: expected double");
+      frame->error = EINVAL;
       return;
     }
 
@@ -442,6 +462,8 @@ opcode_dmul (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in DMUL");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -457,6 +479,7 @@ opcode_dneg (struct stack_frame *frame)
   if (err)
     {
       prerr ("DNEG operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -466,6 +489,8 @@ opcode_dneg (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in DNEG");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -478,18 +503,21 @@ opcode_drem (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &value1))
     {
       prerr ("Stack underflow in DREM");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&value1, JDOUBLE) || check_var_type (&value2, JDOUBLE))
     {
       prerr ("Type mismatch in DREM: expected double");
+      frame->error = EINVAL;
       return;
     }
 
   if (value2.value._double == 0)
     {
       prerr ("ArithmeticException: division by zero in DREM"); // EXCEPTION
+      frame->error = EINVAL;
       return;
     }
 
@@ -501,6 +529,8 @@ opcode_drem (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in DREM");
+      frame->error = EINVAL;
+      return;
     }
 };
 
@@ -549,6 +579,7 @@ opcode_dsub (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in DSUB");
+      frame->error = EINVAL;
       return;
     }
 
@@ -556,6 +587,7 @@ opcode_dsub (struct stack_frame *frame)
   if (check_var_type (&op1, JDOUBLE) || check_var_type (&op2, JDOUBLE))
     {
       prerr ("Type mismatch in DSUB: expected double");
+      frame->error = EINVAL;
       return;
     }
 
@@ -567,6 +599,8 @@ opcode_dsub (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in DSUB");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -577,12 +611,15 @@ opcode_dup (struct stack_frame *frame)
   if (opstack_peek (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in DUP");
+      frame->error = EINVAL;
       return;
     }
 
   if (opstack_push (frame->operand_stack, op1))
     {
       prerr ("Stack overflow in DUP");
+      frame->error = EINVAL;
+      return;
     }
 };
 
@@ -595,12 +632,14 @@ opcode_dup_x1 (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op2))
     {
       prerr ("Stack underflow in DUP_X1");
+      frame->error = EINVAL;
       return;
     }
 
   if (var_computation_type (&op1) == 1 || var_computation_type (&op2) == 1)
     {
       prerr ("Args are not category 1 computational type in DUP_X1");
+      frame->error = EINVAL;
       return;
     }
 
@@ -609,6 +648,8 @@ opcode_dup_x1 (struct stack_frame *frame)
       || opstack_push (frame->operand_stack, op1))
     {
       prerr ("Stack overflow in DUP_X1");
+      frame->error = EINVAL;
+      return;
     }
 };
 
@@ -622,12 +663,14 @@ opcode_dup_x2 (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op2))
     {
       prerr ("Stack underflow in DUP_X2");
+      frame->error = EINVAL;
       return;
     }
 
   if (var_computation_type (&op1) != 1)
     {
       prerr ("Value1 must be 1 computational type in DUP_X2");
+      frame->error = EINVAL;
       return;
     }
 
@@ -638,6 +681,7 @@ opcode_dup_x2 (struct stack_frame *frame)
       if (opstack_pop (frame->operand_stack, &op3))
         {
           prerr ("Stack underflow in DUP_X2");
+          frame->error = EINVAL;
           return;
         }
       if (var_computation_type (&op3) == 1)
@@ -648,11 +692,15 @@ opcode_dup_x2 (struct stack_frame *frame)
               || opstack_push (frame->operand_stack, op1))
             {
               prerr ("Stack overflow in DUP_X2");
+              frame->error = EINVAL;
+              return;
             }
         }
       else
         {
           prerr ("Value3 must be 1 computational type in DUP_X2");
+          frame->error = EINVAL;
+          return;
         }
     }
   else if (computation_type == 2)
@@ -662,11 +710,15 @@ opcode_dup_x2 (struct stack_frame *frame)
           || opstack_push (frame->operand_stack, op1))
         {
           prerr ("Stack overflow in DUP_X2");
+          frame->error = EINVAL;
+          return;
         }
     }
   else
     {
       prerr ("Value2 undefined computational type in DUP_X2");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -696,12 +748,14 @@ opcode_f2d (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in F2D");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JFLOAT))
     {
       prerr ("Type mismatch in F2D: expected float");
+      frame->error = EINVAL;
       return;
     }
 
@@ -711,6 +765,8 @@ opcode_f2d (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in F2D");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -722,12 +778,14 @@ opcode_f2i (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in F2I");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JFLOAT))
     {
       prerr ("Type mismatch in F2I: expected float");
+      frame->error = EINVAL;
       return;
     }
 
@@ -753,6 +811,8 @@ opcode_f2i (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in F2I");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -764,12 +824,14 @@ opcode_f2l (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in F2L");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JFLOAT))
     {
       prerr ("Type mismatch in F2L: expected float");
+      frame->error = EINVAL;
       return;
     }
 
@@ -795,6 +857,8 @@ opcode_f2l (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in F2L");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -810,6 +874,7 @@ opcode_fadd (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Take incorrect data from opstack in fadd");
+      frame->error = EINVAL;
       return;
     }
   jvariable result = create_variable (JFLOAT);
@@ -949,12 +1014,14 @@ opcode_fmul (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in FMUL");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JFLOAT) || check_var_type (&op2, JFLOAT))
     {
       prerr ("Type mismatch in FMUL: expected float");
+      frame->error = EINVAL;
       return;
     }
 
@@ -964,6 +1031,8 @@ opcode_fmul (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in FMUL");
+      frame->error = EINVAL;
+      return;
     }
 }
 // TODO
@@ -1005,18 +1074,21 @@ opcode_frem (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &value1))
     {
       prerr ("Stack underflow in FREM");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&value1, JFLOAT) || check_var_type (&value2, JFLOAT))
     {
       prerr ("Type mismatch in FREM: expected float");
+      frame->error = EINVAL;
       return;
     }
 
   if (value2.value._int == 0)
     {
       prerr ("ArithmeticException: division by zero in FREM"); // EXCEPTION
+      frame->error = EINVAL;
       return;
     }
 
@@ -1028,6 +1100,8 @@ opcode_frem (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in FREM");
+      frame->error = EINVAL;
+      return;
     }
 };
 // TODO
@@ -1075,6 +1149,7 @@ opcode_fsub (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in FSUB");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1082,6 +1157,7 @@ opcode_fsub (struct stack_frame *frame)
   if (check_var_type (&op1, JFLOAT) || check_var_type (&op2, JFLOAT))
     {
       prerr ("Type mismatch in FSUB: expected float");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1091,6 +1167,8 @@ opcode_fsub (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in FSUB");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1105,7 +1183,7 @@ opcode_getstatic (struct stack_frame *)
 {
 }
 
-// TODO
+
 void
 opcode_goto (struct stack_frame *)
 {
@@ -1124,12 +1202,14 @@ opcode_i2b (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in I2B");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JINT))
     {
       prerr ("Type mismatch in I2B: expected int");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1139,6 +1219,8 @@ opcode_i2b (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in I2B");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1150,12 +1232,14 @@ opcode_i2c (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in I2C");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JINT))
     {
       prerr ("Type mismatch in I2C: expected int");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1165,6 +1249,8 @@ opcode_i2c (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in I2C");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1176,12 +1262,14 @@ opcode_i2d (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in I2D");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JINT))
     {
       prerr ("Type mismatch in I2D: expected int");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1191,6 +1279,8 @@ opcode_i2d (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in I2D");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1202,12 +1292,14 @@ opcode_i2f (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in I2F");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JINT))
     {
       prerr ("Type mismatch in I2F: expected int");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1217,6 +1309,8 @@ opcode_i2f (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in I2F");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1228,12 +1322,14 @@ opcode_i2l (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in I2L");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JINT))
     {
       prerr ("Type mismatch in I2L: expected int");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1243,6 +1339,8 @@ opcode_i2l (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in I2L");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1254,12 +1352,14 @@ opcode_i2s (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in I2S");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JINT))
     {
       prerr ("Type mismatch in I2S: expected int");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1269,6 +1369,8 @@ opcode_i2s (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in I2S");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1284,6 +1386,7 @@ opcode_iadd (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Take incorrect data from opstack in iadd");
+      frame->error = EINVAL;
       return;
     }
   jvariable result = create_variable (JINT);
@@ -1311,6 +1414,7 @@ opcode_iand (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Invalid operand types for IAND");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1334,11 +1438,11 @@ _common_iconst (struct stack_frame *frame, jint value)
   var.value._int = value;
   err = opstack_push (frame->operand_stack, var);
   if (err)
-  {
-    prerr ("iconst_m1: can not run opstack_push");
-    frame->error = ENOMEM;
-    return;
-  }
+    {
+      prerr ("iconst_m1: can not run opstack_push");
+      frame->error = ENOMEM;
+      return;
+    }
 }
 
 void
@@ -1395,12 +1499,14 @@ opcode_idiv (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Incorrect data from opstack");
+      frame->error = EINVAL;
       return;
     }
 
   if (op2.value._int == 0)
     {
       prerr ("Division by zero");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1541,12 +1647,14 @@ opcode_imul (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in IMUL");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
     {
       prerr ("Type mismatch in IMUL: expected int");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1556,6 +1664,8 @@ opcode_imul (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in IMUL");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1571,6 +1681,7 @@ opcode_ineg (struct stack_frame *frame)
   if (err)
     {
       prerr ("INEG operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1587,6 +1698,8 @@ opcode_ineg (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in INEG");
+      frame->error = EINVAL;
+      return;
     }
 }
 // TODO
@@ -1601,13 +1714,122 @@ opcode_invokedynamic (struct stack_frame *)
 }
 // TODO
 void
-opcode_invokeinterface (struct stack_frame *)
+opcode_invokevirtual (struct stack_frame *)
 {
 }
 // TODO
+/**
+ * Invoke instance method with special handling
+ * Format: invokespecial
+ * Operand: indexbyte1, indexbyte2 (2-byte methodref index)
+ * Stack: ..., objectref, [arg1, arg2, ...] -> ...
+ */
 void
 opcode_invokespecial (struct stack_frame *)
 {
+  /*
+  // 1. Проверка доступности операндов
+  if (frame->pc + 2 >= frame->code_length) {
+      prerr("Truncated bytecode in invokespecial");
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 2. Чтение индекса метода
+  uint16_t methodref_idx = (frame->code[frame->pc + 1].raw_byte << 8)
+                         | frame->code[frame->pc + 2].raw_byte;
+
+  // 3. Получение Methodref из пула констант
+  struct cp_methodref *methodref;
+  if (get_methodref(frame->class->runtime_cp, methodref_idx, &methodref)) {
+      prerr("Invalid methodref index %d", methodref_idx);
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 4. Загрузка класса-владельца метода
+  struct jclass *target_class;
+  if (frame->jvm->classloader->load_class(frame->jvm->classloader,
+                                        methodref->class_name,
+                                        &target_class)) {
+      prerr("Class %s not found", methodref->class_name);
+      frame->error = ENOENT;
+      return;
+  }
+
+  // 5. Поиск метода в классе
+  struct rt_method *method;
+  int is_constructor = (strcmp(methodref->method_name, "<init>") == 0);
+
+  if (find_method_special(target_class, methodref->method_name,
+                        methodref->method_descriptor,
+                        frame->class, &method)) {
+      prerr("Method %s.%s%s not found",
+            methodref->class_name,
+            methodref->method_name,
+            methodref->method_descriptor);
+      frame->error = ENOENT;
+      return;
+  }
+
+  // 6. Проверка доступности метода
+  if (!check_method_access(frame->class, target_class, method)) {
+      prerr("Illegal access to method %s", methodref->method_name);
+      frame->error = EACCES;
+      return;
+  }
+
+  // 7. Получение objectref из стека
+  jvariable objectref;
+  if (opstack_peek_nth(frame->operand_stack,
+                     count_arguments(methodref->method_descriptor),
+                     &objectref)) {
+      prerr("Stack underflow in invokespecial");
+      frame->error = EINVAL;
+      return;
+  }
+
+  if (objectref.type != JOBJECT || !objectref.value._object) {
+      prerr("Null object reference in invokespecial");
+      frame->error = EFAULT;
+      return;
+  }
+
+  // 8. Создание нового фрейма
+  struct stack_frame *new_frame = create_frame(target_class, method);
+  if (!new_frame) {
+      prerr("Failed to create frame");
+      frame->error = ENOMEM;
+      return;
+  }
+
+  // 9. Копирование аргументов (включая objectref)
+  if (copy_arguments(frame, new_frame, methodref->method_descriptor)) {
+      free_frame(new_frame);
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 10. Специальная обработка конструктора
+  if (is_constructor) {
+      init_object(objectref.value._object, target_class);
+      new_frame->local_vars->vars[0] = objectref;
+  }
+
+  // 11. Установка связей между фреймами
+  new_frame->caller = frame;
+  new_frame->jvm = frame->jvm;
+
+  // 12. Помещение фрейма в стек вызовов
+  if (call_stack_push(frame->jvm->call_stack, new_frame)) {
+      free_frame(new_frame);
+      frame->error = ENOMEM;
+      return;
+  }
+
+  // 13. Обновление PC
+  frame->pc += 2;
+  */
 }
 
 void
@@ -1686,18 +1908,17 @@ opcode_invokestatic (struct stack_frame *frame)
     }
 
   // Args copy from opstack to locals
-  if (copy_arguments(frame, new_frame, target_method->descriptor)) {
-    prerr("Argument copy failed in invokestatic");
-    // free_frame(new_frame);
-    frame->error = EINVAL;
-    return;
-  }
+  if (copy_arguments (frame, new_frame, target_method->descriptor))
+    {
+      prerr ("Argument copy failed in invokestatic");
+      frame->error = EINVAL;
+      return;
+    }
 
   new_frame->caller = frame;
   if (call_stack_push (frame->jvm_runtime->call_stack, new_frame))
     {
       prerr ("Call stack overflow in invokestatic");
-      // free_frame (new_frame);
       frame->error = ENOMEM;
       return;
     }
@@ -1705,9 +1926,128 @@ opcode_invokestatic (struct stack_frame *frame)
   frame->pc += 2;
 }
 // TODO
+/**
+ * Invoke interface method
+ * Format: invokeinterface
+ * Operand: indexbyte1, indexbyte2, count, 0
+ * Stack: ..., objectref, [arg1, arg2, ...] -> ...
+ */
 void
-opcode_invokevirtual (struct stack_frame *)
+opcode_invokeinterface (struct stack_frame *)
 {
+  /*
+  // 1. Проверка доступности операндов
+  if (frame->pc + 4 >= frame->code_length) {
+      prerr("Truncated bytecode in invokeinterface");
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 2. Чтение операндов
+  uint16_t methodref_idx = (frame->code[frame->pc + 1].raw_byte << 8)
+                         | frame->code[frame->pc + 2].raw_byte;
+  uint8_t args_count = frame->code[frame->pc + 3].raw_byte;
+  uint8_t padding = frame->code[frame->pc + 4].raw_byte;
+
+  // 3. Проверка формата (последний байт должен быть 0)
+  if (padding != 0) {
+      prerr("Invalid invokeinterface padding byte: %d", padding);
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 4. Получение Methodref из пула констант
+  struct cp_interfacemethodref *imethodref;
+  if (get_interfacemethodref(frame->class->runtime_cp, methodref_idx,
+  &imethodref)) { prerr("Invalid interface methodref index %d", methodref_idx);
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 5. Загрузка интерфейса
+  struct jclass *interface_class;
+  if (frame->jvm->classloader->load_class(frame->jvm->classloader,
+                                        imethodref->class_name,
+                                        &interface_class)) {
+      prerr("Interface %s not found", imethodref->class_name);
+      frame->error = ENOENT;
+      return;
+  }
+
+  // 6. Получение objectref и проверка null
+  jvariable objectref;
+  if (opstack_peek_nth(frame->operand_stack, args_count, &objectref)) {
+      prerr("Stack underflow in invokeinterface");
+      frame->error = EINVAL;
+      return;
+  }
+
+  if (objectref.type != JOBJECT || !objectref.value._object) {
+      prerr("Null objectref in invokeinterface");
+      frame->error = EFAULT;
+      return;
+  }
+
+  // 7. Получение реального класса объекта
+  struct jclass *target_class = objectref.value._object->class;
+
+  // 8. Проверка реализации интерфейса
+  if (!implements_interface(target_class, interface_class)) {
+      prerr("Class %s does not implement interface %s",
+            target_class->this_class, interface_class->this_class);
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 9. Поиск реализации метода
+  struct rt_method *method;
+  if (find_interface_method(target_class, interface_class,
+                          imethodref->method_name,
+                          imethodref->method_descriptor,
+                          &method)) {
+      prerr("No implementation for %s%s found in %s",
+            imethodref->method_name, imethodref->method_descriptor,
+            target_class->this_class);
+      frame->error = ENOENT;
+      return;
+  }
+
+  // 10. Проверка доступности метода
+  if (!check_interface_access(frame->class, target_class, method)) {
+      prerr("Illegal access to interface method %s", imethodref->method_name);
+      frame->error = EACCES;
+      return;
+  }
+
+  // 11. Создание нового фрейма
+  struct stack_frame *new_frame = create_frame(target_class, method);
+  if (!new_frame) {
+      prerr("Failed to create frame");
+      frame->error = ENOMEM;
+      return;
+  }
+
+  // 12. Копирование аргументов (objectref + args)
+  if (copy_arguments(frame, new_frame, imethodref->method_descriptor)) {
+      free_frame(new_frame);
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 13. Настройка связей между фреймами
+  new_frame->caller = frame;
+  new_frame->jvm = frame->jvm;
+
+  // 14. Помещение фрейма в стек вызовов
+  if (call_stack_push(frame->jvm->call_stack, new_frame)) {
+      free_frame(new_frame);
+      frame->error = ENOMEM;
+      return;
+  }
+
+  // 15. Обновление PC (4 байта операнда)
+  frame->pc += 4;
+  */
 }
 
 void
@@ -1725,6 +2065,7 @@ opcode_ior (struct stack_frame *frame)
   if (err)
     {
       prerr ("IOR operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1734,6 +2075,8 @@ opcode_ior (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in IOR");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1746,18 +2089,21 @@ opcode_irem (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &value1))
     {
       prerr ("Stack underflow in IREM");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&value1, JINT) || check_var_type (&value2, JINT))
     {
       prerr ("Type mismatch in IREM: expected int");
+      frame->error = EINVAL;
       return;
     }
 
   if (value2.value._int == 0)
     {
       prerr ("ArithmeticException: division by zero in IREM"); // EXCEPTION
+      frame->error = EINVAL;
       return;
     }
 
@@ -1769,6 +2115,8 @@ opcode_irem (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in IREM");
+      frame->error = EINVAL;
+      return;
     }
 }
 // TODO
@@ -1829,6 +2177,7 @@ opcode_isub (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Take incorrect data drom opstack");
+      frame->error = EINVAL;
       return;
     }
   jvariable result = create_variable (JINT);
@@ -1848,6 +2197,7 @@ opcode_iushr (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Take incorrect data from opstack");
+      frame->error = EINVAL;
       return;
     }
   jvariable result = create_variable (JINT);
@@ -1878,6 +2228,7 @@ opcode_ixor (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Take incorrect data from opstack");
+      frame->error = EINVAL;
       return;
     }
   jvariable result = create_variable (JINT);
@@ -1904,12 +2255,14 @@ opcode_l2d (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in L2D");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JLONG))
     {
       prerr ("Type mismatch in L2D: expected long");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1919,6 +2272,8 @@ opcode_l2d (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in L2D");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1930,12 +2285,14 @@ opcode_l2f (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in L2F");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JLONG))
     {
       prerr ("Type mismatch in L2F: expected long");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1945,6 +2302,8 @@ opcode_l2f (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in L2F");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1956,12 +2315,14 @@ opcode_l2i (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in L2I");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JLONG))
     {
       prerr ("Type mismatch in L2I: expected long");
+      frame->error = EINVAL;
       return;
     }
 
@@ -1971,6 +2332,8 @@ opcode_l2i (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in L2I");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -1986,6 +2349,7 @@ opcode_ladd (struct stack_frame *frame)
   if (err != 0)
     {
       prerr ("Take incorrect data from opstack in ladd");
+      frame->error = EINVAL;
       return;
     }
   jvariable result = create_variable (JLONG);
@@ -2013,6 +2377,7 @@ opcode_land (struct stack_frame *frame)
   if (err)
     {
       prerr ("LAND operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2022,6 +2387,8 @@ opcode_land (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LAND");
+      frame->error = EINVAL;
+      return;
     }
 }
 // TODO
@@ -2039,12 +2406,14 @@ opcode_lcmp (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &value1))
     {
       prerr ("Stack underflow in LCMP");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&value1, JLONG) || check_var_type (&value2, JLONG))
     {
       prerr ("Type mismatch in LCMP: expected long");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2087,7 +2456,9 @@ opcode_lconst_1 (struct stack_frame *frame)
  * Operand: index (1 byte)
  * Stack: ... -> ..., value
  */
-void opcode_ldc(struct stack_frame *) {
+void
+opcode_ldc (struct stack_frame *)
+{
   /*
   // 1. Проверка доступности операнда
   if (frame->pc + 1 >= frame->code_length) {
@@ -2098,7 +2469,7 @@ void opcode_ldc(struct stack_frame *) {
 
   // 2. Чтение индекса из пула констант
   uint8_t index = frame->code[frame->pc + 1].raw_byte;
-  
+
   // 3. Получение записи из пула констант
   struct cp_entry entry;
   if (get_constant_pool_entry(frame->class->runtime_cp, index, &entry)) {
@@ -2117,13 +2488,13 @@ void opcode_ldc(struct stack_frame *) {
           constant.value._int = entry.info.integer;
           break;
       }
-      
+
       case CONSTANT_Float: {
           constant.type = JFLOAT;
           constant.value._float = entry.info.fbytes;
           break;
       }
-      
+
       case CONSTANT_String: {
           // Создание строкового объекта
           jobject str_obj = create_string_object(
@@ -2140,7 +2511,7 @@ void opcode_ldc(struct stack_frame *) {
           constant.value._object = str_obj;
           break;
       }
-      
+
       case CONSTANT_Class: {
           // Получение Class объекта
           struct jclass *cls;
@@ -2156,7 +2527,7 @@ void opcode_ldc(struct stack_frame *) {
           constant.value._object = cls->class_object;
           break;
       }
-      
+
       default: {
           prerr("Unsupported constant type %d in ldc", entry.tag);
           frame->error = EINVAL;
@@ -2232,12 +2603,14 @@ opcode_lmul (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in LMUL");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JLONG) || check_var_type (&op2, JLONG))
     {
       prerr ("Type mismatch in LMUL: expected long");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2247,6 +2620,8 @@ opcode_lmul (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LMUL");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -2262,6 +2637,7 @@ opcode_lneg (struct stack_frame *frame)
   if (err)
     {
       prerr ("LNEG operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2278,6 +2654,7 @@ opcode_lneg (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LNEG");
+      frame->error = EINVAL;
     }
 }
 
@@ -2302,6 +2679,7 @@ opcode_lor (struct stack_frame *frame)
   if (err)
     {
       prerr ("LOR operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2311,6 +2689,8 @@ opcode_lor (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LOR");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -2323,18 +2703,21 @@ opcode_lrem (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &value1))
     {
       prerr ("Stack underflow in LREM");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&value1, JLONG) || check_var_type (&value2, JLONG))
     {
       prerr ("Type mismatch in LREM: expected long");
+      frame->error = EINVAL;
       return;
     }
 
   if (value2.value._long == 0)
     {
       prerr ("ArithmeticException: division by zero in LREM"); // EXCEPTION
+      frame->error = EINVAL;
       return;
     }
 
@@ -2346,6 +2729,8 @@ opcode_lrem (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LREM");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -2370,6 +2755,7 @@ opcode_lshl (struct stack_frame *frame)
   if (err)
     {
       prerr ("LSHL operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2380,6 +2766,8 @@ opcode_lshl (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LSHL");
+      frame->error = EINVAL;
+      return;
     }
 }
 void
@@ -2397,6 +2785,7 @@ opcode_lshr (struct stack_frame *frame)
   if (err)
     {
       prerr ("LSHR operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2408,6 +2797,7 @@ opcode_lshr (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LSHR");
+      frame->error = EINVAL;
     }
 }
 
@@ -2449,12 +2839,14 @@ opcode_lsub (struct stack_frame *frame)
       || opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in JLONG");
+      frame->error = EINVAL;
       return;
     }
 
   if (check_var_type (&op1, JLONG) || check_var_type (&op2, JLONG))
     {
       prerr ("Type mismatch in JLONG: expected float");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2464,6 +2856,8 @@ opcode_lsub (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in JLONG");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -2482,6 +2876,7 @@ opcode_lushr (struct stack_frame *frame)
   if (err)
     {
       prerr ("LUSHR operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2501,6 +2896,8 @@ opcode_lushr (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LUSHR");
+      frame->error = EINVAL;
+      return;
     }
 }
 
@@ -2519,6 +2916,7 @@ opcode_lxor (struct stack_frame *frame)
   if (err)
     {
       prerr ("LXOR operation failed");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2528,6 +2926,8 @@ opcode_lxor (struct stack_frame *frame)
   if (opstack_push (frame->operand_stack, result))
     {
       prerr ("Stack overflow in LXOR");
+      frame->error = EINVAL;
+      return;
     }
 }
 // TODO
@@ -2547,7 +2947,9 @@ opcode_multianewarray (struct stack_frame *)
 }
 // TODO
 
-void opcode_new(struct stack_frame *) {
+void
+opcode_new (struct stack_frame *)
+{
   /*
   // 1. Проверка наличия достаточного количества байтов
   if (frame->pc + 2 >= frame->code_length) {
@@ -2557,7 +2959,7 @@ void opcode_new(struct stack_frame *) {
   }
 
   // 2. Чтение индекса класса из пула констант
-  uint16_t class_idx = (frame->code[frame->pc + 1].raw_byte << 8) 
+  uint16_t class_idx = (frame->code[frame->pc + 1].raw_byte << 8)
                      | frame->code[frame->pc + 2].raw_byte;
 
   // 3. Получение ссылки на класс из пула констант
@@ -2631,11 +3033,11 @@ opcode_pop (struct stack_frame *frame)
   int err;
   err = opstack_pop (frame->operand_stack, &var);
   if (err)
-  {
-    prerr ("POP: can not run opstack pop");
-    frame->error = ENOMEM;
-    return;
-  }
+    {
+      prerr ("POP: can not run opstack pop");
+      frame->error = ENOMEM;
+      return;
+    }
 }
 
 void
@@ -2646,6 +3048,7 @@ opcode_pop2 (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &var1))
     {
       prerr ("Stack underflow in POP2");
+      frame->error = EINVAL;
       return;
     }
 
@@ -2657,12 +3060,14 @@ opcode_pop2 (struct stack_frame *frame)
   if (opstack_pop (frame->operand_stack, &var2))
     {
       prerr ("Stack underflow in POP2");
+      frame->error = EINVAL;
       return;
     }
 
   if (var_computation_type (&var2) != 1)
     {
       prerr ("Arg 2 is not category 1 computational type in POP2");
+      frame->error = EINVAL;
       return;
     }
 }

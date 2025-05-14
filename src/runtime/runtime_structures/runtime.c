@@ -38,35 +38,34 @@ run_jvm (struct jvm *jvm)
 
   call_stack_push (jvm->call_stack, main_frame);
 
-  // while (!call_stack_is_empty(jvm->call_stack)) {
-  //   struct stack_frame *current_frame = call_stack_peek(jvm->call_stack);
+  /*
+  while (!call_stack_is_empty (jvm->call_stack))
+    {
+      struct stack_frame *current_frame = call_stack_peek (jvm->call_stack);
 
-  //   if (current_frame->pc >= current_frame->code_length) {
-  //       call_stack_pop(jvm->call_stack);
-  //       continue;
-  //   }
+      if (current_frame->pc >= current_frame->code_length)
+        {
+          call_stack_pop (jvm->call_stack);
+          continue;
+        }
 
-  //   struct runtime_opcode op = current_frame->code[current_frame->pc];
-  //   uint32_t old_pc;
+      struct runtime_opcode op = current_frame->code[current_frame->pc];
+      uint32_t old_pc;
 
-  //   printf("[%s.%s%s] PC=%u: %s\n",
-  //          current_frame->class->this_class,
-  //          current_frame->method->name,
-  //          current_frame->method->descriptor,
-  //          current_frame->pc, op.name);
+      printf ("[%s.%s%s] PC=%u: %s\n", current_frame->class->this_class,
+              current_frame->method->name, current_frame->method->descriptor,
+              current_frame->pc, op.name);
 
-  // Execute the instruction
-  // op.handler(current_frame);
+      // Execute the instruction
+      op.handler (current_frame);
 
-  // Increment PC if the instruction did not change it (jump, return, etc.)
-  // if (current_frame->pc == old_pc) {
-  //     current_frame->pc++;
-  // }
-
-  // if (check_exceptions(current_frame)) {
-  //     handle_exception(current_frame);
-  // }
-  // }
+      // Increment PC if the instruction did not change it (jump, return, etc.)
+      if (current_frame->pc == old_pc)
+        {
+          current_frame->pc++;
+        }
+    }
+    */
 
   printf ("Execution completed successfully\n");
   return 0;

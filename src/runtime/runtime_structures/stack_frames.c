@@ -374,8 +374,10 @@ copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
 
       // Parse type
       if ((err = parse_arg_type (&p, &array_depth, &base_type)))
+      {
+        prerr ("can not parse arg type in copy_args");
         return err;
-
+      }
       // Determine expected type
       determine_expected_type (base_type, array_depth, &expected_type,
                                &is_wide);
