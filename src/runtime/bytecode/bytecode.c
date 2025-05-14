@@ -3352,72 +3352,75 @@ opcode_multianewarray (struct stack_frame *)
 // TODO
 
 void
-opcode_new (struct stack_frame *)
+opcode_new(struct stack_frame *frame)
 {
-  /*
-  // 1. Проверка наличия достаточного количества байтов
-  if (frame->pc + 2 >= frame->code_length) {
-      prerr("Truncated bytecode in new");
+  int err;
+
+  // Проверка границ байткода
+  if (frame->pc + 2 >= frame->code_length)
+    {
+      prerr("new: Truncated bytecode");
       frame->error = EINVAL;
       return;
-  }
+    }
 
-  // 2. Чтение индекса класса из пула констант
-  uint16_t class_idx = (frame->code[frame->pc + 1].raw_byte << 8)
-                     | frame->code[frame->pc + 2].raw_byte;
+  // Получаем индекс CONSTANT_Class
+  uint16_t index = (frame->code[frame->pc + 1].raw_byte << 8) |
+                   frame->code[frame->pc + 2].raw_byte;
 
-  // 3. Получение ссылки на класс из пула констант
-  struct cp_class *class_ref;
-  if (get_classref(frame->class->runtime_cp, class_idx, &class_ref)) {
-      prerr("Invalid class index %d in new", class_idx);
-      frame->error = EINVAL;
+  if (index == 0 || index >= frame->class->runtime_cp_count)
+    {
+      prerr("new: Invalid constant pool index %u", index);
+      frame->error = JVM_INVALID_BYTECODE;
       return;
-  }
+    }
 
-  // 4. Загрузка класса (если не загружен)
+  struct runtime_cp *cp_entry = &frame->class->runtime_cp[index - 1];
+
+  if (cp_entry->tag != CLASS)
+    {
+      prerr("new: Constant pool entry %u is not CONSTANT_Class", index);
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  const char *class_name = cp_entry->class_name;
+
+  // Загружаем класс
   struct jclass *target_class;
-  if (frame->jvm->classloader->load_class(frame->jvm->classloader,
-                                        class_ref->name,
-                                        &target_class)) {
-      prerr("Class %s not found", class_ref->name);
+  err = classloader_load_class(frame->jvm_runtime->classloader, class_name, &target_class);
+  if (err)
+    {
+      prerr("new: Failed to load class %s", class_name);
       frame->error = ENOENT;
       return;
-  }
+    }
 
-  // 5. Проверка, что класс может быть инстанцирован
-  if (target_class->access_flags & (ACC_ABSTRACT | ACC_INTERFACE)) {
-      prerr("Cannot instantiate abstract class/interface %s", class_ref->name);
-      frame->error = EACCES;
-      return;
-  }
-
-  // 6. Выделение памяти для объекта
-  jobject obj = heap_alloc(frame->jvm->heap, target_class);
-  if (!obj) {
-      prerr("Failed to allocate object of type %s", class_ref->name);
+  // Аллоцируем объект в куче
+  heap_object *obj = heap_alloc_object(frame->jvm_runtime->heap, target_class);
+  if (!obj)
+    {
+      prerr("new: Failed to allocate object for class %s", class_name);
       frame->error = ENOMEM;
       return;
-  }
+    }
 
-  // 7. Инициализация полей объекта
-  init_object_fields(obj, target_class);
+  // Оборачиваем в jvariable
+  jvariable var;
+  var.type = JOBJECT;
+  var.value._object = obj;
 
-  // 8. Помещение ссылки в стек операндов
-  jvariable ref;
-  ref.type = JOBJECT;
-  ref.value._object = obj;
-
-  if (opstack_push(frame->operand_stack, ref)) {
-      prerr("Stack overflow in new");
-      heap_free(frame->jvm->heap, obj);
+  // Кладём на стек
+  if (opstack_push(frame->operand_stack, var))
+    {
+      prerr("new: Failed to push object reference");
       frame->error = ENOMEM;
       return;
-  }
+    }
 
-  // 9. Обновление счетчика команд
-  frame->pc += 2;
-  */
+  frame->pc += 3; // переходим к следующей инструкции
 }
+
 // TODO
 void
 opcode_newarray (struct stack_frame *)
