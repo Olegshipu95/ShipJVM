@@ -1183,6 +1183,26 @@ opcode_getstatic (struct stack_frame *)
 {
 }
 
+static void
+_common_load_2branchbytes_and_jump (struct stack_frame *frame)
+{
+  if (frame->pc + 2 >= frame->code_length)
+    {
+      prerr ("Truncated bytecode: missing two byte operand");
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  int16_t branchoffset = (frame->code[frame->pc + 1].raw_byte << 8)
+                         | frame->code[frame->pc + 2].raw_byte;
+  frame->pc += branchoffset;
+  if (frame->pc >= frame->code_length)
+    {
+      prerr ("Illegal jump: out of range");
+      frame->error = JVM_ILLEGAL_BRANCH_JUMP;
+    }
+}
+
 void
 opcode_goto (struct stack_frame *frame)
 {
@@ -1521,26 +1541,6 @@ opcode_idiv (struct stack_frame *frame)
   opstack_push (frame->operand_stack, result);
 }
 
-static void
-_common_load_2branchbytes_and_jump (struct stack_frame *frame)
-{
-  if (frame->pc + 2 >= frame->code_length)
-    {
-      prerr ("Truncated bytecode: missing two byte operand");
-      frame->error = JVM_INVALID_BYTECODE;
-      return;
-    }
-
-  int16_t branchoffset = (frame->code[frame->pc + 1].raw_byte << 8)
-                         | frame->code[frame->pc + 2].raw_byte;
-  frame->pc += branchoffset;
-  if (frame->pc >= frame->code_length)
-    {
-      prerr ("Illegal jump: out of range");
-      frame->error = JVM_ILLEGAL_BRANCH_JUMP;
-    }
-}
-
 void
 opcode_if_acmpeq (struct stack_frame *frame)
 {
@@ -1567,7 +1567,7 @@ opcode_if_acmpeq (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1597,7 +1597,7 @@ opcode_if_acmpne (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1627,7 +1627,7 @@ opcode_if_icmpeq (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1657,7 +1657,7 @@ opcode_if_icmpne (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1687,7 +1687,7 @@ opcode_if_icmplt (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1717,7 +1717,7 @@ opcode_if_icmpge (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1747,7 +1747,7 @@ opcode_if_icmpgt (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1777,7 +1777,7 @@ opcode_if_icmple (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1806,7 +1806,7 @@ opcode_ifeq (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1835,7 +1835,7 @@ opcode_ifne (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1864,7 +1864,7 @@ opcode_iflt (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1893,7 +1893,7 @@ opcode_ifge (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1922,7 +1922,7 @@ opcode_ifgt (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1951,7 +1951,7 @@ opcode_ifle (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1960,7 +1960,7 @@ opcode_ifnonnull (struct stack_frame *frame)
 {
   jvariable op1;
 
-  if (opstack_pop (frame->operand_stack, &op2))
+  if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in IFNONNULL");
       frame->error = EINVAL;
@@ -1980,7 +1980,7 @@ opcode_ifnonnull (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 
@@ -1989,7 +1989,7 @@ opcode_ifnull (struct stack_frame *frame)
 {
   jvariable op1;
 
-  if (opstack_pop (frame->operand_stack, &op2))
+  if (opstack_pop (frame->operand_stack, &op1))
     {
       prerr ("Stack underflow in IFNULL");
       frame->error = EINVAL;
@@ -2009,7 +2009,7 @@ opcode_ifnull (struct stack_frame *frame)
     }
   else
     {
-      frame->pc = frame->pc + 3
+      frame->pc = frame->pc + 3;
     }
 }
 // TODO
