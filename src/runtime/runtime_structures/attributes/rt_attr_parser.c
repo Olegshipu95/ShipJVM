@@ -561,9 +561,9 @@ parse_rt_code_attribute (struct runtime_cp *rt_cp,
         }
       else
         {
-          attr->code[code_iter]
-              = (struct runtime_opcode){ .name = "UNKNOWN",
-                                         .handler = opcode_error };
+          attr->code[code_iter] = (struct runtime_opcode){
+            .name = "UNKNOWN", .handler = opcode_error, .raw_byte = opcode
+          };
         }
     }
 

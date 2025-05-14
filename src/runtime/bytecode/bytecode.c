@@ -3,21 +3,30 @@
 void
 _common_store (struct stack_frame *frame, java_value_type type, uint32_t index)
 {
+  int err;
   jvariable var;
 
   if (opstack_pop (frame->operand_stack, &var))
     {
       prerr ("Failed to pop from stack");
+      frame->error = ENOMEM;
       return;
     }
 
   if (check_var_type (&var, type))
     {
       prerr ("Type mismatch in store: expected %d", type);
+      frame->error = ENOMEM;
       return;
     }
 
-  store_local_var (frame->local_vars, var, index);
+  err = store_local_var (frame->local_vars, var, index);
+  if (err)
+  {
+    prerr ("STORE: can not store local var");
+    frame->error = ENOMEM;
+    return;
+  }
 }
 
 void
@@ -161,8 +170,26 @@ opcode_bastore (struct stack_frame *)
 }
 // TODO
 void
-opcode_bipush (struct stack_frame *)
+opcode_bipush (struct stack_frame *frame)
 {
+  ++frame->pc;
+  if (frame->pc >= frame->code_length)
+    {
+      prerr ("Truncated bytecode in bipush: missing byte operand");
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+  uint8_t byte_value = frame->code[frame->pc].raw_byte;
+  jvariable push_value = create_variable (JINT);
+  push_value.value._int = byte_value;
+
+  if (opstack_push (frame->operand_stack, push_value))
+    {
+      prerr ("Stack overflow in bipush");
+      frame->error = JVM_STACK_OVERFLOW;
+      return;
+    }
+  frame->pc++;
 }
 
 // TODO
@@ -846,10 +873,47 @@ opcode_fdiv (struct stack_frame *)
 {
 }
 
-// TODO
 void
-opcode_fload (struct stack_frame *)
+opcode_fload (struct stack_frame *frame)
 {
+  uint8_t index;
+  jvariable value;
+  int err;
+
+  ++frame->pc;
+  if (frame->pc >= frame->code_length)
+    {
+      prerr ("Truncated bytecode in fload: missing index operand");
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+  index = frame->code[frame->pc].raw_byte;
+
+  err = get_local_var (frame->local_vars, &value, index);
+  if (err)
+    {
+      prerr ("Failed to get local variable %d in fload", index);
+      frame->error = err;
+      return;
+    }
+
+  if (value.type != JFLOAT)
+    {
+      prerr ("Type mismatch in fload: expected float at index %d", index);
+      frame->error = EINVAL; // Invalid argument
+      return;
+    }
+
+  // 5. Помещаем значение в стек операндов
+  err = opstack_push (frame->operand_stack, value);
+  if (err)
+    {
+      prerr ("Stack overflow in fload");
+      frame->error = ENOMEM; // Not enough space
+      return;
+    }
+
+  ++frame->pc;
 }
 
 void
@@ -1265,9 +1329,16 @@ opcode_iastore (struct stack_frame *)
 void
 _common_iconst (struct stack_frame *frame, jint value)
 {
+  int err;
   jvariable var = create_variable (JINT);
   var.value._int = value;
-  opstack_push (frame->operand_stack, var);
+  err = opstack_push (frame->operand_stack, var);
+  if (err)
+  {
+    prerr ("iconst_m1: can not run opstack_push");
+    frame->error = ENOMEM;
+    return;
+  }
 }
 
 void
@@ -1538,10 +1609,100 @@ void
 opcode_invokespecial (struct stack_frame *)
 {
 }
-// TODO
+
 void
-opcode_invokestatic (struct stack_frame *)
+opcode_invokestatic (struct stack_frame *frame)
 {
+  int err;
+  if (frame->pc + 2 >= frame->code_length)
+    {
+      prerr ("invokestatic: Truncated bytecode");
+      frame->error = EINVAL;
+      return;
+    }
+
+  // Reading the method index from the constant pool
+  uint16_t methodref_idx = (frame->code[frame->pc + 1].raw_byte << 8)
+                           | frame->code[frame->pc + 2].raw_byte;
+  if (methodref_idx >= frame->class->runtime_cp_count)
+    {
+      prerr ("invokestatic: Illegal index to cp");
+      frame->error = EINVAL;
+      return;
+    }
+
+  // Get MethodRef from constant pool
+  struct rt_methodref *method_ref;
+  if (frame->class->runtime_cp[methodref_idx - 1].tag != METHOD_REF)
+    {
+      prerr ("invokeStatic: CP_Entry by index %hu is not METHOD_REF",
+             methodref_idx);
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+  method_ref = &frame->class->runtime_cp[methodref_idx - 1].methodref;
+
+  // Load the class containing the method
+  struct jclass *target_class;
+  err = classloader_load_class (frame->jvm_runtime->classloader,
+                                method_ref->ref.class_name, &target_class);
+  if (err)
+    {
+      prerr ("invokeStatic: Can not load class %s",
+             method_ref->ref.class_name);
+      frame->error = ENOENT;
+      return;
+    }
+
+  // Find the method in the target class
+  struct rt_method *target_method = NULL;
+  err = find_method_in_current_class (target_class, &target_method,
+                                      method_ref->ref.nat.name,
+                                      method_ref->ref.nat.descriptor);
+  if (err)
+    {
+      prerr ("invokeStatic: Can not find method %s:%s in class %s",
+             method_ref->ref.nat.name, method_ref->ref.nat.descriptor,
+             target_class->this_class);
+      frame->error = ENOENT;
+      return;
+    }
+
+  // Check that the method is static
+  if (!(target_method->access_flags & ACC_STATIC))
+    {
+      prerr ("Method %s is not static", target_method->name);
+      frame->error = EACCES;
+      return;
+    }
+
+  struct stack_frame *new_frame
+      = init_stack_frame (target_class, target_method, frame->jvm_runtime);
+  if (new_frame == NULL)
+    {
+      prerr ("invokeStatic: failed to create frame");
+      frame->error = ENOMEM;
+      return;
+    }
+
+  // Args copy from opstack to locals
+  if (copy_arguments(frame, new_frame, target_method->descriptor)) {
+    prerr("Argument copy failed in invokestatic");
+    // free_frame(new_frame);
+    frame->error = EINVAL;
+    return;
+  }
+
+  new_frame->caller = frame;
+  if (call_stack_push (frame->jvm_runtime->call_stack, new_frame))
+    {
+      prerr ("Call stack overflow in invokestatic");
+      // free_frame (new_frame);
+      frame->error = ENOMEM;
+      return;
+    }
+
+  frame->pc += 2;
 }
 // TODO
 void
@@ -1920,9 +2081,102 @@ opcode_lconst_1 (struct stack_frame *frame)
 };
 
 // TODO
-void
-opcode_ldc (struct stack_frame *)
-{
+/**
+ * Push constant from constant pool onto the stack
+ * Format: ldc
+ * Operand: index (1 byte)
+ * Stack: ... -> ..., value
+ */
+void opcode_ldc(struct stack_frame *) {
+  /*
+  // 1. Проверка доступности операнда
+  if (frame->pc + 1 >= frame->code_length) {
+      prerr("Truncated bytecode in ldc");
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 2. Чтение индекса из пула констант
+  uint8_t index = frame->code[frame->pc + 1].raw_byte;
+  
+  // 3. Получение записи из пула констант
+  struct cp_entry entry;
+  if (get_constant_pool_entry(frame->class->runtime_cp, index, &entry)) {
+      prerr("Invalid constant pool index %d in ldc", index);
+      frame->error = EINVAL;
+      return;
+  }
+
+  jvariable constant;
+  memset(&constant, 0, sizeof(jvariable));
+
+  // 4. Обработка в зависимости от типа записи
+  switch (entry.tag) {
+      case CONSTANT_Integer: {
+          constant.type = JINT;
+          constant.value._int = entry.info.integer;
+          break;
+      }
+      
+      case CONSTANT_Float: {
+          constant.type = JFLOAT;
+          constant.value._float = entry.info.fbytes;
+          break;
+      }
+      
+      case CONSTANT_String: {
+          // Создание строкового объекта
+          jobject str_obj = create_string_object(
+              frame->jvm->heap,
+              entry.info.string.bytes,
+              entry.info.string.length
+          );
+          if (!str_obj) {
+              prerr("Failed to create string object");
+              frame->error = ENOMEM;
+              return;
+          }
+          constant.type = JOBJECT;
+          constant.value._object = str_obj;
+          break;
+      }
+      
+      case CONSTANT_Class: {
+          // Получение Class объекта
+          struct jclass *cls;
+          if (frame->jvm->classloader->load_class(
+                  frame->jvm->classloader,
+                  entry.info.classref.name,
+                  &cls)) {
+              prerr("Class %s not found", entry.info.classref.name);
+              frame->error = ENOENT;
+              return;
+          }
+          constant.type = JOBJECT;
+          constant.value._object = cls->class_object;
+          break;
+      }
+      
+      default: {
+          prerr("Unsupported constant type %d in ldc", entry.tag);
+          frame->error = EINVAL;
+          return;
+      }
+  }
+
+  // 5. Помещение значения в стек
+  if (opstack_push(frame->operand_stack, constant)) {
+      prerr("Stack overflow in ldc");
+      if (constant.type == JOBJECT) {
+          heap_free(frame->jvm->heap, constant.value._object);
+      }
+      frame->error = ENOMEM;
+      return;
+  }
+
+  // 6. Обновление счетчика команд
+  frame->pc += 1;
+  */
 }
 // TODO
 void
@@ -2292,9 +2546,71 @@ opcode_multianewarray (struct stack_frame *)
 {
 }
 // TODO
-void
-opcode_new (struct stack_frame *)
-{
+
+void opcode_new(struct stack_frame *) {
+  /*
+  // 1. Проверка наличия достаточного количества байтов
+  if (frame->pc + 2 >= frame->code_length) {
+      prerr("Truncated bytecode in new");
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 2. Чтение индекса класса из пула констант
+  uint16_t class_idx = (frame->code[frame->pc + 1].raw_byte << 8) 
+                     | frame->code[frame->pc + 2].raw_byte;
+
+  // 3. Получение ссылки на класс из пула констант
+  struct cp_class *class_ref;
+  if (get_classref(frame->class->runtime_cp, class_idx, &class_ref)) {
+      prerr("Invalid class index %d in new", class_idx);
+      frame->error = EINVAL;
+      return;
+  }
+
+  // 4. Загрузка класса (если не загружен)
+  struct jclass *target_class;
+  if (frame->jvm->classloader->load_class(frame->jvm->classloader,
+                                        class_ref->name,
+                                        &target_class)) {
+      prerr("Class %s not found", class_ref->name);
+      frame->error = ENOENT;
+      return;
+  }
+
+  // 5. Проверка, что класс может быть инстанцирован
+  if (target_class->access_flags & (ACC_ABSTRACT | ACC_INTERFACE)) {
+      prerr("Cannot instantiate abstract class/interface %s", class_ref->name);
+      frame->error = EACCES;
+      return;
+  }
+
+  // 6. Выделение памяти для объекта
+  jobject obj = heap_alloc(frame->jvm->heap, target_class);
+  if (!obj) {
+      prerr("Failed to allocate object of type %s", class_ref->name);
+      frame->error = ENOMEM;
+      return;
+  }
+
+  // 7. Инициализация полей объекта
+  init_object_fields(obj, target_class);
+
+  // 8. Помещение ссылки в стек операндов
+  jvariable ref;
+  ref.type = JOBJECT;
+  ref.value._object = obj;
+
+  if (opstack_push(frame->operand_stack, ref)) {
+      prerr("Stack overflow in new");
+      heap_free(frame->jvm->heap, obj);
+      frame->error = ENOMEM;
+      return;
+  }
+
+  // 9. Обновление счетчика команд
+  frame->pc += 2;
+  */
 }
 // TODO
 void
@@ -2312,7 +2628,14 @@ void
 opcode_pop (struct stack_frame *frame)
 {
   jvariable var;
-  opstack_pop (frame->operand_stack, &var);
+  int err;
+  err = opstack_pop (frame->operand_stack, &var);
+  if (err)
+  {
+    prerr ("POP: can not run opstack pop");
+    frame->error = ENOMEM;
+    return;
+  }
 }
 
 void

@@ -25,13 +25,10 @@ main (int argc, char *argv[])
 
   classloader_init_dir_paths (jvm->classloader, argv[1]);
 
-  for (int i = 0; i < 50; ++i)
-    {
-      err = classloader_load_class (jvm->classloader, argv[2],
-                                        &jvm->main_class);
-      if (err)
-        return err;
-    }
-  err = run_jvm(jvm);
+  err = classloader_load_class (jvm->classloader, argv[2], &jvm->main_class);
+  if (err)
+    return err;
+
+  err = run_jvm (jvm);
   return err;
 }
