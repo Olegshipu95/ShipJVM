@@ -9,7 +9,7 @@ init_operand_stack (struct operand_stack *opstack, uint16_t max_stack)
       prerr ("Can not allocate memory for operand stack");
       return ENOMEM;
     }
-
+  opstack->max_stack = max_stack;
   opstack->top = -1;
   return 0;
 }
@@ -23,6 +23,7 @@ init_local_vars (struct local_variables *locals, uint16_t size)
       prerr ("Can not allocate memory for local vars");
       return ENOMEM;
     }
+  locals->max_locals = size;
   return 0;
 }
 
@@ -62,7 +63,7 @@ init_stack_frame (struct jclass *class, struct rt_method *method,
       return NULL;
     }
   err = init_operand_stack (frame->operand_stack,
-                            method->code_attr->max_locals);
+                            method->code_attr->max_stack);
   if (err)
     {
       prerr ("init_operand_stack return error - %d", err);
@@ -140,6 +141,19 @@ opstack_peek (struct operand_stack *opstack, jvariable *value)
 
   jvariable popped = opstack->stack[opstack->top];
   *value = popped;
+  return 0;
+}
+
+int
+opstack_peek_nth(struct operand_stack *stack, int n, jvariable *out)
+{
+  if (!stack || !out || n < 0)
+    return EINVAL;
+
+  if (stack->top <= n)
+    return EINVAL; // недостаточно элементов в стеке
+
+  *out = stack->stack[stack->top - 1 - n];
   return 0;
 }
 
@@ -344,7 +358,40 @@ copy_single_arg (struct stack_frame *caller, struct stack_frame *callee,
   return 0;
 }
 
-#define MAX_ARG_COUNT 64
+int count_arguments_in_descriptor(const char *descriptor) {
+  if (!descriptor || *descriptor != '(')
+    return -1;
+
+  int count = 0;
+  const char *p = descriptor + 1;
+
+  while (*p && *p != ')') {
+    while (*p == '[') // массивы
+      p++;
+
+    if (*p == 'L') { // объектный тип
+      while (*p && *p != ';')
+        p++;
+      if (*p == ';')
+        p++;
+      else
+        return -1;
+    } else if (strchr("BCDFIJSZ", *p)) {
+      count++;
+      p++;
+    } else {
+      return -1; // ошибка
+    }
+
+    count++;
+  }
+
+  if (*p != ')')
+    return -1;
+
+  return count;
+}
+
 
 int
 copy_arguments(struct stack_frame *caller,
@@ -506,4 +553,36 @@ ensure_class_initialized (struct jvm *jvm, struct jclass *cls)
   cls->initialized = true;
 
   return 0;
+}
+
+int find_method_in_hierarchy(struct jvm* jvm, struct jclass *start,
+                             struct rt_method **out_method,
+                             const char *name,
+                             const char *descriptor)
+{
+  struct jclass *cls = start;
+
+  while (cls) {
+    for (int i = 0; i < cls->methods_data.methods_count; i++) {
+      struct rt_method *m = &cls->methods_data.methods[i];
+
+      if (strcmp(m->name, name) == 0 &&
+          strcmp(m->descriptor, descriptor) == 0) {
+        *out_method = m;
+        return 0;
+      }
+    }
+
+    // Переход к суперклассу
+    if (!cls->super_class)
+      break;
+
+    struct jclass *super;
+    if (classloader_load_class(jvm->classloader, cls->super_class, &super))
+      return ENOENT;
+
+    cls = super;
+  }
+
+  return ENOENT;
 }

@@ -31,6 +31,7 @@ struct rt_field
   string descriptor; // CONSTANT_Utf8_info
   uint16_t attributes_count;
   struct rt_attribute **attributes; // size = attributes_count
+  jvariable data;
 };
 
 struct rt_method
@@ -74,11 +75,17 @@ struct jclass
   struct rt_attribute **attributes; // size = attributes_count
   int initialized;                  // true if <clinit> is already executed
   int being_initialized;            // for recurse method
+  uint16_t static_fields_size;
 };
 
 int jclass_new (struct jclass **jclass, struct class_file *class_file);
 int find_method_in_current_class (struct jclass *class,
                                   struct rt_method **find_method,
                                   const char *name, const char *descriptor);
+int
+find_field_in_current_class(struct jclass *cls,
+                            struct rt_field **out_field,
+                            const char *name,
+                            const char *descriptor);
 
 #endif
