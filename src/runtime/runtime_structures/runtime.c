@@ -1,14 +1,5 @@
 #include "runtime.h"
 
-struct jvm *
-new_jvm ()
-{
-  struct jvm *new_jvm = my_alloc (struct jvm);
-  new_jvm->main_class = NULL;
-  new_jvm->classloader = NULL;
-  return new_jvm;
-}
-
 jvariable
 create_empty_args_variable ()
 {

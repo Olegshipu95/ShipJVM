@@ -9,7 +9,7 @@
 
 
 #include "java_types.h"
-#include "runtime.h"
+#include "jvm_structure.h"
 #include "runtime_class.h"
 #include "util.h"
 
@@ -22,8 +22,6 @@
 #define JVM_STACK_OVERFLOW 1002
 #define JVM_ILLEGAL_LOCAL_INDEX 1003
 #define JVM_NULL_POINTER 1004
-
-struct jvm;
 
 struct operand_stack
 {

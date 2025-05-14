@@ -5,9 +5,9 @@
 
 #include "classfile.h"
 #include "runtime_class.h"
-
 #include "classfile_parser.h"
 #include "util.h"
+
 struct classloader;
 struct jclass;
 
