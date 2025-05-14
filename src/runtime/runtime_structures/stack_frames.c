@@ -344,66 +344,91 @@ copy_single_arg (struct stack_frame *caller, struct stack_frame *callee,
   return 0;
 }
 
-/**
- * Копирует аргументы из стека вызывающего фрейма в локальные переменные
- * вызываемого фрейма
- * @param caller Фрейм вызывающего метода
- * @param callee Фрейм вызываемого метода
- * @param descriptor Дескриптор метода (формата (Аргументы)ВозвращаемыйТип)
- * @return 0 при успехе, код ошибки при неудаче
- */
+#define MAX_ARG_COUNT 64
+
 int
-copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
-                const char *descriptor)
+copy_arguments(struct stack_frame *caller,
+               struct stack_frame *callee,
+               const char *descriptor,
+               int has_this)
 {
   const char *p = descriptor;
-  int local_index = 0;
   int err;
+  int local_index = 0;
 
   // 1. Validate descriptor
-  if ((err = validate_descriptor (p)))
+  if ((err = validate_descriptor(p)))
     return err;
-  p++;
+  p++; // Пропускаем '('
 
-  // 2. Parse arguments
-  while (*p != ')')
-    {
-      int array_depth, is_wide;
-      char base_type;
-      java_value_type expected_type;
+  // 2. Пропарсим все аргументы в массив типов
+  typedef struct {
+    java_value_type type;
+    int is_wide;
+  } arg_info;
 
-      // Parse type
-      if ((err = parse_arg_type (&p, &array_depth, &base_type)))
-        {
-          prerr ("can not parse arg type in copy_args");
-          return err;
-        }
-      // Determine expected type
-      determine_expected_type (base_type, array_depth, &expected_type,
-                               &is_wide);
+  arg_info args[MAX_ARG_COUNT];
+  int arg_count = 0;
 
-      // Copy argument
-      if ((err = copy_single_arg (caller, callee, local_index, expected_type)))
-        {
-          return err;
-        }
+  while (*p != ')') {
+    int array_depth, is_wide;
+    char base_type;
+    java_value_type expected_type;
 
-      // Wide types take two slots
-      local_index += is_wide ? 2 : 1;
+    if ((err = parse_arg_type(&p, &array_depth, &base_type)))
+      return err;
+
+    determine_expected_type(base_type, array_depth, &expected_type, &is_wide);
+
+    if (arg_count >= MAX_ARG_COUNT) {
+      prerr("Too many method arguments");
+      return E2BIG;
     }
 
-  // 3. Skip return type
-  p++;
+    args[arg_count].type = expected_type;
+    args[arg_count].is_wide = is_wide;
+    arg_count++;
+  }
 
-  // 4. Verify stack is empty
-  if (!opstack_is_empty (caller->operand_stack))
-    {
-      prerr ("Extra arguments on stack after parsing descriptor");
+  // 3. Начинаем с this-объекта, если метод нестатический
+  if (has_this) {
+    jvariable this_ref;
+    if (opstack_pop(caller->operand_stack, &this_ref)) {
+      prerr("Stack underflow while copying 'this'");
+      return EINVAL;
+    }
+    if (this_ref.type != JOBJECT) {
+      prerr("'this' is not an object reference");
+      return EINVAL;
+    }
+    if ((err = store_local_var(callee->local_vars, this_ref, local_index)))
+      return err;
+    local_index++;
+  }
+
+  // 4. Копируем аргументы в локальные переменные в обратном порядке
+  for (int i = arg_count - 1; i >= 0; i--) {
+    jvariable arg;
+    if (opstack_pop(caller->operand_stack, &arg)) {
+      prerr("Stack underflow while copying argument %d", i);
       return EINVAL;
     }
 
+    if (arg.type != args[i].type) {
+      prerr("Type mismatch in argument %d (expected %d, got %d)",
+            i, args[i].type, arg.type);
+      return EINVAL;
+    }
+
+    if ((err = store_local_var(callee->local_vars, arg, local_index)))
+      return err;
+
+    local_index += args[i].is_wide ? 2 : 1;
+  }
+
   return 0;
 }
+
 
 int
 execute_frame (struct jvm *jvm, struct stack_frame *frame)

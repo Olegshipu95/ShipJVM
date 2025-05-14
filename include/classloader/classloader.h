@@ -9,6 +9,7 @@
 #include "classfile_parser.h"
 #include "util.h"
 struct classloader;
+struct jclass;
 
 /**
  * Creates and initializes a new class loader instance.

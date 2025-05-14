@@ -83,8 +83,11 @@ struct stack_frame *call_stack_pop (struct call_stack *stack);
 struct stack_frame *call_stack_peek (struct call_stack *stack);
 int call_stack_is_empty (struct call_stack *stack);
 
-int copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
-                    const char *descriptor);
+int
+copy_arguments(struct stack_frame *caller,
+               struct stack_frame *callee,
+               const char *descriptor,
+               int has_this);
 
 int execute_frame (struct jvm *jvm, struct stack_frame *frame);
 
