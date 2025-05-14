@@ -72,6 +72,8 @@ struct jclass
   struct rt_methods_data methods_data;
   uint16_t attributes_count;
   struct rt_attribute **attributes; // size = attributes_count
+  int initialized;                  // true if <clinit> is already executed
+  int being_initialized;            // for recurse method
 };
 
 int jclass_new (struct jclass **jclass, struct class_file *class_file);

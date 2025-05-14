@@ -9,22 +9,37 @@ new_jvm ()
   return new_jvm;
 }
 
+jvariable
+create_empty_args_variable ()
+{
+  jvariable var;
+  var.type = JOBJECT;
+
+  var.value._object = NULL;
+
+  return var;
+}
+
 int
 run_jvm (struct jvm *jvm)
 {
-  int err;
-  struct rt_method *main_method = NULL;
-  err = find_method_in_current_class (jvm->main_class, &main_method, "main",
-                                      "([Ljava/lang/String;)V");
-  if (err)
+  if (ensure_class_initialized (jvm, jvm->main_class))
     {
-      prerr ("Can not find Main method");
+      prerr ("Failed to initialize main class");
+      return EINVAL;
+    }
+
+  struct rt_method *main_method = NULL;
+  if (find_method_in_current_class (jvm->main_class, &main_method, "main",
+                                    "([Ljava/lang/String;)V"))
+    {
+      prerr ("Main method not found");
       return -1;
     }
-  err = new_call_stack (&jvm->call_stack);
-  if (err)
+
+  if (new_call_stack (&jvm->call_stack))
     {
-      prerr ("Can not create call stack for jvm");
+      prerr ("Call stack creation failed");
       return -1;
     }
 
@@ -32,41 +47,17 @@ run_jvm (struct jvm *jvm)
       = init_stack_frame (jvm->main_class, main_method, jvm);
   if (!main_frame)
     {
-      prerr ("Can not create main_frame");
+      prerr ("Failed to initialize main frame");
       return -1;
     }
 
-  call_stack_push (jvm->call_stack, main_frame);
+  // Устанавливаем пустой args
+  main_frame->local_vars->vars[0] = create_empty_args_variable ();
 
-  /*
-  while (!call_stack_is_empty (jvm->call_stack))
-    {
-      struct stack_frame *current_frame = call_stack_peek (jvm->call_stack);
+  int result = execute_frame (jvm, main_frame);
 
-      if (current_frame->pc >= current_frame->code_length)
-        {
-          call_stack_pop (jvm->call_stack);
-          continue;
-        }
+  printf ("Execution completed %s\n",
+          result == 0 ? "successfully" : "with errors");
 
-      struct runtime_opcode op = current_frame->code[current_frame->pc];
-      uint32_t old_pc;
-
-      printf ("[%s.%s%s] PC=%u: %s\n", current_frame->class->this_class,
-              current_frame->method->name, current_frame->method->descriptor,
-              current_frame->pc, op.name);
-
-      // Execute the instruction
-      op.handler (current_frame);
-
-      // Increment PC if the instruction did not change it (jump, return, etc.)
-      if (current_frame->pc == old_pc)
-        {
-          current_frame->pc++;
-        }
-    }
-    */
-
-  printf ("Execution completed successfully\n");
-  return 0;
+  return result;
 }

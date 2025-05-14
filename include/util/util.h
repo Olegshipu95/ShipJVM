@@ -31,4 +31,10 @@ int is_utf8_match (uint8_t *str, size_t len, const char *expected);
 
 int strcmp (const char *string1, const char *string2);
 
+#ifdef DEBUG
+#define TRACE(...) printf (__VA_ARGS__)
+#else
+#define TRACE(...) (void)0
+#endif
+
 #endif

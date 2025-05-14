@@ -374,10 +374,10 @@ copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
 
       // Parse type
       if ((err = parse_arg_type (&p, &array_depth, &base_type)))
-      {
-        prerr ("can not parse arg type in copy_args");
-        return err;
-      }
+        {
+          prerr ("can not parse arg type in copy_args");
+          return err;
+        }
       // Determine expected type
       determine_expected_type (base_type, array_depth, &expected_type,
                                &is_wide);
@@ -401,6 +401,84 @@ copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
       prerr ("Extra arguments on stack after parsing descriptor");
       return EINVAL;
     }
+
+  return 0;
+}
+
+int
+execute_frame (struct jvm *jvm, struct stack_frame *frame)
+{
+  call_stack_push (jvm->call_stack, frame);
+
+  while (!call_stack_is_empty (jvm->call_stack))
+    {
+      struct stack_frame *current_frame = call_stack_peek (jvm->call_stack);
+
+      if (current_frame->pc >= current_frame->code_length)
+        {
+          call_stack_pop (jvm->call_stack);
+          continue;
+        }
+
+      struct runtime_opcode op = current_frame->code[current_frame->pc];
+      uint32_t old_pc = current_frame->pc;
+
+      printf ("[%s.%s%s] PC=%u: %s\n", current_frame->class->this_class,
+              current_frame->method->name, current_frame->method->descriptor,
+              current_frame->pc, op.name);
+
+      op.handler (current_frame);
+
+      if (current_frame->pc == old_pc)
+        {
+          current_frame->pc++;
+        }
+
+      if (current_frame->error)
+        {
+          // if (!handle_exception(current_frame)) {
+          prerr ("Unhandled exception in method %s",
+                 current_frame->method->name);
+          return -1;
+          // }
+        }
+    }
+
+  return 0;
+}
+
+int
+ensure_class_initialized (struct jvm *jvm, struct jclass *cls)
+{
+  int err;
+  if (cls->initialized)
+    return 0; // уже всё сделано
+
+  if (cls->being_initialized)
+    return 0; // предотвращаем рекурсию (спецификация это разрешает)
+
+  cls->being_initialized = true;
+
+  struct rt_method *clinit_method = NULL;
+  if (!find_method_in_current_class (cls, &clinit_method, "<clinit>", "()V"))
+    {
+      struct stack_frame *clinit_frame
+          = init_stack_frame (cls, clinit_method, jvm);
+      if (!clinit_frame)
+        return -1;
+
+      err = execute_frame (jvm, clinit_frame);
+      if (err)
+        {
+          prerr ("ensure_class_initialized: error");
+          // free_frame(clinit_frame);
+          return -1;
+        }
+      // free_frame(clinit_frame);
+    }
+
+  cls->being_initialized = false;
+  cls->initialized = true;
 
   return 0;
 }

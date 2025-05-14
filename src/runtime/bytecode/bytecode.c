@@ -1183,7 +1183,6 @@ opcode_getstatic (struct stack_frame *)
 {
 }
 
-
 void
 opcode_goto (struct stack_frame *)
 {
@@ -1898,6 +1897,14 @@ opcode_invokestatic (struct stack_frame *frame)
       return;
     }
 
+  if (ensure_class_initialized (frame->jvm_runtime, target_class))
+    {
+      prerr ("invokestatic: failed to initialize class %s",
+             target_class->this_class);
+      frame->error = EINVAL;
+      return;
+    }
+
   struct stack_frame *new_frame
       = init_stack_frame (target_class, target_method, frame->jvm_runtime);
   if (new_frame == NULL)
@@ -1923,7 +1930,7 @@ opcode_invokestatic (struct stack_frame *frame)
       return;
     }
 
-  frame->pc += 2;
+  frame->pc += 3;
 }
 // TODO
 /**

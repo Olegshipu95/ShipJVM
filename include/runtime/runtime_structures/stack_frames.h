@@ -86,4 +86,8 @@ int call_stack_is_empty (struct call_stack *stack);
 int copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
                     const char *descriptor);
 
+int execute_frame (struct jvm *jvm, struct stack_frame *frame);
+
+int ensure_class_initialized (struct jvm *jvm, struct jclass *cls);
+
 #endif
