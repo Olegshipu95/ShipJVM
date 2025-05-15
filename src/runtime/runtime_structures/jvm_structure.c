@@ -7,10 +7,10 @@ new_jvm ()
   struct jvm *new_jvm = my_alloc (struct jvm);
   new_jvm->main_class = NULL;
   new_jvm->classloader = NULL;
-  err = heap_init(&new_jvm->heap);
+  err = heap_init (&new_jvm->heap);
   if (err)
-  {
-    PANIC ("Can not allocate memory");
-  }
+    {
+      PANIC ("Can not allocate memory");
+    }
   return new_jvm;
 }

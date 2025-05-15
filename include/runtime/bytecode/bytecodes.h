@@ -3,6 +3,7 @@
 
 #include "classloader.h"
 #include "java_types.h"
+#include "jni_registry.h"
 #include "jvm_structure.h"
 #include "runtime_class.h"
 #include "runtime_constpool.h"

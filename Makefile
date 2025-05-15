@@ -34,6 +34,7 @@ INCLUDE_DIRS ?= ./include \
   							./include/util \
 	 							./include/runtime/bytecode \
 	  						./include/runtime/runtime_structures \
+								./include/runtime/runtime_structures/jni \
 								./include/runtime/runtime_structures/attributes \
 								./include/classloader
 

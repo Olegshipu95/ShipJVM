@@ -15,10 +15,10 @@ int
 run_jvm (struct jvm *jvm)
 {
   if (new_call_stack (&jvm->call_stack))
-  {
-    prerr ("Call stack creation failed");
-    return -1;
-  }
+    {
+      prerr ("Call stack creation failed");
+      return -1;
+    }
 
   struct rt_method *main_method = NULL;
   if (find_method_in_current_class (jvm->main_class, &main_method, "main",

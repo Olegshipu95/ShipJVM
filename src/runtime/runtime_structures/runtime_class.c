@@ -29,6 +29,26 @@ parse_rt_interfaces (struct runtime_cp *rt_cp, string **new_interfaces,
   return 0;
 }
 
+int
+assign_field_slots (struct jclass *cls, int start_slot)
+{
+  if (!cls)
+    return start_slot;
+
+  // Сначала суперкласс
+  if (cls->super_class)
+    start_slot = assign_field_slots (cls->super_class, start_slot);
+
+  for (int i = 0; i < cls->fields_count; ++i)
+    {
+      struct rt_field *field = &cls->fields[i];
+      if (!(field->access_flags & ACC_STATIC))
+        field->slot_id = start_slot++;
+    }
+
+  return start_slot;
+}
+
 void
 print_rt_interfaces (string *interf, uint16_t count)
 {
@@ -40,7 +60,7 @@ print_rt_interfaces (string *interf, uint16_t count)
 }
 
 int
-set_field_type_from_descriptor(struct rt_field *field)
+set_field_type_from_descriptor (struct rt_field *field)
 {
   const char *desc = field->descriptor;
 
@@ -58,27 +78,27 @@ set_field_type_from_descriptor(struct rt_field *field)
     case 'S':
     case 'C':
     case 'Z':
-      field->data = create_variable(JINT);
+      field->data = create_variable (JINT);
       break;
     case 'J':
-      field->data = create_variable(JLONG);
+      field->data = create_variable (JLONG);
       break;
     case 'F':
-      field->data = create_variable(JFLOAT);
+      field->data = create_variable (JFLOAT);
       break;
     case 'D':
-      field->data = create_variable(JDOUBLE);
+      field->data = create_variable (JDOUBLE);
       break;
     case 'L':
-      field->data = create_variable(JOBJECT);
+      field->data = create_variable (JOBJECT);
       break;
     default:
-      prerr("Unknown field descriptor: %s", desc);
-      field->data = create_variable(JINT); // fail-safe
+      prerr ("Unknown field descriptor: %s", desc);
+      field->data = create_variable (JINT); // fail-safe
       return -1;
       break;
     }
-    return 0;
+  return 0;
 }
 
 int
@@ -113,12 +133,12 @@ parse_rt_fields (struct runtime_cp *rt_cp, struct rt_field **rt_fields,
           prerr ("can not parse rt fields");
           return err;
         }
-      err = set_field_type_from_descriptor(&new_fieds[iter]);
+      err = set_field_type_from_descriptor (&new_fieds[iter]);
       if (err)
-      {
-        prerr ("can not parse field type");
-        return -1;
-      }
+        {
+          prerr ("can not parse field type");
+          return -1;
+        }
     }
   *rt_fields = new_fieds;
   return 0;
@@ -425,10 +445,8 @@ find_method_in_current_class (struct jclass *class,
 }
 
 int
-find_field_in_current_class(struct jclass *cls,
-                            struct rt_field **out_field,
-                            const char *name,
-                            const char *descriptor)
+find_field_in_current_class (struct jclass *cls, struct rt_field **out_field,
+                             const char *name, const char *descriptor)
 {
   if (!cls || !out_field || !name || !descriptor)
     return EINVAL;
@@ -439,8 +457,8 @@ find_field_in_current_class(struct jclass *cls,
       if (!field)
         continue;
 
-      if (strcmp(field->name, name) == 0 &&
-          strcmp(field->descriptor, descriptor) == 0)
+      if (strcmp (field->name, name) == 0
+          && strcmp (field->descriptor, descriptor) == 0)
         {
           *out_field = field;
           return 0; // Найдено
@@ -448,4 +466,32 @@ find_field_in_current_class(struct jclass *cls,
     }
 
   return ENOENT; // Поле не найдено
+}
+
+int
+find_field_in_class_hierarchy (struct classloader *classloader,
+                               struct jclass *cls, struct rt_field **out_field,
+                               const char *name, const char *descriptor)
+{
+  if (!cls || !out_field || !name || !descriptor)
+    return EINVAL;
+
+  while (cls)
+    {
+      int err = find_field_in_current_class (cls, out_field, name, descriptor);
+      if (err == 0)
+        return 0; // Поле найдено
+
+      if (!cls->super_class)
+        break;
+
+      struct jclass *super_cls = NULL;
+      err = classloader_load_class (classloader, cls->super_class, &super_cls);
+      if (err != 0)
+        return err;
+
+      cls = super_cls;
+    }
+
+  return ENOENT; // Поле не найдено в иерархии
 }

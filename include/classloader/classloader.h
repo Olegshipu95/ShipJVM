@@ -4,8 +4,8 @@
 #include <stdio.h>
 
 #include "classfile.h"
-#include "runtime_class.h"
 #include "classfile_parser.h"
+#include "runtime_class.h"
 #include "util.h"
 
 struct classloader;

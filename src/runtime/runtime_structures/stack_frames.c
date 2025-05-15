@@ -43,6 +43,24 @@ init_stack_frame (struct jclass *class, struct rt_method *method,
   frame->method = method;
   frame->caller = NULL;
 
+  // TODO
+  if ((method->access_flags & ACC_NATIVE) && method->code_attr == NULL)
+    {
+      frame->code_length = 0;
+      frame->code = NULL;
+
+      // безопасные значения
+      frame->local_vars = my_alloc (struct local_variables);
+      init_local_vars (frame->local_vars, 10); // безопасный дефолт
+
+      frame->operand_stack = my_alloc (struct operand_stack);
+      init_operand_stack (frame->operand_stack, 10); // безопасный дефолт
+
+      frame->pc = 0;
+      frame->error = 0;
+      return frame;
+    }
+
   frame->local_vars = my_alloc (struct local_variables);
   if (frame->local_vars == NULL)
     {
@@ -145,7 +163,7 @@ opstack_peek (struct operand_stack *opstack, jvariable *value)
 }
 
 int
-opstack_peek_nth(struct operand_stack *stack, int n, jvariable *out)
+opstack_peek_nth (struct operand_stack *stack, int n, jvariable *out)
 {
   if (!stack || !out || n < 0)
     return EINVAL;
@@ -358,33 +376,41 @@ copy_single_arg (struct stack_frame *caller, struct stack_frame *callee,
   return 0;
 }
 
-int count_arguments_in_descriptor(const char *descriptor) {
+int
+count_arguments_in_descriptor (const char *descriptor)
+{
   if (!descriptor || *descriptor != '(')
     return -1;
 
   int count = 0;
   const char *p = descriptor + 1;
 
-  while (*p && *p != ')') {
-    while (*p == '[') // массивы
-      p++;
+  while (*p && *p != ')')
+    {
+      while (*p == '[') // массивы
+        p++;
 
-    if (*p == 'L') { // объектный тип
-      while (*p && *p != ';')
-        p++;
-      if (*p == ';')
-        p++;
+      if (*p == 'L')
+        { // объектный тип
+          while (*p && *p != ';')
+            p++;
+          if (*p == ';')
+            p++;
+          else
+            return -1;
+        }
+      else if (strchr ("BCDFIJSZ", *p))
+        {
+          count++;
+          p++;
+        }
       else
-        return -1;
-    } else if (strchr("BCDFIJSZ", *p)) {
-      count++;
-      p++;
-    } else {
-      return -1; // ошибка
-    }
+        {
+          return -1; // ошибка
+        }
 
-    count++;
-  }
+      count++;
+    }
 
   if (*p != ')')
     return -1;
@@ -392,24 +418,22 @@ int count_arguments_in_descriptor(const char *descriptor) {
   return count;
 }
 
-
 int
-copy_arguments(struct stack_frame *caller,
-               struct stack_frame *callee,
-               const char *descriptor,
-               int has_this)
+copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
+                const char *descriptor, int has_this)
 {
   const char *p = descriptor;
   int err;
   int local_index = 0;
 
   // 1. Validate descriptor
-  if ((err = validate_descriptor(p)))
+  if ((err = validate_descriptor (p)))
     return err;
   p++; // Пропускаем '('
 
   // 2. Пропарсим все аргументы в массив типов
-  typedef struct {
+  typedef struct
+  {
     java_value_type type;
     int is_wide;
   } arg_info;
@@ -417,65 +441,73 @@ copy_arguments(struct stack_frame *caller,
   arg_info args[MAX_ARG_COUNT];
   int arg_count = 0;
 
-  while (*p != ')') {
-    int array_depth, is_wide;
-    char base_type;
-    java_value_type expected_type;
+  while (*p != ')')
+    {
+      int array_depth, is_wide;
+      char base_type;
+      java_value_type expected_type;
 
-    if ((err = parse_arg_type(&p, &array_depth, &base_type)))
-      return err;
+      if ((err = parse_arg_type (&p, &array_depth, &base_type)))
+        return err;
 
-    determine_expected_type(base_type, array_depth, &expected_type, &is_wide);
+      determine_expected_type (base_type, array_depth, &expected_type,
+                               &is_wide);
 
-    if (arg_count >= MAX_ARG_COUNT) {
-      prerr("Too many method arguments");
-      return E2BIG;
+      if (arg_count >= MAX_ARG_COUNT)
+        {
+          prerr ("Too many method arguments");
+          return E2BIG;
+        }
+
+      args[arg_count].type = expected_type;
+      args[arg_count].is_wide = is_wide;
+      arg_count++;
     }
-
-    args[arg_count].type = expected_type;
-    args[arg_count].is_wide = is_wide;
-    arg_count++;
-  }
 
   // 3. Начинаем с this-объекта, если метод нестатический
-  if (has_this) {
-    jvariable this_ref;
-    if (opstack_pop(caller->operand_stack, &this_ref)) {
-      prerr("Stack underflow while copying 'this'");
-      return EINVAL;
+  if (has_this)
+    {
+      jvariable this_ref;
+      if (opstack_pop (caller->operand_stack, &this_ref))
+        {
+          prerr ("Stack underflow while copying 'this'");
+          return EINVAL;
+        }
+      if (this_ref.type != JOBJECT)
+        {
+          prerr ("'this' is not an object reference");
+          return EINVAL;
+        }
+      if ((err = store_local_var (callee->local_vars, this_ref, local_index)))
+        return err;
+      local_index++;
     }
-    if (this_ref.type != JOBJECT) {
-      prerr("'this' is not an object reference");
-      return EINVAL;
-    }
-    if ((err = store_local_var(callee->local_vars, this_ref, local_index)))
-      return err;
-    local_index++;
-  }
 
   // 4. Копируем аргументы в локальные переменные в обратном порядке
-  for (int i = arg_count - 1; i >= 0; i--) {
-    jvariable arg;
-    if (opstack_pop(caller->operand_stack, &arg)) {
-      prerr("Stack underflow while copying argument %d", i);
-      return EINVAL;
+  for (int i = arg_count - 1; i >= 0; i--)
+    {
+      jvariable arg;
+      if (opstack_pop (caller->operand_stack, &arg))
+        {
+          prerr ("Stack underflow while copying argument %d", i);
+          return EINVAL;
+        }
+
+      if (arg.type != args[i].type)
+        {
+          prerr ("Type mismatch in argument %d (expected %d, got %d)", i,
+                 args[i].type, arg.type);
+          return EINVAL;
+        }
+
+      if ((err = store_local_var (callee->local_vars, arg, local_index)))
+        return err;
+
+      local_index += args[i].is_wide ? 2 : 1;
     }
-
-    if (arg.type != args[i].type) {
-      prerr("Type mismatch in argument %d (expected %d, got %d)",
-            i, args[i].type, arg.type);
-      return EINVAL;
-    }
-
-    if ((err = store_local_var(callee->local_vars, arg, local_index)))
-      return err;
-
-    local_index += args[i].is_wide ? 2 : 1;
-  }
 
   return 0;
 }
-
 
 int
 execute_frame (struct jvm *jvm, struct stack_frame *frame)
@@ -555,34 +587,37 @@ ensure_class_initialized (struct jvm *jvm, struct jclass *cls)
   return 0;
 }
 
-int find_method_in_hierarchy(struct jvm* jvm, struct jclass *start,
-                             struct rt_method **out_method,
-                             const char *name,
-                             const char *descriptor)
+int
+find_method_in_hierarchy (struct jvm *jvm, struct jclass *start,
+                          struct rt_method **out_method, const char *name,
+                          const char *descriptor)
 {
   struct jclass *cls = start;
 
-  while (cls) {
-    for (int i = 0; i < cls->methods_data.methods_count; i++) {
-      struct rt_method *m = &cls->methods_data.methods[i];
+  while (cls)
+    {
+      for (int i = 0; i < cls->methods_data.methods_count; i++)
+        {
+          struct rt_method *m = &cls->methods_data.methods[i];
 
-      if (strcmp(m->name, name) == 0 &&
-          strcmp(m->descriptor, descriptor) == 0) {
-        *out_method = m;
-        return 0;
-      }
+          if (strcmp (m->name, name) == 0
+              && strcmp (m->descriptor, descriptor) == 0)
+            {
+              *out_method = m;
+              return 0;
+            }
+        }
+
+      // Переход к суперклассу
+      if (!cls->super_class)
+        break;
+
+      struct jclass *super;
+      if (classloader_load_class (jvm->classloader, cls->super_class, &super))
+        return ENOENT;
+
+      cls = super;
     }
-
-    // Переход к суперклассу
-    if (!cls->super_class)
-      break;
-
-    struct jclass *super;
-    if (classloader_load_class(jvm->classloader, cls->super_class, &super))
-      return ENOENT;
-
-    cls = super;
-  }
 
   return ENOENT;
 }

@@ -32,6 +32,7 @@ struct rt_field
   uint16_t attributes_count;
   struct rt_attribute **attributes; // size = attributes_count
   jvariable data;
+  uint32_t slot_id; // index of field in class.
 };
 
 struct rt_method
@@ -82,10 +83,13 @@ int jclass_new (struct jclass **jclass, struct class_file *class_file);
 int find_method_in_current_class (struct jclass *class,
                                   struct rt_method **find_method,
                                   const char *name, const char *descriptor);
-int
-find_field_in_current_class(struct jclass *cls,
-                            struct rt_field **out_field,
-                            const char *name,
-                            const char *descriptor);
+int find_field_in_current_class (struct jclass *cls,
+                                 struct rt_field **out_field, const char *name,
+                                 const char *descriptor);
+
+int find_field_in_class_hierarchy (struct classloader *classloader,
+                                   struct jclass *cls,
+                                   struct rt_field **out_field,
+                                   const char *name, const char *descriptor);
 
 #endif

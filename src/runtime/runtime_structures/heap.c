@@ -1,20 +1,20 @@
 #include "heap.h"
 
 int
-heap_init(struct heap **new_heap)
+heap_init (struct heap **new_heap)
 {
-  struct heap* heap = my_alloc(struct heap);
+  struct heap *heap = my_alloc (struct heap);
   heap->capacity = INITIAL_HEAP_CAPACITY;
   heap->used = 0;
-  heap->memory = malloc(INITIAL_HEAP_CAPACITY);
+  heap->memory = malloc (INITIAL_HEAP_CAPACITY);
   if (!heap->memory)
     return -1;
 
-  heap->objects = calloc(sizeof (struct heap_object *), MAX_OBJECTS);
+  heap->objects = calloc (sizeof (struct heap_object *), MAX_OBJECTS);
   if (!heap->objects)
     {
-      free(heap->memory);
-      free(heap);
+      free (heap->memory);
+      free (heap);
       return -1;
     }
 
@@ -24,43 +24,87 @@ heap_init(struct heap **new_heap)
 }
 
 void
-heap_destroy(struct heap *heap)
+heap_destroy (struct heap *heap)
 {
   for (size_t i = 0; i < heap->object_count; i++)
     {
       if (heap->objects[i])
         {
-          free(heap->objects[i]->fields);
-          free(heap->objects[i]);
+          free (heap->objects[i]->fields);
+          free (heap->objects[i]);
         }
     }
 
-  free(heap->objects);
-  free(heap->memory);
-  free(heap);
+  free (heap->objects);
+  free (heap->memory);
+  free (heap);
 }
 
-
-heap_object *heap_alloc_object(struct heap *heap, struct jclass *jclass)
+int
+assign_field_slots (struct jclass *cls, int start_slot)
 {
-    if (heap->object_count >= MAX_OBJECTS) {
-        // В будущем здесь будет GC
-        prerr("Heap is full");
-        return NULL;
+  if (!cls)
+    return start_slot;
+
+  // Сначала суперкласс
+  if (cls->super_class)
+    start_slot = assign_field_slots (cls->super_class, start_slot);
+
+  for (int i = 0; i < cls->fields_count; ++i)
+    {
+      struct rt_field *field = &cls->fields[i];
+      if (!(field->access_flags & ACC_STATIC))
+        field->slot_id = start_slot++;
     }
 
-    size_t field_count = jclass->fields_count;
-    heap_object *obj = my_alloc(heap_object);
-    obj->jclass = jclass;
-    obj->fields = my_alloc_array(jvariable, field_count);
-    if (!obj->fields)
+  return start_slot;
+}
+
+int
+count_instance_fields (struct jclass *cls)
+{
+  if (!cls)
+    return 0;
+
+  int count = 0;
+
+  // Сначала суперкласс
+  if (cls->super_class)
+    count += count_instance_fields (cls->super_class);
+
+  // Потом свои нестатические поля
+  for (int i = 0; i < cls->fields_count; ++i)
+    {
+      struct rt_field *field = &cls->fields[i];
+      if (!(field->access_flags & ACC_STATIC))
+        count++;
+    }
+
+  return count;
+}
+
+heap_object *
+heap_alloc_object (struct heap *heap, struct jclass *jclass)
+{
+  if (heap->object_count >= MAX_OBJECTS)
+    {
+      // В будущем здесь будет GC
+      prerr ("Heap is full");
+      return NULL;
+    }
+
+  size_t field_count = jclass->fields_count;
+  heap_object *obj = my_alloc (heap_object);
+  obj->jclass = jclass;
+  obj->fields = my_alloc_array (jvariable, field_count);
+  if (!obj->fields)
     {
       prerr ("Can not allocate object");
       free (obj);
       return NULL;
     }
-    obj->marked = 0;
+  obj->marked = 0;
 
-    heap->objects[heap->object_count++] = obj;
-    return obj;
+  heap->objects[heap->object_count++] = obj;
+  return obj;
 }
