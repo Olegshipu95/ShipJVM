@@ -1,10 +1,9 @@
 #ifndef SHIP_JVM_JNI_H
 #define SHIP_JVM_JNI_H
 
+#include "native_types.h"
 #include "stack_frames.h"
 #include "util.h"
-
-typedef int (*native_func_t) (struct stack_frame *frame);
 
 struct jni_native_method
 {

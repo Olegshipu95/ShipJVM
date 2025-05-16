@@ -224,7 +224,7 @@ _classloader_load_class (struct classloader *classloader, const char *path,
   struct class_file *classfile = my_alloc (struct class_file);
   *classfile = class;
   struct jclass *entry = 0;
-  err = jclass_new (&entry, classfile);
+  err = jclass_new (classloader, &entry, classfile);
   if (err)
     {
       prerr ("Can not convert class file to rt class in classloader");

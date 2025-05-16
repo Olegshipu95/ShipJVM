@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "classfile.h"
+#include "classloader.h"
 #include "rt_attr_parser.h"
 #include "runtime_constpool.h"
 
@@ -79,7 +80,9 @@ struct jclass
   uint16_t static_fields_size;
 };
 
-int jclass_new (struct jclass **jclass, struct class_file *class_file);
+struct classloader;
+int jclass_new (struct classloader *classloader, struct jclass **jclass,
+                struct class_file *class_file);
 int find_method_in_current_class (struct jclass *class,
                                   struct rt_method **find_method,
                                   const char *name, const char *descriptor);

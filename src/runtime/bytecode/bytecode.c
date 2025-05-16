@@ -1216,9 +1216,9 @@ opcode_getfield (struct stack_frame *frame)
 
   // Ищем поле
   struct rt_field *field = NULL;
-  err = find_field_in_class_hierarchy (field_class, &field,
-                                       field_ref->ref.nat.name,
-                                       field_ref->ref.nat.descriptor);
+  err = find_field_in_class_hierarchy (
+      frame->jvm_runtime->classloader, field_class, &field,
+      field_ref->ref.nat.name, field_ref->ref.nat.descriptor);
   if (err || !field)
     {
       prerr ("getfield: Field %s:%s not found in class %s",

@@ -1,7 +1,7 @@
 #include "jni_java_lang_Object.h"
 
 int
-native_Object_init (struct stack_frame *frame)
+native_Object_init (struct stack_frame *)
 {
   return 0; // do nothing
 }
@@ -34,42 +34,42 @@ native_Object_hashCode (struct stack_frame *frame)
 }
 
 int
-native_Object_clone (struct stack_frame *frame)
+native_Object_clone (struct stack_frame *)
 {
   prerr ("clone: not implemented");
   return ENOTSUP;
 }
 
 int
-native_Object_notify (struct stack_frame *frame)
+native_Object_notify (struct stack_frame *)
 {
   prerr ("notify: not implemented");
   return 0;
 }
 
 int
-native_Object_notifyAll (struct stack_frame *frame)
+native_Object_notifyAll (struct stack_frame *)
 {
   prerr ("notifyAll: not implemented");
   return 0;
 }
 
 int
-native_Object_wait (struct stack_frame *frame)
+native_Object_wait (struct stack_frame *)
 {
   prerr ("wait: not implemented");
   return 0;
 }
 
 int
-native_Object_wait_with_timeout (struct stack_frame *frame)
+native_Object_wait_with_timeout (struct stack_frame *)
 {
   prerr ("wait(long): not implemented");
   return 0;
 }
 
 int
-native_Object_wait_with_timeout_nanos (struct stack_frame *frame)
+native_Object_wait_with_timeout_nanos (struct stack_frame *)
 {
   prerr ("wait(long, int): not implemented");
   return 0;

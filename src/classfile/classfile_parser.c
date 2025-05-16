@@ -179,7 +179,6 @@ parse_class_methods (Loader *loader, struct class_file *class,
 {
   int error = 0;
   method->access_flags = loader_u2 (loader);
-  printf ("METHOD ACCESS_FLAGS = %hu\n", method->access_flags);
   method->name_index = loader_u2 (loader);
   method->descriptor_index = loader_u2 (loader);
   method->attributes_count = loader_u2 (loader);

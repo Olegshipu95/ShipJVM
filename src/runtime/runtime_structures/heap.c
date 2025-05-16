@@ -41,38 +41,32 @@ heap_destroy (struct heap *heap)
 }
 
 int
-assign_field_slots (struct jclass *cls, int start_slot)
+count_instance_fields (struct classloader *classloader, struct jclass *cls)
 {
-  if (!cls)
-    return start_slot;
-
-  // Сначала суперкласс
-  if (cls->super_class)
-    start_slot = assign_field_slots (cls->super_class, start_slot);
-
-  for (int i = 0; i < cls->fields_count; ++i)
-    {
-      struct rt_field *field = &cls->fields[i];
-      if (!(field->access_flags & ACC_STATIC))
-        field->slot_id = start_slot++;
-    }
-
-  return start_slot;
-}
-
-int
-count_instance_fields (struct jclass *cls)
-{
-  if (!cls)
+  if (!classloader || !cls)
     return 0;
 
   int count = 0;
 
-  // Сначала суперкласс
+  // Сначала считаем поля суперкласса
   if (cls->super_class)
-    count += count_instance_fields (cls->super_class);
+    {
+      struct jclass *super_cls = NULL;
+      int err
+          = classloader_load_class (classloader, cls->super_class, &super_cls);
+      if (!err && super_cls) // Если загрузили успешно
+        {
+          count += count_instance_fields (classloader, super_cls);
+        }
+      else
+        {
+          prerr ("count_instance_fields: Failed to load superclass %s",
+                 cls->super_class);
+          // Можно не останавливать, просто не учитываем суперкласс
+        }
+    }
 
-  // Потом свои нестатические поля
+  // Теперь свои нестатические поля
   for (int i = 0; i < cls->fields_count; ++i)
     {
       struct rt_field *field = &cls->fields[i];

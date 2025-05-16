@@ -29,16 +29,65 @@ parse_rt_interfaces (struct runtime_cp *rt_cp, string **new_interfaces,
   return 0;
 }
 
+// TODO
 int
-assign_field_slots (struct jclass *cls, int start_slot)
+assign_field_slots (struct classloader *classloader, struct jclass *cls,
+                    int start_slot)
 {
-  if (!cls)
+  if (!classloader || !cls)
     return start_slot;
 
-  // Сначала суперкласс
-  if (cls->super_class)
-    start_slot = assign_field_slots (cls->super_class, start_slot);
+  // Проверка: уже были назначены slot_id?
+  int already_initialized = 1;
+  for (int i = 0; i < cls->fields_count; i++)
+    {
+      if (!(cls->fields[i].access_flags & ACC_STATIC))
+      {
+          if (cls->fields[i].slot_id == UINT32_MAX)
+          {
+            already_initialized = 0;
+            break;
+          }
+        }
+    }
 
+  if (already_initialized)
+    {
+      uint32_t max_slot = start_slot;
+
+      // Пройтись по всем нестатическим полям и вернуть max(slot_id + 1)
+      for (int i = 0; i < cls->fields_count; i++)
+        {
+          struct rt_field *field = &cls->fields[i];
+          if (!(field->access_flags & ACC_STATIC)
+              && field->slot_id + 1 > max_slot)
+            max_slot = field->slot_id + 1;
+        }
+
+      return max_slot;
+    }
+
+  // Инициализация суперкласса
+  if (cls->super_class)
+    {
+      struct jclass *super_cls = NULL;
+      printf ("Try load super class: %s\n", cls->super_class);
+      int err
+          = classloader_load_class (classloader, cls->super_class, &super_cls);
+      if (err)
+        {
+          // prerr("assign_field_slots: Failed to load superclass %s",
+          // cls->super_class);
+          PANIC ("assign_field_slots: Failed to load superclass %s",
+                 cls->super_class);
+          return start_slot;
+        }
+      printf ("Super %s successfully read\n", cls->super_class);
+
+      start_slot = assign_field_slots (classloader, super_cls, start_slot);
+    }
+
+  // Назначение slot_id текущим нестатическим полям
   for (int i = 0; i < cls->fields_count; ++i)
     {
       struct rt_field *field = &cls->fields[i];
@@ -63,6 +112,11 @@ int
 set_field_type_from_descriptor (struct rt_field *field)
 {
   const char *desc = field->descriptor;
+  if (desc == NULL)
+  {
+    prerr ("Can not parse desc");
+    return -1;
+  }
 
   // Если массив, то это объект
   if (desc[0] == '[')
@@ -114,14 +168,14 @@ parse_rt_fields (struct runtime_cp *rt_cp, struct rt_field **rt_fields,
     {
       printf ("Fields #%-3hu: ", iter);
       new_fieds[iter].access_flags = old_field[iter].access_flags;
-      err |= parse_rt_index_to_string (rt_cp, &new_fieds->name,
+      err |= parse_rt_index_to_string (rt_cp, &new_fieds[iter].name,
                                        old_field[iter].name_index,
                                        runtime_cp_count);
-      printf ("Field name: %s, ", new_fieds->name);
-      err |= parse_rt_index_to_string (rt_cp, &new_fieds->descriptor,
+      printf ("Field name: %s, ", new_fieds[iter].name);
+      err |= parse_rt_index_to_string (rt_cp, &new_fieds[iter].descriptor,
                                        old_field[iter].descriptor_index,
                                        runtime_cp_count);
-      printf ("descriptor: %s, ", new_fieds->descriptor);
+      printf ("descriptor: %s, ", new_fieds[iter].descriptor);
       new_fieds[iter].attributes_count = new_fieds[iter].attributes_count;
       printf ("attr count: %hu \n", new_fieds[iter].attributes_count);
       err |= parse_rt_attributes (
@@ -139,6 +193,7 @@ parse_rt_fields (struct runtime_cp *rt_cp, struct rt_field **rt_fields,
           prerr ("can not parse field type");
           return -1;
         }
+      new_fieds[iter].slot_id = UINT32_MAX;
     }
   *rt_fields = new_fieds;
   return 0;
@@ -296,7 +351,8 @@ parse_rt_methods (struct runtime_cp *rt_cp,
 }
 
 int
-jclass_new (struct jclass **jclass, struct class_file *class_file)
+jclass_new (struct classloader *classloader, struct jclass **jclass,
+            struct class_file *class_file)
 {
   int err;
   if (*jclass != NULL)
@@ -339,6 +395,23 @@ jclass_new (struct jclass **jclass, struct class_file *class_file)
       return -1;
     }
 
+  if (class_file->super_class == 0)
+    {
+      new->super_class = NULL;
+    }
+  else
+    {
+      err = parse_rt_classname (new->runtime_cp, &new->super_class,
+                                class_file->super_class,
+                                new->runtime_cp_count);
+
+      if (err)
+        {
+          prerr ("can not convert class.super_class");
+          return -1;
+        }
+    }
+
   printf ("rt class_name : %s\n", new->this_class);
 
   new->interfaces_count = class_file->interfaces_count;
@@ -365,6 +438,8 @@ jclass_new (struct jclass **jclass, struct class_file *class_file)
       prerr ("can not convert fields");
       return -1;
     }
+
+  assign_field_slots (classloader, new, 0);
 
   new->methods_data.methods_count = class_file->methods_count;
 
