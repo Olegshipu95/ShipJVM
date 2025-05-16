@@ -29,7 +29,6 @@ parse_rt_interfaces (struct runtime_cp *rt_cp, string **new_interfaces,
   return 0;
 }
 
-// TODO
 int
 assign_field_slots (struct classloader *classloader, struct jclass *cls,
                     int start_slot)
@@ -94,6 +93,8 @@ assign_field_slots (struct classloader *classloader, struct jclass *cls,
       if (!(field->access_flags & ACC_STATIC))
         field->slot_id = start_slot++;
     }
+
+  cls->object_fields_count = start_slot - 1;
 
   return start_slot;
 }

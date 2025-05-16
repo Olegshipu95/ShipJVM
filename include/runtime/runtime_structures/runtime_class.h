@@ -71,6 +71,7 @@ struct jclass
   uint16_t interfaces_count;
   string *interfaces; // size = interfaces_count
   uint16_t fields_count;
+  uint16_t object_fields_count;
   struct rt_field *fields; // size = fields_count
   struct rt_methods_data methods_data;
   uint16_t attributes_count;

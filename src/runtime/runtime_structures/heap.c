@@ -30,7 +30,7 @@ heap_destroy (struct heap *heap)
     {
       if (heap->objects[i])
         {
-          free (heap->objects[i]->fields);
+          free (heap->objects[i]->variables);
           free (heap->objects[i]);
         }
     }
@@ -77,28 +77,84 @@ count_instance_fields (struct classloader *classloader, struct jclass *cls)
   return count;
 }
 
-heap_object *
-heap_alloc_object (struct heap *heap, struct jclass *jclass)
+static int
+fill_variable_types(struct classloader *classloader,
+                    struct jclass *cls,
+                    jvariable *variables)
 {
+  if (!classloader || !cls || !variables)
+    return -1;
+
+  // Сначала обрабатываем суперкласс, если он есть
+  if (cls->super_class)
+    {
+      struct jclass *super_cls = NULL;
+      int err = classloader_load_class(classloader, cls->super_class, &super_cls);
+      if (err)
+        {
+          prerr("fill_variable_types: failed to load superclass %s", cls->super_class);
+          return -1;
+        }
+
+      err = fill_variable_types(classloader, super_cls, variables);
+      if (err)
+        return err;
+    }
+
+  // Обработка текущих нестатических полей
+  for (int i = 0; i < cls->fields_count; ++i)
+    {
+      struct rt_field *field = &cls->fields[i];
+
+      if (field->access_flags & ACC_STATIC)
+        continue;
+
+      uint32_t slot = field->slot_id;
+      variables[slot] = field->data;
+    }
+
+  return 0;
+}
+
+
+heap_object *
+heap_alloc_object(struct classloader *classloader, struct heap *heap, struct jclass *jclass)
+{
+  if (!heap || !jclass)
+    return NULL;
+
   if (heap->object_count >= MAX_OBJECTS)
     {
-      // В будущем здесь будет GC
-      prerr ("Heap is full");
+      prerr("heap_alloc_object: Heap is full");
       return NULL;
     }
 
-  size_t field_count = jclass->fields_count;
-  heap_object *obj = my_alloc (heap_object);
+  size_t object_fields_count = jclass->object_fields_count;
+
+  heap_object *obj = my_alloc(heap_object);
+  if (!obj)
+    return NULL;
+
   obj->jclass = jclass;
-  obj->fields = my_alloc_array (jvariable, field_count);
-  if (!obj->fields)
+  obj->variables = calloc(object_fields_count, sizeof(jvariable));
+  if (!obj->variables)
     {
-      prerr ("Can not allocate object");
-      free (obj);
+      prerr("heap_alloc_object: Failed to allocate fields");
+      free(obj);
       return NULL;
     }
+
   obj->marked = 0;
+
+  if (fill_variable_types(classloader, jclass, obj->variables) != 0)
+  {
+    prerr("heap_alloc_object: Failed to fill variable types");
+    free(obj->variables);
+    free(obj);
+    return NULL;
+  }
 
   heap->objects[heap->object_count++] = obj;
   return obj;
 }
+

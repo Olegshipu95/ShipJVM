@@ -1173,8 +1173,9 @@ opcode_fsub (struct stack_frame *frame)
 }
 
 void
-opcode_getfield (struct stack_frame *frame)
+opcode_getfield (struct stack_frame *)
 {
+  /*
   if (frame->pc + 2 >= frame->code_length)
     {
       prerr ("getfield: Truncated bytecode");
@@ -1266,6 +1267,7 @@ opcode_getfield (struct stack_frame *frame)
     }
 
   frame->pc += 3;
+  */
 }
 
 void
@@ -3407,7 +3409,7 @@ opcode_new (struct stack_frame *frame)
 
   // Аллоцируем объект в куче
   heap_object *obj
-      = heap_alloc_object (frame->jvm_runtime->heap, target_class);
+      = heap_alloc_object (frame->jvm_runtime->classloader, frame->jvm_runtime->heap, target_class);
   if (!obj)
     {
       prerr ("new: Failed to allocate object for class %s", class_name);

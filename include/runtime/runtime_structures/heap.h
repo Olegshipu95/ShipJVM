@@ -12,7 +12,7 @@
 typedef struct heap_object
 {
   struct jclass *jclass;
-  jvariable *fields; // Один jvariable на каждое поле
+  jvariable *variables; // Один jvariable на каждое поле
   uint8_t marked;    // Для будущего GC
 } heap_object;
 
@@ -28,6 +28,6 @@ struct heap
 int heap_init (struct heap **new_heap);
 void heap_destroy (struct heap *heap);
 
-heap_object *heap_alloc_object (struct heap *heap, struct jclass *jclass);
+heap_object *heap_alloc_object (struct classloader* loader, struct heap *heap, struct jclass *jclass);
 
 #endif
