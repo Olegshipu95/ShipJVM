@@ -94,7 +94,7 @@ assign_field_slots (struct classloader *classloader, struct jclass *cls,
         field->slot_id = start_slot++;
     }
 
-  cls->object_fields_count = start_slot - 1;
+  cls->object_fields_count = start_slot;
 
   return start_slot;
 }
@@ -177,7 +177,7 @@ parse_rt_fields (struct runtime_cp *rt_cp, struct rt_field **rt_fields,
                                        old_field[iter].descriptor_index,
                                        runtime_cp_count);
       printf ("descriptor: %s, ", new_fieds[iter].descriptor);
-      new_fieds[iter].attributes_count = new_fieds[iter].attributes_count;
+      new_fieds[iter].attributes_count = old_field[iter].attributes_count;
       printf ("attr count: %hu \n", new_fieds[iter].attributes_count);
       err |= parse_rt_attributes (
           rt_cp, &new_fieds[iter].attributes, old_field[iter].attributes,
@@ -247,11 +247,23 @@ search_static_native_methods (struct rt_methods_data *methods_data)
               prerr ("Mismatch in number of native methods");
               return -1;
             }
-          methods_data->native_methods[static_counter]
+          methods_data->native_methods[native_counter]
               = &methods_data->methods[iter];
-          ++static_counter;
+          ++native_counter;
         }
     }
+  if (static_counter != methods_data->static_methods_count)
+    {
+      prerr ("Final static method count mismatch");
+      return -1;
+    }
+  
+  if (native_counter != methods_data->native_methods_count)
+    {
+      prerr ("Final native method count mismatch");
+      return -1;
+    }
+  
   return 0;
 }
 
@@ -502,16 +514,6 @@ find_method_in_current_class (struct jclass *class,
           return 0;
         }
     }
-
-  // // Если не нашли в текущем классе, ищем в суперклассах
-  // if (class->super_class != NULL && strcmp (class->super_class, "") != 0)
-  //   {
-  //     struct jclass *super_class = load_class (class->super_class);
-  //     if (super_class)
-  //       {
-  //         return find_method (super_class, name, descriptor);
-  //       }
-  //   }
 
   // Метод не найден
   printf ("Can not find method %s:%s in class %s", name, descriptor,

@@ -78,9 +78,8 @@ count_instance_fields (struct classloader *classloader, struct jclass *cls)
 }
 
 static int
-fill_variable_types(struct classloader *classloader,
-                    struct jclass *cls,
-                    jvariable *variables)
+fill_variable_types(struct classloader *classloader, struct jclass *cls,
+                    jvariable *variables, uint16_t variable_count)
 {
   if (!classloader || !cls || !variables)
     return -1;
@@ -92,14 +91,17 @@ fill_variable_types(struct classloader *classloader,
       int err = classloader_load_class(classloader, cls->super_class, &super_cls);
       if (err)
         {
-          prerr("fill_variable_types: failed to load superclass %s", cls->super_class);
+          prerr("fill_variable_types: failed to load superclass %s",
+                cls->super_class);
           return -1;
         }
 
-      err = fill_variable_types(classloader, super_cls, variables);
+      err = fill_variable_types(classloader, super_cls, variables, variable_count);
       if (err)
         return err;
     }
+
+  printf ("Object Fields of class %s: \n", cls->this_class);
 
   // Обработка текущих нестатических полей
   for (int i = 0; i < cls->fields_count; ++i)
@@ -110,51 +112,82 @@ fill_variable_types(struct classloader *classloader,
         continue;
 
       uint32_t slot = field->slot_id;
+      if (slot >= variable_count)
+        {
+          prerr("fill_variable_types: slot_id %u out of bounds (max %hu)",
+                slot, variable_count);
+          return -1;
+        }
+
       variables[slot] = field->data;
+
+      // Debug вывод: тип поля и значение
+      // Предполагаю, что у jvariable есть поле 'type' и в зависимости от типа нужно выводить по-разному
+      switch (variables[slot].type)
+        {
+          case JINT:
+            printf("Field name: %s, slot %u: int = %d\n", field->name, slot, variables[slot].value._int);
+            break;
+          case JFLOAT:
+            printf("Field name: %s, slot %u: float = %f\n", field->name, slot, variables[slot].value._float);
+            break;
+          case JLONG:
+            printf("Field name: %s, slot %u: long = %lld\n", field->name, slot, (long long)variables[slot].value._long);
+            break;
+          case JDOUBLE:
+            printf("Field name: %s, slot %u: double = %f\n", field->name, slot, variables[slot].value._double);
+            break;
+          case JOBJECT:
+            printf("Field name: %s, slot %u: object ptr = %p\n", field->name, slot, variables[slot].value._object);
+            break;
+          default:
+            printf("Field name: %s, slot %u: unknown type %d\n", field->name, slot, variables[slot].type);
+        }
     }
 
   return 0;
 }
 
 
+
 heap_object *
-heap_alloc_object(struct classloader *classloader, struct heap *heap, struct jclass *jclass)
+heap_alloc_object (struct classloader *classloader, struct heap *heap,
+                   struct jclass *jclass)
 {
   if (!heap || !jclass)
     return NULL;
 
   if (heap->object_count >= MAX_OBJECTS)
     {
-      prerr("heap_alloc_object: Heap is full");
+      prerr ("heap_alloc_object: Heap is full");
       return NULL;
     }
 
-  size_t object_fields_count = jclass->object_fields_count;
+  uint16_t object_fields_count = jclass->object_fields_count;
 
-  heap_object *obj = my_alloc(heap_object);
+  heap_object *obj = my_alloc (heap_object);
   if (!obj)
     return NULL;
 
   obj->jclass = jclass;
-  obj->variables = calloc(object_fields_count, sizeof(jvariable));
+  obj->variables = calloc (object_fields_count, sizeof (jvariable));
   if (!obj->variables)
     {
-      prerr("heap_alloc_object: Failed to allocate fields");
-      free(obj);
+      prerr ("heap_alloc_object: Failed to allocate fields");
+      free (obj);
       return NULL;
     }
 
   obj->marked = 0;
 
-  if (fill_variable_types(classloader, jclass, obj->variables) != 0)
-  {
-    prerr("heap_alloc_object: Failed to fill variable types");
-    free(obj->variables);
-    free(obj);
-    return NULL;
-  }
+  if (fill_variable_types (classloader, jclass, obj->variables, object_fields_count) != 0)
+    {
+      prerr ("heap_alloc_object: Failed to fill variable types");
+      free (obj->variables);
+      free (obj);
+      return NULL;
+    }
 
   heap->objects[heap->object_count++] = obj;
   return obj;
 }
-

@@ -36,7 +36,7 @@ utf8_to_string (struct UTF8_info *utf8, string *dest)
       prerr ("Can not allocate memory for string");
       return ENOMEM;
     }
-  memcpy (local, utf8->bytes, length + 1);
+  memcpy (local, utf8->bytes, length);
   local[length] = 0;
   *dest = local;
   return 0;

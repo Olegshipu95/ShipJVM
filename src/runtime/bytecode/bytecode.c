@@ -1173,9 +1173,11 @@ opcode_fsub (struct stack_frame *frame)
 }
 
 void
-opcode_getfield (struct stack_frame *)
+opcode_getfield (struct stack_frame *frame)
 {
-  /*
+  int err;
+
+  // Проверка выхода за пределы байткода
   if (frame->pc + 2 >= frame->code_length)
     {
       prerr ("getfield: Truncated bytecode");
@@ -1183,48 +1185,48 @@ opcode_getfield (struct stack_frame *)
       return;
     }
 
-  uint16_t index = (frame->code[frame->pc + 1].raw_byte << 8)
-                   | frame->code[frame->pc + 2].raw_byte;
+  // Чтение индекса fieldref из байткода
+  uint16_t fieldref_idx = (frame->code[frame->pc + 1].raw_byte << 8)
+                          | frame->code[frame->pc + 2].raw_byte;
 
-  if (index == 0 || index > frame->class->runtime_cp_count)
+  if (fieldref_idx == 0 || fieldref_idx > frame->class->runtime_cp_count)
     {
-      prerr ("getfield: Invalid constant pool index %u", index);
+      prerr ("getfield: Invalid constant pool index %u", fieldref_idx);
       frame->error = JVM_INVALID_BYTECODE;
       return;
     }
 
-  struct runtime_cp *cp_entry = &frame->class->runtime_cp[index - 1];
-
+  struct runtime_cp *cp_entry = &frame->class->runtime_cp[fieldref_idx - 1];
   if (cp_entry->tag != FIELD_REF)
     {
-      prerr ("getfield: CP entry at index %u is not a FIELD_REF", index);
+      prerr ("getfield: CP entry at index %u is not FIELD_REF", fieldref_idx);
       frame->error = JVM_INVALID_BYTECODE;
       return;
     }
 
-  struct rt_fieldref *field_ref = &cp_entry->fieldref;
+  struct rt_fieldref *fieldref = &cp_entry->fieldref;
 
   // Загружаем класс, содержащий поле
-  struct jclass *field_class;
-  int err = classloader_load_class (frame->jvm_runtime->classloader,
-                                    field_ref->ref.class_name, &field_class);
+  struct jclass *target_class = NULL;
+  err = classloader_load_class (frame->jvm_runtime->classloader,
+                                fieldref->ref.class_name, &target_class);
   if (err)
     {
-      prerr ("getfield: Failed to load class %s", field_ref->ref.class_name);
-      frame->error = ENOENT;
+      prerr ("getfield: Failed to load class %s", fieldref->ref.class_name);
+      frame->error = err;
       return;
     }
 
-  // Ищем поле
+  // Ищем поле в иерархии классов
   struct rt_field *field = NULL;
   err = find_field_in_class_hierarchy (
-      frame->jvm_runtime->classloader, field_class, &field,
-      field_ref->ref.nat.name, field_ref->ref.nat.descriptor);
+      frame->jvm_runtime->classloader, target_class, &field,
+      fieldref->ref.nat.name, fieldref->ref.nat.descriptor);
   if (err || !field)
     {
       prerr ("getfield: Field %s:%s not found in class %s",
-             field_ref->ref.nat.name, field_ref->ref.nat.descriptor,
-             field_ref->ref.class_name);
+             fieldref->ref.nat.name, fieldref->ref.nat.descriptor,
+             fieldref->ref.class_name);
       frame->error = ENOENT;
       return;
     }
@@ -1232,42 +1234,45 @@ opcode_getfield (struct stack_frame *)
   // Проверка: поле не должно быть static
   if (field->access_flags & ACC_STATIC)
     {
-      prerr ("getfield: Field %s is static, should use getstatic",
-             field->name);
+      prerr ("getfield: Field %s is static (use getstatic)",
+             fieldref->ref.nat.name);
       frame->error = JVM_INVALID_BYTECODE;
       return;
     }
 
-  // Снимаем объект со стека
-  jvariable ref;
-  if (opstack_pop (frame->operand_stack, &ref))
+  // Снимаем objectref со стека
+  jvariable objectref;
+  err = opstack_pop (frame->operand_stack, &objectref);
+  if (err)
     {
-      prerr ("getfield: Operand stack underflow");
-      frame->error = JVM_STACK_UNDERFLOW;
+      prerr ("getfield: Failed to pop object reference");
+      frame->error = err;
       return;
     }
 
-  if (ref.type != JOBJECT || !ref.value._object)
+  if (objectref.type != JOBJECT || objectref.value._object == NULL)
     {
-      prerr ("getfield: Null or non-object reference");
+      prerr ("getfield: Null object reference");
       frame->error = JVM_NULL_POINTER;
       return;
     }
 
-  // Извлекаем значение поля из объекта
-  heap_object *obj = ref.value._object;
-  jvariable value = obj->fields[field->slot_id];
+  heap_object *obj = objectref.value._object;
 
-  // Кладём значение на стек
-  if (opstack_push (frame->operand_stack, value))
+  // Получаем значение из поля по slot_id
+  uint32_t slot = field->slot_id;
+  jvariable value = obj->variables[slot];
+
+  // Кладем значение обратно на стек
+  err = opstack_push (frame->operand_stack, value);
+  if (err)
     {
-      prerr ("getfield: Failed to push field value to operand stack");
-      frame->error = ENOMEM;
+      prerr ("getfield: Failed to push value to operand stack");
+      frame->error = err;
       return;
     }
 
-  frame->pc += 3;
-  */
+  frame->pc += 3; // Переход к следующей инструкции
 }
 
 void
@@ -1883,148 +1888,169 @@ void
 opcode_invokedynamic (struct stack_frame *)
 {
 }
+
 void
-opcode_invokevirtual (struct stack_frame *frame)
+opcode_invokevirtual(struct stack_frame *frame)
 {
   int err;
 
+  // Проверка на достаточную длину байткода (1 байт op + 2 байта index)
   if (frame->pc + 2 >= frame->code_length)
     {
-      prerr ("invokevirtual: Truncated bytecode");
+      prerr("invokevirtual: Truncated bytecode");
       frame->error = EINVAL;
       return;
     }
 
-  // Чтение индекса methodref из constant pool
+  // Чтение индекса methodref (big-endian)
   uint16_t methodref_idx = (frame->code[frame->pc + 1].raw_byte << 8)
                            | frame->code[frame->pc + 2].raw_byte;
 
-  if (methodref_idx == 0 || methodref_idx >= frame->class->runtime_cp_count)
+  // Проверка диапазона индекса
+  if (methodref_idx == 0 || methodref_idx > frame->class->runtime_cp_count)
     {
-      prerr ("invokevirtual: Invalid constant pool index");
-      frame->error = EINVAL;
-      return;
-    }
-
-  struct runtime_cp *entry = &frame->class->runtime_cp[methodref_idx - 1];
-
-  if (entry->tag != METHOD_REF)
-    {
-      prerr ("invokevirtual: Constant pool entry is not a methodref");
+      prerr("invokevirtual: Invalid constant pool index %u", methodref_idx);
       frame->error = JVM_INVALID_BYTECODE;
       return;
     }
 
-  struct rt_methodref *method_ref = &entry->methodref;
+  // Получение methodref из constant pool
+  struct runtime_cp *cp_entry = &frame->class->runtime_cp[methodref_idx - 1];
+  if (cp_entry->tag != METHOD_REF)
+    {
+      prerr("invokevirtual: CP entry at index %u is not METHOD_REF", methodref_idx);
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
 
-  // Предварительно загружаем класс из methodref (но метод может быть в
-  // подклассе)
-  struct jclass *decl_class;
-  err = classloader_load_class (frame->jvm_runtime->classloader,
-                                method_ref->ref.class_name, &decl_class);
+  struct rt_methodref *method_ref = &cp_entry->methodref;
+
+  // Загружаем класс, в котором находится вызываемый метод
+  struct jclass *target_class = NULL;
+  err = classloader_load_class(frame->jvm_runtime->classloader,
+                               method_ref->ref.class_name, &target_class);
   if (err)
     {
-      prerr ("invokevirtual: Failed to load declared class %s",
-             method_ref->ref.class_name);
+      prerr("invokevirtual: Cannot load class %s", method_ref->ref.class_name);
+      frame->error = ENOENT;
+      return;
+    }
+
+  // Инициализируем класс
+  if ((err = ensure_class_initialized(frame->jvm_runtime, target_class)))
+    {
+      prerr("invokevirtual: Failed to initialize class %s", target_class->this_class);
       frame->error = err;
       return;
     }
 
-  // Получаем количество аргументов, включая `this`
-  int num_args
-      = count_arguments_in_descriptor (method_ref->ref.nat.descriptor);
-  if (num_args < 1)
+  // Находим метод
+  struct rt_method *target_method = NULL;
+  err = find_method_in_current_class(target_class, &target_method,
+                                     method_ref->ref.nat.name,
+                                     method_ref->ref.nat.descriptor);
+  if (err || !target_method)
     {
-      prerr ("invokevirtual: Invalid descriptor (no 'this')");
-      frame->error = EINVAL;
+      prerr("invokevirtual: Method %s:%s not found in class %s",
+            method_ref->ref.nat.name, method_ref->ref.nat.descriptor,
+            target_class->this_class);
+      frame->error = ENOENT;
       return;
     }
 
-  // Получаем `this` из operand stack (не удаляя его)
-  jvariable this_ref;
-  if (opstack_peek_nth (frame->operand_stack, num_args - 1, &this_ref))
+  // Проверка: метод не должен быть static
+  if (target_method->access_flags & ACC_STATIC)
     {
-      prerr ("invokevirtual: Failed to peek 'this'");
+      prerr("invokevirtual: Method %s is static (use invokestatic)", target_method->name);
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  // Подсчет количества аргументов (включая this)
+  int arg_count = count_arguments_in_descriptor(target_method->descriptor);
+  if (arg_count < 0)
+    {
+      prerr("invokevirtual: Failed to parse method descriptor: %s", target_method->descriptor);
+      frame->error = EINVAL;
+      return;
+    }
+  arg_count += 1; // Добавляем this
+
+  // Проверка, что this != null
+  jvariable this_ref;
+  if (opstack_peek_nth(frame->operand_stack, arg_count - 1, &this_ref) != 0)
+    {
+      prerr("invokevirtual: Failed to read 'this' reference from operand stack");
       frame->error = EINVAL;
       return;
     }
 
   if (this_ref.type != JOBJECT || this_ref.value._object == NULL)
     {
-      prerr ("invokevirtual: 'this' is null");
+      prerr("invokevirtual: NullPointerException — 'this' is null");
       frame->error = JVM_NULL_POINTER;
       return;
     }
 
-  struct jclass *actual_class = (struct jclass *)this_ref.value._object;
-  if (!actual_class)
-    {
-      prerr ("invokevirtual: Null class in object");
-      frame->error = EINVAL;
-      return;
-    }
-
-  // Убедимся, что класс инициализирован
-  if ((err = ensure_class_initialized (frame->jvm_runtime, actual_class)))
-    {
-      prerr ("invokevirtual: Failed to initialize target class");
-      frame->error = err;
-      return;
-    }
-
-  // Ищем переопределённый метод в иерархии
-  struct rt_method *target_method = NULL;
-  err = find_method_in_hierarchy (frame->jvm_runtime, actual_class,
-                                  &target_method, method_ref->ref.nat.name,
-                                  method_ref->ref.nat.descriptor);
-  if (err || !target_method)
-    {
-      prerr ("invokevirtual: Method %s:%s not found in class hierarchy of %s",
-             method_ref->ref.nat.name, method_ref->ref.nat.descriptor,
-             actual_class->this_class);
-      frame->error = ENOENT;
-      return;
-    }
-
-  // Метод не должен быть static
-  if (target_method->access_flags & ACC_STATIC)
-    {
-      prerr ("invokevirtual: Attempt to call static method as virtual");
-      frame->error = EACCES;
-      return;
-    }
-
-  // Создаем стек-фрейм
-  struct stack_frame *new_frame
-      = init_stack_frame (actual_class, target_method, frame->jvm_runtime);
+  // Создаем новый фрейм
+  struct stack_frame *new_frame = init_stack_frame(target_class, target_method, frame->jvm_runtime);
   if (!new_frame)
     {
-      prerr ("invokevirtual: Failed to create new frame");
+      prerr("invokevirtual: Failed to allocate new stack frame");
       frame->error = ENOMEM;
       return;
     }
 
-  // Копируем аргументы (включая `this`)
-  err = copy_arguments (frame, new_frame, method_ref->ref.nat.descriptor,
-                        /* has_this = */ 1);
+  // Копируем аргументы (включая this)
+  err = copy_arguments(frame, new_frame, target_method->descriptor, 1);
   if (err)
     {
-      prerr ("invokevirtual: Failed to copy arguments");
+      prerr("invokevirtual: Failed to copy arguments: %s", strerror(err));
+      free(new_frame);
       frame->error = err;
       return;
     }
 
   new_frame->caller = frame;
-  if ((err = call_stack_push (frame->jvm_runtime->call_stack, new_frame)))
+
+  // Если метод native
+  if (target_method->access_flags & ACC_NATIVE)
     {
-      prerr ("invokevirtual: Call stack overflow");
-      frame->error = err;
-      return;
+      native_func_t native = lookup_native(target_class->this_class,
+                                           target_method->name,
+                                           target_method->descriptor);
+      if (!native)
+        {
+          prerr("invokevirtual: Native method %s.%s:%s not found",
+                target_class->this_class, target_method->name, target_method->descriptor);
+          frame->error = ENOENT;
+          return;
+        }
+
+      int native_result = native(new_frame);
+      if (native_result != 0)
+        {
+          prerr("invokevirtual: Native method returned error: %d", native_result);
+          frame->error = native_result;
+          return;
+        }
+
+      // Не пушим в стек вызовов, так как native уже выполнен
+    }
+  else
+    {
+      if ((err = call_stack_push(frame->jvm_runtime->call_stack, new_frame)))
+        {
+          prerr("invokevirtual: Call stack overflow");
+          frame->error = err;
+          return;
+        }
     }
 
-  // Продвигаем PC на 2 байта
-  frame->pc += 2;
+  // Продвигаем PC
+  frame->pc += 3;
 }
+
 
 /**
  * Invoke instance method with special handling
@@ -2107,6 +2133,15 @@ opcode_invokespecial (struct stack_frame *frame)
       prerr ("invokespecial: Method %s is static (use invokestatic)",
              target_method->name);
       frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  jvariable this_ref;
+  err = opstack_peek (frame->operand_stack, &this_ref);
+  if (err)
+    {
+      prerr ("invokeSpecial: stack underflow in opstack_peek");
+      frame->error = ENOMEM;
       return;
     }
 
@@ -2275,12 +2310,42 @@ opcode_invokestatic (struct stack_frame *frame)
   // Установка caller
   new_frame->caller = frame;
 
-  // Помещаем фрейм в стек вызовов
-  if (call_stack_push (frame->jvm_runtime->call_stack, new_frame))
+  // Проверка: является ли метод native
+  if (target_method->access_flags & ACC_NATIVE)
     {
-      prerr ("invokestatic: Call stack overflow");
-      frame->error = ENOMEM;
-      return;
+      native_func_t native
+          = lookup_native (target_class->this_class, target_method->name,
+                           target_method->descriptor);
+      if (!native)
+        {
+          prerr ("invokestatic: Native method not registered: %s.%s:%s",
+                 target_class->this_class, target_method->name,
+                 target_method->descriptor);
+          frame->error = ENOENT;
+          return;
+        }
+
+      // Вызов native-метода
+      int native_result = native (new_frame);
+      if (native_result != 0)
+        {
+          prerr ("invokestatic: Native method returned error: %d",
+                 native_result);
+          frame->error = native_result;
+          return;
+        }
+
+      // Не добавляем фрейм в стек вызовов, т.к. уже выполнен
+    }
+  else
+    {
+      // Помещаем фрейм в стек вызовов
+      if (call_stack_push (frame->jvm_runtime->call_stack, new_frame))
+        {
+          prerr ("invokestatic: Call stack overflow");
+          frame->error = ENOMEM;
+          return;
+        }
     }
 
   // Продвигаем PC (1 байт опкод + 2 байта индекса)
@@ -3398,6 +3463,15 @@ opcode_new (struct stack_frame *frame)
       return;
     }
 
+  if ((target_class->access_flags & ACC_INTERFACE)
+      || (target_class->access_flags & ACC_ABSTRACT))
+    {
+      prerr ("new: Cannot instantiate abstract/interface class %s",
+             class_name);
+      frame->error = JVM_INVALID_CLASS;
+      return;
+    }
+
   // Инициализация класса
   err = ensure_class_initialized (frame->jvm_runtime, target_class);
   if (err)
@@ -3408,8 +3482,8 @@ opcode_new (struct stack_frame *frame)
     }
 
   // Аллоцируем объект в куче
-  heap_object *obj
-      = heap_alloc_object (frame->jvm_runtime->classloader, frame->jvm_runtime->heap, target_class);
+  heap_object *obj = heap_alloc_object (
+      frame->jvm_runtime->classloader, frame->jvm_runtime->heap, target_class);
   if (!obj)
     {
       prerr ("new: Failed to allocate object for class %s", class_name);
@@ -3443,6 +3517,7 @@ void
 opcode_nop (struct stack_frame *)
 {
   // do nothing
+  return;
 }
 
 void
@@ -3490,10 +3565,110 @@ opcode_pop2 (struct stack_frame *frame)
       return;
     }
 }
-// TODO
+
 void
-opcode_putfield (struct stack_frame *)
+opcode_putfield (struct stack_frame *frame)
 {
+  int err;
+
+  // Проверка выхода за пределы байткода
+  if (frame->pc + 2 >= frame->code_length)
+    {
+      prerr ("putfield: Truncated bytecode");
+      frame->error = EINVAL;
+      return;
+    }
+
+  // Получаем индекс fieldref
+  uint16_t fieldref_idx = (frame->code[frame->pc + 1].raw_byte << 8)
+                          | frame->code[frame->pc + 2].raw_byte;
+
+  if (fieldref_idx == 0 || fieldref_idx > frame->class->runtime_cp_count)
+    {
+      prerr ("putfield: Invalid constant pool index %u", fieldref_idx);
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  struct runtime_cp *cp_entry = &frame->class->runtime_cp[fieldref_idx - 1];
+  if (cp_entry->tag != FIELD_REF)
+    {
+      prerr ("putfield: Constant pool entry %u is not FIELD_REF",
+             fieldref_idx);
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  struct rt_fieldref *fieldref = &cp_entry->fieldref;
+
+  // Загружаем класс, содержащий поле
+  struct jclass *target_class = NULL;
+  err = classloader_load_class (frame->jvm_runtime->classloader,
+                                fieldref->ref.class_name, &target_class);
+  if (err)
+    {
+      prerr ("putfield: Failed to load class %s", fieldref->ref.class_name);
+      frame->error = err;
+      return;
+    }
+
+  // Ищем поле в иерархии
+  struct rt_field *field = NULL;
+  err = find_field_in_class_hierarchy (
+      frame->jvm_runtime->classloader, target_class, &field,
+      fieldref->ref.nat.name, fieldref->ref.nat.descriptor);
+  if (err || !field)
+    {
+      prerr ("putfield: Field %s:%s not found in class %s",
+             fieldref->ref.nat.name, fieldref->ref.nat.descriptor,
+             fieldref->ref.class_name);
+      frame->error = ENOENT;
+      return;
+    }
+
+  // Проверка на static
+  if (field->access_flags & ACC_STATIC)
+    {
+      prerr ("putfield: Field %s is static (use putstatic)",
+             fieldref->ref.nat.name);
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  // Снимаем значения со стека: сначала value, потом objectref
+  jvariable value, objectref;
+
+  err = opstack_pop (frame->operand_stack, &value);
+  if (err)
+    {
+      prerr ("putfield: Failed to pop value");
+      frame->error = err;
+      return;
+    }
+
+  err = opstack_pop (frame->operand_stack, &objectref);
+  if (err)
+    {
+      prerr ("putfield: Failed to pop object reference");
+      frame->error = err;
+      return;
+    }
+
+  if (objectref.type != JOBJECT || objectref.value._object == NULL)
+    {
+      prerr ("putfield: Null object reference");
+      frame->error = JVM_NULL_POINTER;
+      return;
+    }
+
+  heap_object *obj = objectref.value._object;
+
+  // Устанавливаем значение в поле
+  uint32_t slot = field->slot_id;
+  obj->variables[slot] = value;
+
+  // Переходим к следующей инструкции
+  frame->pc += 3;
 }
 
 void

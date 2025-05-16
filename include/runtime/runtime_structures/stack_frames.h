@@ -22,6 +22,7 @@
 #define JVM_ILLEGAL_LOCAL_INDEX 1003
 #define JVM_NULL_POINTER 1004
 #define JVM_STACK_UNDERFLOW 1005
+#define JVM_INVALID_CLASS 1006
 
 struct operand_stack
 {
