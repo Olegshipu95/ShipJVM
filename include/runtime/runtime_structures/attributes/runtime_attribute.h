@@ -5,6 +5,7 @@
 
 #include "bytecodes.h"
 #include "util.h"
+#include "java_types.h"
 // /* Verification type tags */
 // #define ITEM_Top 0
 // #define ITEM_Integer 1
@@ -122,11 +123,11 @@ struct rt_attribute
   uint32_t attribute_length;
 };
 
-// struct ConstantValue_attribute
-// {
-//   struct rt_attribute header;
-//   uint16_t constant_value_index;
-// };
+struct rt_constantValue_attribute
+{
+  struct rt_attribute header;
+  jvariable constant_value;
+};
 
 struct rt_exception_table
 {

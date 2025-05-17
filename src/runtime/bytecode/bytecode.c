@@ -2459,7 +2459,7 @@ opcode_ineg (struct stack_frame *frame)
 
 // todo
 void
-opcode_instanceof (struct stack_frame * frame)
+opcode_instanceof (struct stack_frame *frame)
 {
   // if (!frame || frame->pc + 2 >= frame->code_length)
   //   {
@@ -2511,7 +2511,8 @@ opcode_instanceof (struct stack_frame * frame)
   // string targer_class_name = cp_entry->class_name;
 
   // // Проверяем тип объекта (нужно реализовать эту функцию где-то)
-  // int is_instance = is_instanceof (obj_ref.value._object, targer_class_name);
+  // int is_instance = is_instanceof (obj_ref.value._object,
+  // targer_class_name);
 
   // jvariable result = { .type = JINT, .value._int = is_instance ? 1 : 0 };
   // opstack_push (frame->operand_stack, result);
@@ -3128,8 +3129,8 @@ opcode_invokeinterface (struct stack_frame *frame)
   // 15. Обновление PC (4 байта операнда)
   frame->pc += 4;
   */
- frame->error = EINVAL;
- return;
+  frame->error = EINVAL;
+  return;
 }
 
 void

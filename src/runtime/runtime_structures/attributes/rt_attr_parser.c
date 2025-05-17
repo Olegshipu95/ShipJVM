@@ -592,6 +592,68 @@ parse_rt_code_attribute (struct runtime_cp *rt_cp,
   return 0;
 }
 
+// ---- ConstantValue Attribute ----
+
+int
+parse_rt_constantValue_attribute (struct runtime_cp *rt_cp,
+                                  struct rt_constantValue_attribute *attr,
+                                  struct ConstantValue_attribute *old_attr,
+                                  uint16_t runtime_cp_count)
+{
+  if (!rt_cp || !attr || !old_attr)
+    return EINVAL;
+
+  uint16_t index = old_attr->constant_value_index;
+  if (index == 0 || index > runtime_cp_count)
+    return JVM_INVALID_BYTECODE;
+
+  struct runtime_cp *entry = &rt_cp[index - 1];
+
+  jvariable val = {0};
+
+  switch (entry->tag)
+    {
+    case INTEGER:
+      val.type = JINT;
+      val.value._int = entry->integer_info;
+      break;
+
+    case FLOAT:
+      val.type = JFLOAT;
+      val.value._float = entry->float_info;
+      break;
+
+    case LONG:
+      val.type = JLONG;
+      val.value._long = entry->long_info;
+      break;
+
+    case DOUBLE:
+      val.type = JDOUBLE;
+      val.value._double = entry->double_info;
+      break;
+
+    case STRING:
+      if (entry->string_info == NULL)
+        {
+          prerr ("ConstantValue: string_object is NULL at cp[%d]", index);
+          return JVM_NULL_POINTER;
+        }
+      // val.type = JOBJECT;
+      // val.value._object = entry->string_object;
+      break;
+
+    default:
+      prerr ("ConstantValue: invalid CP tag=%d at index=%d", entry->tag, index);
+      return JVM_INVALID_BYTECODE;
+    }
+
+  attr->constant_value = val;
+
+  return 0;
+}
+
+
 // ---- PARSE ATTRIBUTES ----
 
 int
@@ -612,7 +674,21 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
       return err;
     }
   printf ("Attribute name : %s\n", name);
-  if (strcmp (name, "Code") == 0)
+  if (strcmp (name, "ConstantValue") == 0)
+    // start converting Code
+    {
+      PARSE_ATTRIBUTE_BASE (struct rt_constantValue_attribute, name,
+                            attribute_length);
+      attr->header.type = ATTRIBUTE_ConstantValue;
+
+      struct ConstantValue_attribute *original_attr
+          = (struct ConstantValue_attribute *)old_attribute;
+      err = parse_rt_constantValue_attribute (rt_cp, attr, original_attr,
+                                              runtime_cp_count);
+
+      CHECK_ERROR_AND_SET (err, name, new_attribute, attr);
+    }
+  else if (strcmp (name, "Code") == 0)
     // start converting Code
     {
       PARSE_ATTRIBUTE_BASE (struct rt_code_attribute, name, attribute_length);
