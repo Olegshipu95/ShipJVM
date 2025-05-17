@@ -920,17 +920,19 @@ struct type_argument_target
   uint8_t type_argument_index; /* 0-based type argument index */
 };
 
+
+struct type_path_path
+{
+  uint8_t type_path_kind;      /* Path step kind (0=array,1=inner,etc) */
+  uint8_t type_argument_index; /* For parameterized types */
+};
 /**
  * Type path (path to nested type)
  */
 struct type_path
 {
   uint8_t path_length; /* Number of path entries */
-  struct
-  {
-    uint8_t type_path_kind;      /* Path step kind (0=array,1=inner,etc) */
-    uint8_t type_argument_index; /* For parameterized types */
-  } *path;                       /* Array of path steps */
+  struct type_path_path *path;                       /* Array of path steps */
 };
 
 /**
@@ -1007,18 +1009,7 @@ struct type_annotation
   /**
    * Array of annotation element-value pairs
    */
-  struct
-  {
-    /**
-     * Index into the constant pool of element name
-     */
-    uint16_t element_name_index;
-
-    /**
-     * The element value
-     */
-    struct element_value value;
-  } *element_value_pairs; /* array of size num_element_value_pairs */
+   struct element_value_pairs *element_value_pairs; /* array of size num_element_value_pairs */
 };
 
 /**

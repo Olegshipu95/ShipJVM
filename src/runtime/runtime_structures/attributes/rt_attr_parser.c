@@ -718,7 +718,7 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
     }
   else
     {
-      prerr ("Attribute %s is not supported", name);
+      prerr ("Runtime Attribute %s is not supported", name);
       return -1;
     }
   return 0;
