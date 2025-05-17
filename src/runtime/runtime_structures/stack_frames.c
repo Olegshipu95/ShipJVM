@@ -639,12 +639,24 @@ ensure_class_initialized (struct jvm *jvm, struct jclass *cls)
   struct rt_method *clinit_method = NULL;
   if (!find_method_in_current_class (cls, &clinit_method, "<clinit>", "()V"))
     {
+      // IT IS VERY BAD, NEED CHANGE. TODO
+      struct jvm *clinit_jvm = new_jvm();
+      clinit_jvm->classloader = jvm->classloader;
+      heap_destroy(clinit_jvm->heap);
+      clinit_jvm->heap = jvm->heap;
+
+      if (new_call_stack (&clinit_jvm->call_stack))
+      {
+        prerr ("Call stack creation failed");
+        return -1;
+      }
+
       struct stack_frame *clinit_frame
-          = init_stack_frame (cls, clinit_method, jvm);
+          = init_stack_frame (cls, clinit_method, clinit_jvm);
       if (!clinit_frame)
         return -1;
 
-      err = execute_frame (jvm, clinit_frame);
+      err = execute_frame (clinit_jvm, clinit_frame);
       if (err)
         {
           prerr ("ensure_class_initialized: error");
