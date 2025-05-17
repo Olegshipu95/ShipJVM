@@ -170,6 +170,10 @@ parse_class_fields (Loader *loader, struct class_file *class,
   fields->attributes_count = loader_u2 (loader);
   error = read_attributes (loader, class, &fields->attributes,
                            fields->attributes_count);
+  if (error)
+    {
+      prerr ("can not parse class fields");
+    }
   return error;
 }
 
@@ -184,6 +188,10 @@ parse_class_methods (Loader *loader, struct class_file *class,
   method->attributes_count = loader_u2 (loader);
   error = read_attributes (loader, class, &method->attributes,
                            method->attributes_count);
+  if (error)
+    {
+      prerr ("can not parse methods");
+    }
   return error;
 }
 
@@ -258,7 +266,12 @@ parse_class_file (struct class_file *class, const char *filename)
   printf ("DEBUG: Number of fields: %hu \n", class->fields_count);
   for (iterator = 0; iterator < class->fields_count; ++iterator)
     {
-      err |= parse_class_fields (&loader, class, &class->fields[iterator]);
+      err = parse_class_fields (&loader, class, &class->fields[iterator]);
+      if (err)
+        {
+          prerr ("can not parse fields in class file");
+          return ENOEXEC;
+        }
     }
 
   class->methods_count = loader_u2 (&loader);
@@ -273,14 +286,25 @@ parse_class_file (struct class_file *class, const char *filename)
   printf ("DEBUG: Number of methods: %hu\n", class->methods_count);
   for (iterator = 0; iterator < class->methods_count; ++iterator)
     {
-      err |= parse_class_methods (&loader, class, &class->methods[iterator]);
+      err = parse_class_methods (&loader, class, &class->methods[iterator]);
+      if (err)
+        {
+          prerr ("Can not parse methods in class file");
+          return ENOEXEC;
+        }
     }
 
   class->attributes_count = loader_u2 (&loader);
 
   printf ("DEBUG: Number of attributes: %hu\n", class->attributes_count);
-  err |= read_attributes (&loader, class, &class->attributes,
-                          class->attributes_count);
+  err = read_attributes (&loader, class, &class->attributes,
+                         class->attributes_count);
+
+  if (err)
+    {
+      prerr ("can not parse attributes for class file");
+      return ENOEXEC;
+    }
 
   if (loader.error)
     {

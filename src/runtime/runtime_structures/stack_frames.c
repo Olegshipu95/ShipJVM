@@ -96,6 +96,8 @@ init_stack_frame (struct jclass *class, struct rt_method *method,
   return frame;
 }
 
+// ---- OPSTACK OPERATIONS ----
+
 int
 opstack_is_full (struct operand_stack *opstack)
 {
@@ -170,15 +172,71 @@ opstack_peek_nth (struct operand_stack *stack, int n, jvariable *out)
       prerr ("opstack_peek_nth: stack or variable are null | n is 0");
       return EINVAL;
     }
+  printf ("opstack size : %d\n", stack->top);
 
   if (stack->top < n)
     {
       prerr ("opstack_peek_nth: Opstack underflow");
       return EINVAL; // недостаточно элементов в стеке
     }
-  *out = stack->stack[stack->top - 1 - n];
+
+  if (opstack_is_empty (stack))
+    {
+      prerr ("OPSTACK is empty");
+      return EINVAL;
+    }
+  *out = stack->stack[stack->top - n];
   return 0;
 }
+
+void
+debug_print_operand_stack (struct operand_stack *opstack)
+{
+  printf ("  >> Operand Stack: size = %d\n", opstack->top + 1);
+
+  for (int i = opstack->top; i >= 0; i--)
+    {
+      jvariable var = opstack->stack[i];
+      printf ("    [%d] ", opstack->top - i); // индекс сверху вниз
+
+      switch (var.type)
+        {
+        case JBOOLEAN:
+          printf ("JBOOLEAN = %s\n", var.value._bool ? "true" : "false");
+          break;
+        case JBYTE:
+          printf ("JBYTE = %d\n", var.value._byte);
+          break;
+        case JCHAR:
+          printf ("JCHAR = '%c' (0x%04x)\n", var.value._char, var.value._char);
+          break;
+        case JSHORT:
+          printf ("JSHORT = %d\n", var.value._short);
+          break;
+        case JINT:
+          printf ("JINT = %d\n", var.value._int);
+          break;
+        case JLONG:
+          printf ("JLONG = %lld\n", (long long)var.value._long);
+          break;
+        case JFLOAT:
+          printf ("JFLOAT = %f\n", var.value._float);
+          break;
+        case JDOUBLE:
+          printf ("JDOUBLE = %f\n", var.value._double);
+          break;
+        case JOBJECT:
+          printf ("JOBJECT = %p\n", (void *)var.value._object);
+          break;
+        default:
+          printf ("UNKNOWN TYPE (%d)\n", var.type);
+        }
+    }
+
+  printf ("\n");
+}
+
+// ---- LOCAL VARIABLES ----
 
 int
 get_local_var (struct local_variables *locals, jvariable *value,
@@ -213,6 +271,8 @@ store_local_var (struct local_variables *locals, jvariable value,
   locals->vars[index] = value;
   return 0;
 }
+
+// ---- CALL STACK OPERATIONS
 
 int
 new_call_stack (struct call_stack **stack)
@@ -537,7 +597,14 @@ execute_frame (struct jvm *jvm, struct stack_frame *frame)
               current_frame->method->name, current_frame->method->descriptor,
               current_frame->pc, op.name);
 
+      if (current_frame->pc == 20)
+        {
+          printf ("pc == 20\n");
+        }
+
       op.handler (current_frame);
+
+      debug_print_operand_stack (current_frame->operand_stack);
 
       if (current_frame->pc == old_pc)
         {

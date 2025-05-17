@@ -1969,8 +1969,9 @@ opcode_invokevirtual (struct stack_frame *frame)
       frame->error = JVM_INVALID_BYTECODE;
       return;
     }
-  
-  printf ("TARGER METHOD: %s:%s\n", target_method->name, target_method->descriptor);
+
+  printf ("TARGER METHOD: %s:%s\n", target_method->name,
+          target_method->descriptor);
 
   // Подсчет количества аргументов (включая this)
   int arg_count = count_arguments_in_descriptor (target_method->descriptor);
@@ -1983,7 +1984,7 @@ opcode_invokevirtual (struct stack_frame *frame)
     }
   arg_count += 1; // Добавляем this
 
-  printf("ARG_COUNT = %d\n", arg_count);
+  printf ("ARG_COUNT = %d\n", arg_count);
 
   // Проверка, что this != null
   jvariable this_ref;

@@ -831,6 +831,11 @@ parse_Code_attribute (Loader *loader, struct class_file *class,
   error = read_attributes (loader, class, &attr->attributes,
                            attr->attributes_count);
 
+  if (error)
+    {
+      prerr ("Can not parse Code attr");
+    }
+
   return error;
 }
 
@@ -1238,7 +1243,10 @@ parser_record_component_info (Loader *loader, struct class_file *class,
 
   error = read_attributes (loader, class, &record->attributes,
                            record->attributes_count);
-
+  if (error)
+    {
+      prerr ("can not parse parser_record_component_info");
+    }
   return error;
 }
 

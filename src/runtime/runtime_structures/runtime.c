@@ -45,6 +45,8 @@ run_jvm (struct jvm *jvm)
   // Устанавливаем пустой args
   main_frame->local_vars->vars[0] = create_empty_args_variable ();
 
+  printf ("\n\n\n START EXECUTION MAIN\n\n\n\n");
+
   int result = execute_frame (jvm, main_frame);
 
   printf ("Execution completed %s\n",
