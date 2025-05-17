@@ -575,6 +575,7 @@ copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
   return 0;
 }
 
+
 int
 execute_frame (struct jvm *jvm, struct stack_frame *frame)
 {
@@ -596,11 +597,6 @@ execute_frame (struct jvm *jvm, struct stack_frame *frame)
       printf ("[%s.%s%s] PC=%u: %s\n", current_frame->class->this_class,
               current_frame->method->name, current_frame->method->descriptor,
               current_frame->pc, op.name);
-
-      if (current_frame->pc == 20)
-        {
-          printf ("pc == 20\n");
-        }
 
       op.handler (current_frame);
 

@@ -19,5 +19,6 @@ public class New extends Parent {
       int b = 2;
       New test = new New(a,b);
       int c = test.add();
+      int r = c + b + a;
     }
 }
