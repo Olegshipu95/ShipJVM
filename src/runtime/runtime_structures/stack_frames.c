@@ -166,11 +166,16 @@ int
 opstack_peek_nth (struct operand_stack *stack, int n, jvariable *out)
 {
   if (!stack || !out || n < 0)
-    return EINVAL;
+    {
+      prerr ("opstack_peek_nth: stack or variable are null | n is 0");
+      return EINVAL;
+    }
 
-  if (stack->top <= n)
-    return EINVAL; // недостаточно элементов в стеке
-
+  if (stack->top < n)
+    {
+      prerr ("opstack_peek_nth: Opstack underflow");
+      return EINVAL; // недостаточно элементов в стеке
+    }
   *out = stack->stack[stack->top - 1 - n];
   return 0;
 }
@@ -424,7 +429,7 @@ copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
 {
   const char *p = descriptor;
   int err;
-  int local_index = 0;
+  int local_index = has_this ? 1 : 0;
 
   // 1. Validate descriptor
   if ((err = validate_descriptor (p)))
@@ -463,27 +468,9 @@ copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
       args[arg_count].is_wide = is_wide;
       arg_count++;
     }
+  printf ("ARG_COUNT = %d\n\n", arg_count);
 
-  // 3. Начинаем с this-объекта, если метод нестатический
-  if (has_this)
-    {
-      jvariable this_ref;
-      if (opstack_pop (caller->operand_stack, &this_ref))
-        {
-          prerr ("Stack underflow while copying 'this'");
-          return EINVAL;
-        }
-      if (this_ref.type != JOBJECT)
-        {
-          prerr ("'this' is not an object reference");
-          return EINVAL;
-        }
-      if ((err = store_local_var (callee->local_vars, this_ref, local_index)))
-        return err;
-      local_index++;
-    }
-
-  // 4. Копируем аргументы в локальные переменные в обратном порядке
+  // 3. Копируем аргументы в локальные переменные в обратном порядке
   for (int i = arg_count - 1; i >= 0; i--)
     {
       jvariable arg;
@@ -504,6 +491,25 @@ copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
         return err;
 
       local_index += args[i].is_wide ? 2 : 1;
+    }
+
+  // 3. Начинаем с this-объекта, если метод нестатический
+  if (has_this)
+    {
+      jvariable this_ref;
+      if (opstack_pop (caller->operand_stack, &this_ref))
+        {
+          prerr ("Stack underflow while copying 'this'");
+          return EINVAL;
+        }
+      if (this_ref.type != JOBJECT)
+        {
+          prerr ("'this' is not an object reference");
+          return EINVAL;
+        }
+      if ((err = store_local_var (callee->local_vars, this_ref, 0)))
+        return err;
+      local_index++;
     }
 
   return 0;

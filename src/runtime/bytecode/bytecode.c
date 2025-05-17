@@ -1890,14 +1890,14 @@ opcode_invokedynamic (struct stack_frame *)
 }
 
 void
-opcode_invokevirtual(struct stack_frame *frame)
+opcode_invokevirtual (struct stack_frame *frame)
 {
   int err;
 
   // Проверка на достаточную длину байткода (1 байт op + 2 байта index)
   if (frame->pc + 2 >= frame->code_length)
     {
-      prerr("invokevirtual: Truncated bytecode");
+      prerr ("invokevirtual: Truncated bytecode");
       frame->error = EINVAL;
       return;
     }
@@ -1909,7 +1909,7 @@ opcode_invokevirtual(struct stack_frame *frame)
   // Проверка диапазона индекса
   if (methodref_idx == 0 || methodref_idx > frame->class->runtime_cp_count)
     {
-      prerr("invokevirtual: Invalid constant pool index %u", methodref_idx);
+      prerr ("invokevirtual: Invalid constant pool index %u", methodref_idx);
       frame->error = JVM_INVALID_BYTECODE;
       return;
     }
@@ -1918,7 +1918,8 @@ opcode_invokevirtual(struct stack_frame *frame)
   struct runtime_cp *cp_entry = &frame->class->runtime_cp[methodref_idx - 1];
   if (cp_entry->tag != METHOD_REF)
     {
-      prerr("invokevirtual: CP entry at index %u is not METHOD_REF", methodref_idx);
+      prerr ("invokevirtual: CP entry at index %u is not METHOD_REF",
+             methodref_idx);
       frame->error = JVM_INVALID_BYTECODE;
       return;
     }
@@ -1927,33 +1928,35 @@ opcode_invokevirtual(struct stack_frame *frame)
 
   // Загружаем класс, в котором находится вызываемый метод
   struct jclass *target_class = NULL;
-  err = classloader_load_class(frame->jvm_runtime->classloader,
-                               method_ref->ref.class_name, &target_class);
+  err = classloader_load_class (frame->jvm_runtime->classloader,
+                                method_ref->ref.class_name, &target_class);
   if (err)
     {
-      prerr("invokevirtual: Cannot load class %s", method_ref->ref.class_name);
+      prerr ("invokevirtual: Cannot load class %s",
+             method_ref->ref.class_name);
       frame->error = ENOENT;
       return;
     }
 
   // Инициализируем класс
-  if ((err = ensure_class_initialized(frame->jvm_runtime, target_class)))
+  if ((err = ensure_class_initialized (frame->jvm_runtime, target_class)))
     {
-      prerr("invokevirtual: Failed to initialize class %s", target_class->this_class);
+      prerr ("invokevirtual: Failed to initialize class %s",
+             target_class->this_class);
       frame->error = err;
       return;
     }
 
   // Находим метод
   struct rt_method *target_method = NULL;
-  err = find_method_in_current_class(target_class, &target_method,
-                                     method_ref->ref.nat.name,
-                                     method_ref->ref.nat.descriptor);
+  err = find_method_in_current_class (target_class, &target_method,
+                                      method_ref->ref.nat.name,
+                                      method_ref->ref.nat.descriptor);
   if (err || !target_method)
     {
-      prerr("invokevirtual: Method %s:%s not found in class %s",
-            method_ref->ref.nat.name, method_ref->ref.nat.descriptor,
-            target_class->this_class);
+      prerr ("invokevirtual: Method %s:%s not found in class %s",
+             method_ref->ref.nat.name, method_ref->ref.nat.descriptor,
+             target_class->this_class);
       frame->error = ENOENT;
       return;
     }
@@ -1961,52 +1964,60 @@ opcode_invokevirtual(struct stack_frame *frame)
   // Проверка: метод не должен быть static
   if (target_method->access_flags & ACC_STATIC)
     {
-      prerr("invokevirtual: Method %s is static (use invokestatic)", target_method->name);
+      prerr ("invokevirtual: Method %s is static (use invokestatic)",
+             target_method->name);
       frame->error = JVM_INVALID_BYTECODE;
       return;
     }
+  
+  printf ("TARGER METHOD: %s:%s\n", target_method->name, target_method->descriptor);
 
   // Подсчет количества аргументов (включая this)
-  int arg_count = count_arguments_in_descriptor(target_method->descriptor);
+  int arg_count = count_arguments_in_descriptor (target_method->descriptor);
   if (arg_count < 0)
     {
-      prerr("invokevirtual: Failed to parse method descriptor: %s", target_method->descriptor);
+      prerr ("invokevirtual: Failed to parse method descriptor: %s",
+             target_method->descriptor);
       frame->error = EINVAL;
       return;
     }
   arg_count += 1; // Добавляем this
 
+  printf("ARG_COUNT = %d\n", arg_count);
+
   // Проверка, что this != null
   jvariable this_ref;
-  if (opstack_peek_nth(frame->operand_stack, arg_count - 1, &this_ref) != 0)
+  if (opstack_peek_nth (frame->operand_stack, arg_count - 1, &this_ref) != 0)
     {
-      prerr("invokevirtual: Failed to read 'this' reference from operand stack");
+      prerr (
+          "invokevirtual: Failed to read 'this' reference from operand stack");
       frame->error = EINVAL;
       return;
     }
 
   if (this_ref.type != JOBJECT || this_ref.value._object == NULL)
     {
-      prerr("invokevirtual: NullPointerException — 'this' is null");
+      prerr ("invokevirtual: NullPointerException — 'this' is null");
       frame->error = JVM_NULL_POINTER;
       return;
     }
 
   // Создаем новый фрейм
-  struct stack_frame *new_frame = init_stack_frame(target_class, target_method, frame->jvm_runtime);
+  struct stack_frame *new_frame
+      = init_stack_frame (target_class, target_method, frame->jvm_runtime);
   if (!new_frame)
     {
-      prerr("invokevirtual: Failed to allocate new stack frame");
+      prerr ("invokevirtual: Failed to allocate new stack frame");
       frame->error = ENOMEM;
       return;
     }
 
   // Копируем аргументы (включая this)
-  err = copy_arguments(frame, new_frame, target_method->descriptor, 1);
+  err = copy_arguments (frame, new_frame, target_method->descriptor, 1);
   if (err)
     {
-      prerr("invokevirtual: Failed to copy arguments: %s", strerror(err));
-      free(new_frame);
+      prerr ("invokevirtual: Failed to copy arguments: %s", strerror (err));
+      free (new_frame);
       frame->error = err;
       return;
     }
@@ -2016,21 +2027,23 @@ opcode_invokevirtual(struct stack_frame *frame)
   // Если метод native
   if (target_method->access_flags & ACC_NATIVE)
     {
-      native_func_t native = lookup_native(target_class->this_class,
-                                           target_method->name,
-                                           target_method->descriptor);
+      native_func_t native
+          = lookup_native (target_class->this_class, target_method->name,
+                           target_method->descriptor);
       if (!native)
         {
-          prerr("invokevirtual: Native method %s.%s:%s not found",
-                target_class->this_class, target_method->name, target_method->descriptor);
+          prerr ("invokevirtual: Native method %s.%s:%s not found",
+                 target_class->this_class, target_method->name,
+                 target_method->descriptor);
           frame->error = ENOENT;
           return;
         }
 
-      int native_result = native(new_frame);
+      int native_result = native (new_frame);
       if (native_result != 0)
         {
-          prerr("invokevirtual: Native method returned error: %d", native_result);
+          prerr ("invokevirtual: Native method returned error: %d",
+                 native_result);
           frame->error = native_result;
           return;
         }
@@ -2039,9 +2052,9 @@ opcode_invokevirtual(struct stack_frame *frame)
     }
   else
     {
-      if ((err = call_stack_push(frame->jvm_runtime->call_stack, new_frame)))
+      if ((err = call_stack_push (frame->jvm_runtime->call_stack, new_frame)))
         {
-          prerr("invokevirtual: Call stack overflow");
+          prerr ("invokevirtual: Call stack overflow");
           frame->error = err;
           return;
         }
@@ -2050,7 +2063,6 @@ opcode_invokevirtual(struct stack_frame *frame)
   // Продвигаем PC
   frame->pc += 3;
 }
-
 
 /**
  * Invoke instance method with special handling

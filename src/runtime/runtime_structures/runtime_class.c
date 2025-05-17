@@ -41,12 +41,12 @@ assign_field_slots (struct classloader *classloader, struct jclass *cls,
   for (int i = 0; i < cls->fields_count; i++)
     {
       if (!(cls->fields[i].access_flags & ACC_STATIC))
-      {
+        {
           if (cls->fields[i].slot_id == UINT32_MAX)
-          {
-            already_initialized = 0;
-            break;
-          }
+            {
+              already_initialized = 0;
+              break;
+            }
         }
     }
 
@@ -114,10 +114,10 @@ set_field_type_from_descriptor (struct rt_field *field)
 {
   const char *desc = field->descriptor;
   if (desc == NULL)
-  {
-    prerr ("Can not parse desc");
-    return -1;
-  }
+    {
+      prerr ("Can not parse desc");
+      return -1;
+    }
 
   // Если массив, то это объект
   if (desc[0] == '[')
@@ -257,13 +257,13 @@ search_static_native_methods (struct rt_methods_data *methods_data)
       prerr ("Final static method count mismatch");
       return -1;
     }
-  
+
   if (native_counter != methods_data->native_methods_count)
     {
       prerr ("Final native method count mismatch");
       return -1;
     }
-  
+
   return 0;
 }
 
@@ -516,7 +516,7 @@ find_method_in_current_class (struct jclass *class,
     }
 
   // Метод не найден
-  printf ("Can not find method %s:%s in class %s", name, descriptor,
+  printf ("Can not find method %s:%s in class %s\n", name, descriptor,
           class->this_class);
   *find_method = NULL;
   return -1;

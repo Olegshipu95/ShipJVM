@@ -1,9 +1,9 @@
 #ifndef SHIP_JVM_HEAP_H
 #define SHIP_JVM_HEAP_H
 
+#include "classloader.h"
 #include "java_types.h"
 #include "runtime_class.h"
-#include "classloader.h"
 #include "util.h"
 #include <stdint.h>
 
