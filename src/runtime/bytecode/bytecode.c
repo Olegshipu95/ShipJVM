@@ -52,14 +52,18 @@ _common_load (struct stack_frame *frame, java_value_type type, uint32_t index)
 
 // TODO
 void
-opcode_aaload (struct stack_frame *)
+opcode_aaload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_aastore (struct stack_frame *)
+opcode_aastore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -76,8 +80,10 @@ opcode_aconst_null (struct stack_frame *frame)
 
 // TODO
 void
-opcode_aload (struct stack_frame *)
+opcode_aload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -106,19 +112,25 @@ opcode_aload_3 (struct stack_frame *frame)
 
 // TODO
 void
-opcode_anewarray (struct stack_frame *)
+opcode_anewarray (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_areturn (struct stack_frame *)
+opcode_areturn (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_arraylength (struct stack_frame *)
+opcode_arraylength (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -131,8 +143,10 @@ _common_astore (struct stack_frame *frame, uint32_t index)
 }
 // TODO
 void
-opcode_astore (struct stack_frame *)
+opcode_astore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -160,18 +174,24 @@ opcode_astore_3 (struct stack_frame *frame)
 }
 // TODO
 void
-opcode_athrow (struct stack_frame *)
+opcode_athrow (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_baload (struct stack_frame *)
+opcode_baload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_bastore (struct stack_frame *)
+opcode_bastore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -199,20 +219,26 @@ opcode_bipush (struct stack_frame *frame)
 
 // TODO
 void
-opcode_caload (struct stack_frame *)
+opcode_caload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_castore (struct stack_frame *)
+opcode_castore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_checkcast (struct stack_frame *)
+opcode_checkcast (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -358,26 +384,34 @@ opcode_dadd (struct stack_frame *frame)
 }
 
 void
-opcode_daload (struct stack_frame *)
+opcode_daload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_dastore (struct stack_frame *)
+opcode_dastore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_dcmpg (struct stack_frame *)
+opcode_dcmpg (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_dcmpl (struct stack_frame *)
+opcode_dcmpl (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -402,14 +436,18 @@ opcode_dconst_1 (struct stack_frame *frame)
 
 // TODO
 void
-opcode_ddiv (struct stack_frame *)
+opcode_ddiv (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_dload (struct stack_frame *)
+opcode_dload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -536,14 +574,18 @@ opcode_drem (struct stack_frame *frame)
 
 // TODO
 void
-opcode_dreturn (struct stack_frame *)
+opcode_dreturn (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_dstore (struct stack_frame *)
+opcode_dstore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -724,20 +766,26 @@ opcode_dup_x2 (struct stack_frame *frame)
 
 // TODO
 void
-opcode_dup2 (struct stack_frame *)
+opcode_dup2 (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 } // try to reuse
 
 // TODO
 void
-opcode_dup2_x1 (struct stack_frame *)
+opcode_dup2_x1 (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_dup2_x2 (struct stack_frame *)
+opcode_dup2_x2 (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -884,26 +932,34 @@ opcode_fadd (struct stack_frame *frame)
 
 // TODO
 void
-opcode_faload (struct stack_frame *)
+opcode_faload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_fastore (struct stack_frame *)
+opcode_fastore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_fcmpg (struct stack_frame *)
+opcode_fcmpg (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_fcmpl (struct stack_frame *)
+opcode_fcmpl (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -934,8 +990,10 @@ opcode_fconst_2 (struct stack_frame *frame)
 
 // TODO
 void
-opcode_fdiv (struct stack_frame *)
+opcode_fdiv (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -1037,8 +1095,10 @@ opcode_fmul (struct stack_frame *frame)
 }
 // TODO
 void
-opcode_fneg (struct stack_frame *)
+opcode_fneg (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // {
 //     jvariable val;
@@ -1106,14 +1166,18 @@ opcode_frem (struct stack_frame *frame)
 };
 // TODO
 void
-opcode_freturn (struct stack_frame *)
+opcode_freturn (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_fstore (struct stack_frame *)
+opcode_fstore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -1360,14 +1424,37 @@ opcode_getstatic (struct stack_frame *frame)
   frame->pc += 3; // 1 opcode + 2 bytes operand
 }
 
-void
-opcode_goto (struct stack_frame *)
+static void
+_common_load_2branchbytes_and_jump (struct stack_frame *frame)
 {
+  if (frame->pc + 2 >= frame->code_length)
+    {
+      prerr ("Truncated bytecode: missing two byte operand");
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  int16_t branchoffset = (frame->code[frame->pc + 1].raw_byte << 8)
+                         | frame->code[frame->pc + 2].raw_byte;
+  frame->pc += branchoffset;
+  if (frame->pc >= frame->code_length)
+    {
+      prerr ("Illegal jump: out of range");
+      frame->error = JVM_ILLEGAL_BRANCH_JUMP;
+    }
+}
+
+void
+opcode_goto (struct stack_frame *frame)
+{
+  _common_load_2branchbytes_and_jump (frame);
 }
 // TODO
 void
-opcode_goto_w (struct stack_frame *)
+opcode_goto_w (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -1571,8 +1658,10 @@ opcode_iadd (struct stack_frame *frame)
 }
 // TODO
 void
-opcode_iaload (struct stack_frame *)
+opcode_iaload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -1602,8 +1691,10 @@ opcode_iand (struct stack_frame *frame)
 
 // TODO
 void
-opcode_iastore (struct stack_frame *)
+opcode_iastore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -1696,98 +1787,585 @@ opcode_idiv (struct stack_frame *frame)
   result.value._int = op1.value._int / op2.value._int;
   opstack_push (frame->operand_stack, result);
 }
-// TODO
+
 void
-opcode_if_acmpeq (struct stack_frame *)
+opcode_if_acmpeq (struct stack_frame *frame)
 {
-}
-// TODO
-void
-opcode_if_acmpne (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmpeq (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmpne (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmplt (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmpge (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmpgt (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_if_icmple (struct stack_frame *)
-{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ACMPEQ");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JOBJECT) || check_var_type (&op2, JOBJECT))
+    {
+      prerr ("Type mismatch in ACMPEQ: expected reference");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._object == op2.value._object)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
 }
 
-// TODO
 void
-opcode_ifeq (struct stack_frame *)
+opcode_if_acmpne (struct stack_frame *frame)
 {
-}
-// TODO
-void
-opcode_ifne (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_iflt (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_ifge (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_ifgt (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_ifle (struct stack_frame *)
-{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ACMPNE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JOBJECT) || check_var_type (&op2, JOBJECT))
+    {
+      prerr ("Type mismatch in ACMPNE: expected reference");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._object != op2.value._object)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
 }
 
-// TODO
 void
-opcode_ifnonnull (struct stack_frame *)
+opcode_if_icmpeq (struct stack_frame *frame)
 {
-}
-// TODO
-void
-opcode_ifnull (struct stack_frame *)
-{
-}
-// TODO
-void
-opcode_iinc (struct stack_frame *)
-{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPEQ");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPEQ: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int == op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
 }
 
-// TODO
 void
-opcode_iload (struct stack_frame *)
+opcode_if_icmpne (struct stack_frame *frame)
 {
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPNE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPNE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int != op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_if_icmplt (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPLT");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPLT: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int < op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_if_icmpge (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPGE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPGE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int >= op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_if_icmpgt (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPGT");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPGT: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int > op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_if_icmple (struct stack_frame *frame)
+{
+  jvariable op1, op2;
+
+  if (opstack_pop (frame->operand_stack, &op2)
+      || opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in ICMPLE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT) || check_var_type (&op2, JINT))
+    {
+      prerr ("Type mismatch in ICMPLE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int <= op2.value._int)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_ifeq (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFEQ");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFEQ: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int == 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_ifne (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFNE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFNE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int != 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_iflt (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFLT");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFLT: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int < 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_ifge (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFGE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFGE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int >= 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_ifgt (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFGT");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFGT: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int > 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_ifle (struct stack_frame *frame)
+{
+  jvariable op1;
+
+  if (opstack_pop (frame->operand_stack, &op1))
+    {
+      prerr ("Stack underflow in IFLE");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (check_var_type (&op1, JINT))
+    {
+      prerr ("Type mismatch in IFLE: expected int");
+      frame->error = EINVAL;
+      return;
+    }
+
+  if (op1.value._int <= 0)
+    {
+      _common_load_2branchbytes_and_jump (frame);
+    }
+  else
+    {
+      frame->pc = frame->pc + 3;
+    }
+}
+
+void
+opcode_ifnonnull (struct stack_frame *frame)
+{
+  if (!frame || frame->pc + 2 >= frame->code_length)
+    {
+      prerr ("ifnonnull: Invalid frame or PC out of bounds");
+      frame->error = 1;
+      return;
+    }
+
+  // Считать смещение перехода (signed short)
+  int16_t offset = (int16_t)((frame->code[frame->pc + 1].raw_byte << 8)
+                             | frame->code[frame->pc + 2].raw_byte);
+
+  // Снять объект со стека
+  jvariable value;
+  if (opstack_pop (frame->operand_stack, &value))
+    {
+      prerr ("ifnonnull: Operand stack underflow");
+      frame->error = 1;
+      return;
+    }
+
+  if (value.type != JOBJECT)
+    {
+      prerr ("ifnonnull: Expected object reference, got type %d", value.type);
+      frame->error = 1;
+      return;
+    }
+
+  // Если объект НЕ null — переход
+  if (value.value._object != NULL)
+    {
+      frame->pc += offset;
+    }
+  else
+    {
+      frame->pc += 3;
+    }
+}
+
+void
+opcode_ifnull (struct stack_frame *frame)
+{
+  if (!frame || frame->pc + 2 >= frame->code_length)
+    {
+      prerr ("ifnull: Invalid frame or PC out of bounds");
+      frame->error = 1;
+      return;
+    }
+
+  // Считать смещение
+  int16_t offset = (int16_t)((frame->code[frame->pc + 1].raw_byte << 8)
+                             | frame->code[frame->pc + 2].raw_byte);
+
+  // Снять значение со стека
+  jvariable value;
+  if (opstack_pop (frame->operand_stack, &value))
+    {
+      prerr ("ifnull: Operand stack underflow");
+      frame->error = 1;
+      return;
+    }
+
+  if (value.type != JOBJECT)
+    {
+      prerr ("ifnull: Expected object reference on stack, got type %d",
+             value.type);
+      frame->error = 1;
+      return;
+    }
+
+  if (value.value._object == NULL)
+    {
+      // null -> прыгаем
+      frame->pc += offset;
+    }
+  else
+    {
+      // не null -> просто продолжаем
+      frame->pc += 3;
+    }
+}
+
+void
+opcode_iinc (struct stack_frame *frame)
+{
+  if (!frame || frame->pc + 2 >= frame->code_length)
+    {
+      prerr ("iinc: Invalid frame or PC out of bounds");
+      frame->error = 1;
+      return;
+    }
+
+  uint8_t index
+      = frame->code[frame->pc + 1].raw_byte; // индекс локальной переменной
+  int8_t constant
+      = (int8_t)frame->code[frame->pc + 2].raw_byte; // знаковый инкремент
+
+  jvariable var;
+  if (get_local_var (frame->local_vars, &var, index))
+    {
+      prerr ("iinc: Failed to load local variable at index %d", index);
+      frame->error = 1;
+      return;
+    }
+
+  if (var.type != JINT)
+    {
+      prerr ("iinc: Expected local variable of type JINT at index %d", index);
+      frame->error = 1;
+      return;
+    }
+
+  var.value._int += constant;
+
+  if (store_local_var (frame->local_vars, var, index))
+    {
+      prerr ("iinc: Failed to store incremented value back at index %d",
+             index);
+      frame->error = 1;
+      return;
+    }
+
+  frame->pc += 3; // Пропускаем два байта аргументов
+}
+
+void
+opcode_iload (struct stack_frame *frame)
+{
+  if (!frame || frame->pc + 1 >= frame->code_length)
+    {
+      prerr ("iload: Invalid frame or PC out of range");
+      frame->error = 1;
+      return;
+    }
+
+  uint8_t index
+      = frame->code[frame->pc + 1].raw_byte; // индекс локальной переменной
+
+  jvariable value;
+  if (get_local_var (frame->local_vars, &value, index))
+    {
+      prerr ("iload: Failed to load local variable at index %d", index);
+      frame->error = 1;
+      return;
+    }
+
+  if (value.type != JINT)
+    {
+      prerr ("iload: Type mismatch, expected JINT but got %d", value.type);
+      frame->error = 1;
+      return;
+    }
+
+  if (opstack_push (frame->operand_stack, value))
+    {
+      prerr ("iload: Operand stack overflow");
+      frame->error = 1;
+      return;
+    }
+
+  frame->pc += 2; // Пропускаем байт аргумента (у тебя в execute_frame PC++ уже
+                  // будет)
 }
 
 void
@@ -1878,15 +2456,77 @@ opcode_ineg (struct stack_frame *frame)
       return;
     }
 }
-// TODO
+
+// todo
 void
-opcode_instanceof (struct stack_frame *)
+opcode_instanceof (struct stack_frame * frame)
 {
+  // if (!frame || frame->pc + 2 >= frame->code_length)
+  //   {
+  //     prerr ("instanceof: Invalid frame or PC out of bounds");
+  //     frame->error = 1;
+  //     return;
+  //   }
+
+  // // Получаем индекс из байт-кода
+  // uint16_t index = (frame->code[frame->pc + 1].raw_byte << 8)
+  //                  | frame->code[frame->pc + 2].raw_byte;
+
+  // // Получаем объект с вершины стека
+  // jvariable obj_ref;
+  // if (opstack_pop (frame->operand_stack, &obj_ref))
+  //   {
+  //     prerr ("instanceof: Operand stack underflow");
+  //     frame->error = 1;
+  //     return;
+  //   }
+
+  // if (obj_ref.type != JOBJECT)
+  //   {
+  //     prerr ("instanceof: Expected object reference, got type %d",
+  //            obj_ref.type);
+  //     frame->error = EINVAL;
+  //     return;
+  //   }
+
+  // // Если объект null — результат 0
+  // if (obj_ref.value._object == NULL)
+  //   {
+  //     jvariable result = { .type = JINT, .value._int = 0 };
+  //     opstack_push (frame->operand_stack, result);
+  //     frame->pc += 3;
+  //     return;
+  //   }
+
+  // // Получаем имя класса из constant pool
+  // struct runtime_cp *cp_entry = &frame->class->runtime_cp[index - 1];
+
+  // if (cp_entry->tag != CLASS)
+  //   {
+  //     prerr ("instanceof: Failed to resolve class at CP index %u", index);
+  //     frame->error = EINVAL;
+  //     return;
+  //   }
+
+  // string targer_class_name = cp_entry->class_name;
+
+  // // Проверяем тип объекта (нужно реализовать эту функцию где-то)
+  // int is_instance = is_instanceof (obj_ref.value._object, targer_class_name);
+
+  // jvariable result = { .type = JINT, .value._int = is_instance ? 1 : 0 };
+  // opstack_push (frame->operand_stack, result);
+
+  // frame->pc += 3;
+  frame->error = EINVAL;
+  return;
 }
+
 // TODO
 void
-opcode_invokedynamic (struct stack_frame *)
+opcode_invokedynamic (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -2373,7 +3013,7 @@ opcode_invokestatic (struct stack_frame *frame)
  * Stack: ..., objectref, [arg1, arg2, ...] -> ...
  */
 void
-opcode_invokeinterface (struct stack_frame *)
+opcode_invokeinterface (struct stack_frame *frame)
 {
   /*
   // 1. Проверка доступности операндов
@@ -2488,6 +3128,8 @@ opcode_invokeinterface (struct stack_frame *)
   // 15. Обновление PC (4 байта операнда)
   frame->pc += 4;
   */
+ frame->error = EINVAL;
+ return;
 }
 
 void
@@ -2609,19 +3251,56 @@ opcode_ireturn (struct stack_frame *frame)
 
 // TODO
 void
-opcode_ishl (struct stack_frame *)
+opcode_ishl (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_ishr (struct stack_frame *)
+opcode_ishr (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
-// TODO
 void
-opcode_istore (struct stack_frame *)
+opcode_istore (struct stack_frame *frame)
 {
+  if (!frame || frame->pc + 1 >= frame->code_length)
+    {
+      prerr ("istore: Invalid frame or PC out of range");
+      frame->error = 1;
+      return;
+    }
+
+  uint8_t index = frame->code[frame->pc + 1].raw_byte;
+  // printf ("OPCODE ISTORE: index - %hhu", index);
+
+  jvariable value;
+  if (opstack_pop (frame->operand_stack, &value))
+    {
+      prerr ("istore: Stack underflow");
+      frame->error = 1;
+      return;
+    }
+
+  if (value.type != JINT)
+    {
+      prerr ("istore: Type mismatch, expected JINT but got %d", value.type);
+      frame->error = 1;
+      return;
+    }
+
+  if (store_local_var (frame->local_vars, value, index))
+    {
+      prerr ("istore: Failed to store local variable at index %d", index);
+      frame->error = 1;
+      return;
+    }
+
+  frame->pc
+      += 2; // Пропускаем байт аргумента (у тебя в основном теле PC++ уже есть)
 }
 
 void
@@ -2721,13 +3400,17 @@ opcode_ixor (struct stack_frame *frame)
 }
 // TODO
 void
-opcode_jsr (struct stack_frame *)
+opcode_jsr (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_jsr_w (struct stack_frame *)
+opcode_jsr_w (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -2842,9 +3525,12 @@ opcode_ladd (struct stack_frame *frame)
 
 // TODO
 void
-opcode_laload (struct stack_frame *)
+opcode_laload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
+
 void
 opcode_land (struct stack_frame *frame)
 {
@@ -2876,8 +3562,10 @@ opcode_land (struct stack_frame *frame)
 }
 // TODO
 void
-opcode_lastore (struct stack_frame *)
+opcode_lastore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -3034,24 +3722,33 @@ opcode_ldc (struct stack_frame *)
 }
 // TODO
 void
-opcode_ldc_w (struct stack_frame *)
+opcode_ldc_w (struct stack_frame *frame)
 {
-}
-// TODO
-void
-opcode_ldc2_w (struct stack_frame *)
-{
+  frame->error = EINVAL;
+  return;
 }
 
 // TODO
 void
-opcode_ldiv (struct stack_frame *)
+opcode_ldc2_w (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
+}
+
+// TODO
+void
+opcode_ldiv (struct stack_frame *frame)
+{
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_lload (struct stack_frame *)
+opcode_lload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 void
 opcode_lload_0 (struct stack_frame *frame)
@@ -3143,8 +3840,10 @@ opcode_lneg (struct stack_frame *frame)
 
 // TODO
 void
-opcode_lookupswitch (struct stack_frame *)
+opcode_lookupswitch (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -3219,8 +3918,10 @@ opcode_lrem (struct stack_frame *frame)
 
 // TODO
 void
-opcode_lreturn (struct stack_frame *)
+opcode_lreturn (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -3415,20 +4116,23 @@ opcode_lxor (struct stack_frame *frame)
 }
 // TODO
 void
-opcode_monitorenter (struct stack_frame *)
+opcode_monitorenter (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
 }
 // TODO
 void
-opcode_monitorexit (struct stack_frame *)
+opcode_monitorexit (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
 }
 // TODO
 void
-opcode_multianewarray (struct stack_frame *)
+opcode_multianewarray (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
-// TODO
 
 void
 opcode_new (struct stack_frame *frame)
@@ -3522,8 +4226,10 @@ opcode_new (struct stack_frame *frame)
 
 // TODO
 void
-opcode_newarray (struct stack_frame *)
+opcode_newarray (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void
@@ -3813,33 +4519,45 @@ opcode_return (struct stack_frame *frame)
 }
 // TODO
 void
-opcode_saload (struct stack_frame *)
+opcode_saload (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_sastore (struct stack_frame *)
+opcode_sastore (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_sipush (struct stack_frame *)
+opcode_sipush (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_swap (struct stack_frame *)
+opcode_swap (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_tableswitch (struct stack_frame *)
+opcode_tableswitch (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 // TODO
 void
-opcode_wide (struct stack_frame *)
+opcode_wide (struct stack_frame *frame)
 {
+  frame->error = EINVAL;
+  return;
 }
 
 void

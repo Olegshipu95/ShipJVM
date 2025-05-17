@@ -575,7 +575,6 @@ copy_arguments (struct stack_frame *caller, struct stack_frame *callee,
   return 0;
 }
 
-
 int
 execute_frame (struct jvm *jvm, struct stack_frame *frame)
 {
@@ -636,16 +635,16 @@ ensure_class_initialized (struct jvm *jvm, struct jclass *cls)
   if (!find_method_in_current_class (cls, &clinit_method, "<clinit>", "()V"))
     {
       // IT IS VERY BAD, NEED CHANGE. TODO
-      struct jvm *clinit_jvm = new_jvm();
+      struct jvm *clinit_jvm = new_jvm ();
       clinit_jvm->classloader = jvm->classloader;
-      heap_destroy(clinit_jvm->heap);
+      heap_destroy (clinit_jvm->heap);
       clinit_jvm->heap = jvm->heap;
 
       if (new_call_stack (&clinit_jvm->call_stack))
-      {
-        prerr ("Call stack creation failed");
-        return -1;
-      }
+        {
+          prerr ("Call stack creation failed");
+          return -1;
+        }
 
       struct stack_frame *clinit_frame
           = init_stack_frame (cls, clinit_method, clinit_jvm);
