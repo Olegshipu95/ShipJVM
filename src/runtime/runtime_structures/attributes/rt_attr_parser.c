@@ -641,6 +641,8 @@ parse_rt_constantValue_attribute (struct runtime_cp *rt_cp,
         }
       // val.type = JOBJECT;
       // val.value._object = entry->string_object;
+      prerr ("Can not parse String object");
+      return JVM_INVALID_BYTECODE;
       break;
 
     default:

@@ -1,4 +1,4 @@
-public class New extends Parent {
+public class New extends New_Parent {
 
   int i;
   int b;

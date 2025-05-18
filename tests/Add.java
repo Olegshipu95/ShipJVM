@@ -1,5 +1,5 @@
 public class Add {
-    static int aboba = 100;
+    static final int aboba = 100;
 
     public static int add2(int i, int b)
     {
@@ -15,5 +15,6 @@ public class Add {
         int i = -1;
         int i2 = 4;
 		int i3 = add(i, i2);
+        int i4 = i3 + i2 + i;
     }
 }

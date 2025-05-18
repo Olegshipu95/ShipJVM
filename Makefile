@@ -43,6 +43,11 @@ BUILD_DIR ?= ./build
 # Добавляем пути к include в CFLAGS
 CFLAGS += $(addprefix -I,$(INCLUDE_DIRS))
 
+# Каталоги и файлы для тестов
+TESTS_DIR := ./tests
+JAVA_SOURCES := $(shell find $(TESTS_DIR) -name '*.java')
+JAVA_CLASSES := $(JAVA_SOURCES:.java=.class)
+
 # Автоматический поиск исходных файлов во всех поддиректориях src
 SOURCES = $(shell find $(SRC_DIR) -name '*.c')
 OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
@@ -148,6 +153,7 @@ analyze:
 clean:
 	rm -rf $(BUILD_DIR) $(TARGET) $(DEBUG_TARGET) $(SANITIZE_TARGET) \
         $(TSAN_TARGET) $(MSAN_TARGET) *.gcov *.gcda *.gcno
+	find $(TESTS_DIR) -name '*.class' -delete
 
 # Установка зависимостей
 deps:
@@ -189,6 +195,10 @@ check_circular_includes:
 		echo "Error: Circular includes detected!"; \
 		exit 1; \
 	fi
+
+# Цель для компиляции всех Java тестов
+compile_tests:
+	javac $(JAVA_SOURCES)
 
 .PHONY: all release debug sanitize tsan msan \
         run run_debug run_sanitize run_tsan run_msan \

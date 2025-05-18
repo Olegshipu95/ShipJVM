@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/include/classfile",
+                "${workspaceFolder}/include/runtime",
+                "${workspaceFolder}/include/runtime/bytecode",
+                "${workspaceFolder}/include/runtime/runtime_structures",
+                "${workspaceFolder}/include/runtime/runtime_structures/attributes",
+                "${workspaceFolder}/include/runtime/runtime_structures/jni",
+                "${workspaceFolder}/include/util",
+                "${workspaceFolder}/include/classloader",
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/classfile",
+                "${workspaceFolder}/src/runtime",
+                "/usr/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
