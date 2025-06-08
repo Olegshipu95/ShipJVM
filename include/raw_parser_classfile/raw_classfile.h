@@ -1,11 +1,11 @@
-#ifndef SHIP_JVM_CLASSFILE_H
-#define SHIP_JVM_CLASSFILE_H
+#ifndef SHIP_JVM_RAW_CLASSFILE_H
+#define SHIP_JVM_RAW_CLASSFILE_H
 
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "attribute_info.h"
-#include "constant_pool.h"
+#include "raw_attribute_info.h"
+#include "raw_constant_pool.h"
 #include "util.h"
 
 struct field_info

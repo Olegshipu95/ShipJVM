@@ -1,7 +1,7 @@
 #ifndef SHIP_JVM_RT_ATTR_PARSER_H
 #define SHIP_JVM_RT_ATTR_PARSER_H
 
-#include "attribute_info.h"
+#include "raw_attribute_info.h"
 #include "runtime_attribute.h"
 #include "runtime_constpool.h"
 

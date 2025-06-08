@@ -63,6 +63,9 @@
         "types.h": "c",
         "native_types.h": "c",
         "runtime_attribute.h": "c",
-        "bytecode_opcode_table.h": "c"
+        "bytecode_opcode_table.h": "c",
+        "raw_attribute_info.h": "c",
+        "raw_classfile.h": "c",
+        "raw_constant_pool.h": "c"
     }
 }

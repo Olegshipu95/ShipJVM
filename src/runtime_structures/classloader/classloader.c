@@ -2,8 +2,8 @@
 
 #include "classloader.h"
 #include "heap.h"
-#include "classfile.h"
-#include "classfile_parser.h"
+#include "raw_classfile.h"
+#include "raw_classfile_parser.h"
 #include "util.h"
 #include "rt_attr_parser.h"
 

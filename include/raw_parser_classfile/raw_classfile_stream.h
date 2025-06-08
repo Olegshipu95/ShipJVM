@@ -1,5 +1,5 @@
-#ifndef SHIP_JVM_CLASSFILE_STREAM_H
-#define SHIP_JVM_CLASSFILE_STREAM_H
+#ifndef SHIP_JVM_RAW_CLASSFILE_STREAM_H
+#define SHIP_JVM_RAW_CLASSFILE_STREAM_H
 #include <stdint.h>
 #include <stdio.h>
 

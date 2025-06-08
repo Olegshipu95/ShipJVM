@@ -1,6 +1,6 @@
 #include "runtime_class_util.h"
 
-#include "classfile.h"
+#include "raw_classfile.h"
 #include "rt_attr_parser.h"
 
 int

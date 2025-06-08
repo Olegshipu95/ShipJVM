@@ -1,4 +1,4 @@
-#include "classfile_parser.h"
+#include "raw_classfile_parser.h"
 
 int
 parse_const_pool (struct class_file *class, Loader *loader)

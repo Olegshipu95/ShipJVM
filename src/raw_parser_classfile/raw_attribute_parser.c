@@ -1,4 +1,4 @@
-#include "attribute_parser.h"
+#include "raw_attribute_parser.h"
 
 struct attribute_info *
 parse_attribute (Loader *loader, struct class_file *class)

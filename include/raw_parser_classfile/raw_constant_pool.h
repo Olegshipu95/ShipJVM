@@ -1,12 +1,12 @@
-#ifndef SHIP_JVM_CONSTANT_POOL_H
-#define SHIP_JVM_CONSTANT_POOL_H
+#ifndef SHIP_JVM_RAW_CONSTANT_POOL_H
+#define SHIP_JVM_RAW_CONSTANT_POOL_H
 
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "classfile_stream.h"
+#include "raw_classfile_stream.h"
 #include "util.h"
 
 enum CONSTANT_POOL_TAG

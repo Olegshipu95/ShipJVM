@@ -1,7 +1,7 @@
 #ifndef SHIP_JVM_RUNTIME_CP_H
 #define SHIP_JVM_RUNTIME_CP_H
 
-#include "constant_pool.h"
+#include "raw_constant_pool.h"
 #include "java_types.h"
 
 struct rt_name_and_type

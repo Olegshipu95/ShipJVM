@@ -1,12 +1,12 @@
-#ifndef SHIP_JVM_ATTR_PARSER_H
-#define SHIP_JVM_ATTR_PARSER_H
+#ifndef SHIP_JVM_RAW_ATTR_PARSER_H
+#define SHIP_JVM_RAW_ATTR_PARSER_H
 
 #include <stdlib.h>
 
-#include "attribute_info.h"
-#include "classfile.h"
-#include "classfile_stream.h"
-#include "constant_pool.h"
+#include "raw_attribute_info.h"
+#include "raw_classfile.h"
+#include "raw_classfile_stream.h"
+#include "raw_constant_pool.h"
 #include "util.h"
 
 struct attribute_info *parse_attribute (Loader *loader,

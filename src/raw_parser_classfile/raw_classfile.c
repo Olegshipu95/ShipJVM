@@ -1,4 +1,4 @@
-#include "classfile.h"
+#include "raw_classfile.h"
 void
 init_class_file (struct class_file *class)
 {

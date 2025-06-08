@@ -1,5 +1,5 @@
-#ifndef SHIP_JVM_ATTR_INFO_H
-#define SHIP_JVM_ATTR_INFO_H
+#ifndef SHIP_JVM_RAW_ATTR_INFO_H
+#define SHIP_JVM_RAW_ATTR_INFO_H
 
 #include <stdint.h>
 

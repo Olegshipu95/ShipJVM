@@ -1,4 +1,4 @@
-#include "constant_pool.h"
+#include "raw_constant_pool.h"
 
 int
 read_utf8_info (Loader *loader, struct UTF8_info *utf8)

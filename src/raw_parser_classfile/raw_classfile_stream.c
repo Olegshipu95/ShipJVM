@@ -1,4 +1,4 @@
-#include "classfile_stream.h"
+#include "raw_classfile_stream.h"
 
 void
 loader_read_bytes (Loader *loader, uint8_t *buf, size_t n)
