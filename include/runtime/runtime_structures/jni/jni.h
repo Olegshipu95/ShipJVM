@@ -2,8 +2,6 @@
 #define SHIP_JVM_JNI_H
 
 #include "native_types.h"
-#include "stack_frames.h"
-#include "util.h"
 
 struct jni_native_method
 {

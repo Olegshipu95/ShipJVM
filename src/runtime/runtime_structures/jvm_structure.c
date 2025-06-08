@@ -1,6 +1,8 @@
 #include "jvm_structure.h"
+#include "util.h"
+#include "heap.h"
 
-struct jvm *
+struct jvm*
 new_jvm ()
 {
   int err;

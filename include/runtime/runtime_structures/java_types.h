@@ -1,10 +1,7 @@
 #ifndef SHIP_JVM_JAVA_TYPES_H
 #define SHIP_JVM_JAVA_TYPES_H
 
-#include "util.h"
-#include <errno.h>
 #include <stdint.h>
-#include <stdio.h>
 
 typedef void *jobject; // Basic reference type
 

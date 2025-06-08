@@ -61,6 +61,8 @@
         "jni_java_lang_object.h": "c",
         "unistd.h": "c",
         "types.h": "c",
-        "native_types.h": "c"
+        "native_types.h": "c",
+        "runtime_attribute.h": "c",
+        "bytecode_opcode_table.h": "c"
     }
 }

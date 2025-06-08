@@ -1,4 +1,6 @@
 #include "jni_registry.h"
+#include "jni.h"
+#include "util.h"
 
 extern const struct jni_native_method java_lang_Object_natives[];
 

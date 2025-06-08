@@ -5,3 +5,5 @@ jvm_sanitize
 jvm_tsan
 jvm_msan
 tests/*.class
+compile_commands.json
+.cache

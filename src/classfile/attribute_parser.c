@@ -781,9 +781,10 @@ read_attributes (Loader *loader, struct class_file *class,
 int
 parse_ConstantValue_at (Loader *loader, struct ConstantValue_attribute *attr)
 {
-  if (attr == NULL) {
-    return EINVAL;
-  }
+  if (attr == NULL)
+    {
+      return EINVAL;
+    }
   attr->constant_value_index = loader_u2 (loader);
   return 0;
 }
@@ -1414,37 +1415,40 @@ parse_SourceDebugExtension_at (Loader *loader,
   return 0;
 }
 
-int
-parse_element_value (Loader *loader, struct element_value *elem);
+int parse_element_value (Loader *loader, struct element_value *elem);
 
-static
-int
-parse_RuntimeVisibleAnnotations_annotation(Loader *loader, struct annotation *a)
+static int
+parse_RuntimeVisibleAnnotations_annotation (Loader *loader,
+                                            struct annotation *a)
 {
-  a->type_index = loader_u2(loader);
-  a->num_element_value_pairs = loader_u2(loader);
+  a->type_index = loader_u2 (loader);
+  a->num_element_value_pairs = loader_u2 (loader);
 
-  if ( a->num_element_value_pairs ) {
-    a->element_value_pairs = (struct element_value_pairs *)
-      (malloc(a->num_element_value_pairs * sizeof(struct element_value_pairs)));
-    
-    if ( !a->element_value_pairs ) {
-      prerr (": can not allocate memory for element_value_pairs in "
-             "RuntimeVisibleAnnotations.annotations");
-      return ENOMEM;
-    }
-  }
+  if (a->num_element_value_pairs)
+    {
+      a->element_value_pairs = (struct element_value_pairs *)(malloc (
+          a->num_element_value_pairs * sizeof (struct element_value_pairs)));
 
-  for ( uint16_t i = 0; i < a->num_element_value_pairs; ++i ) {
-    struct element_value_pairs *elt = a->element_value_pairs + i;
-    elt->element_name_index = loader_u2(loader);
-    int rc = parse_element_value(loader, &(elt->value));
-    if ( rc != 0 ) {
-      prerr(" in parse_RuntimeVisibleAnnotations_annotation");
-      free(a->element_value_pairs);
-      return rc;
+      if (!a->element_value_pairs)
+        {
+          prerr (": can not allocate memory for element_value_pairs in "
+                 "RuntimeVisibleAnnotations.annotations");
+          return ENOMEM;
+        }
     }
-  }
+
+  for (uint16_t i = 0; i < a->num_element_value_pairs; ++i)
+    {
+      struct element_value_pairs *elt = a->element_value_pairs + i;
+      elt->element_name_index = loader_u2 (loader);
+      int rc = parse_element_value (loader, &(elt->value));
+      if (rc != 0)
+        {
+          prerr (" in parse_RuntimeVisibleAnnotations_annotation");
+          free (a->element_value_pairs);
+          return rc;
+        }
+    }
 
   return 0;
 }
@@ -1453,31 +1457,39 @@ int
 parse_RuntimeVisibleAnnotations_at (
     Loader *loader, struct RuntimeVisibleAnnotations_attribute *attr)
 {
-  if ( !attr ) {
-    return EINVAL;
-  }
-
-  attr->num_annotations = loader_u2(loader);
-  if ( attr->num_annotations ) {
-    attr->annotations = (struct annotation *)(malloc(attr->num_annotations * sizeof(struct annotation)));
-    if ( !attr->annotations ) {
-      prerr (": can not allocate memory for annotations in "
-             "RuntimeVisibleAnnotations");
-      return ENOMEM;
+  if (!attr)
+    {
+      return EINVAL;
     }
-  }
 
-  for ( uint16_t i = 0; i < attr->num_annotations; ++i ) {
-    int rc = parse_RuntimeVisibleAnnotations_annotation(loader, attr->annotations + i);
-    if ( rc != 0 ) {
-      for ( uint16_t j = 0; j < i; ++j ) {
-        struct annotation *elt = attr->annotations + j;
-        free(elt->element_value_pairs);
-      }
-
-      return rc;
+  attr->num_annotations = loader_u2 (loader);
+  if (attr->num_annotations)
+    {
+      attr->annotations = (struct annotation *)(malloc (
+          attr->num_annotations * sizeof (struct annotation)));
+      if (!attr->annotations)
+        {
+          prerr (": can not allocate memory for annotations in "
+                 "RuntimeVisibleAnnotations");
+          return ENOMEM;
+        }
     }
-  }
+
+  for (uint16_t i = 0; i < attr->num_annotations; ++i)
+    {
+      int rc = parse_RuntimeVisibleAnnotations_annotation (
+          loader, attr->annotations + i);
+      if (rc != 0)
+        {
+          for (uint16_t j = 0; j < i; ++j)
+            {
+              struct annotation *elt = attr->annotations + j;
+              free (elt->element_value_pairs);
+            }
+
+          return rc;
+        }
+    }
 
   return 0;
 }
@@ -1676,26 +1688,26 @@ parse_RuntimeInvisibleParameterAnnotations_at (
   return 0;
 }
 
-static
-int
-parse_type_annotation (
-Loader *loader, struct type_annotation *ta)
+static int
+parse_type_annotation (Loader *loader, struct type_annotation *ta)
 {
-  ta->target_type = loader_u1(loader);
-  switch ( ta->target_type ) {
+  ta->target_type = loader_u1 (loader);
+  switch (ta->target_type)
+    {
     case 0x00:
     case 0x01:
-      ta->target_info.type_parameter.type_parameter_index = loader_u1(loader);
+      ta->target_info.type_parameter.type_parameter_index = loader_u1 (loader);
       break;
 
     case 0x10:
-      ta->target_info.supertype.supertype_index = loader_u2(loader);
+      ta->target_info.supertype.supertype_index = loader_u2 (loader);
       break;
 
     case 0x11:
     case 0x12:
-      ta->target_info.type_parameter_bound.type_parameter_index = loader_u1(loader);
-      ta->target_info.type_parameter_bound.bound_index = loader_u1(loader);
+      ta->target_info.type_parameter_bound.type_parameter_index
+          = loader_u1 (loader);
+      ta->target_info.type_parameter_bound.bound_index = loader_u1 (loader);
       break;
 
     case 0x13:
@@ -1705,54 +1717,63 @@ Loader *loader, struct type_annotation *ta)
       break;
 
     case 0x16:
-      ta->target_info.formal_parameter.formal_parameter_index = loader_u1(loader);
+      ta->target_info.formal_parameter.formal_parameter_index
+          = loader_u1 (loader);
       break;
 
     case 0x17:
-      ta->target_info.throws.throws_type_index = loader_u2(loader);
+      ta->target_info.throws.throws_type_index = loader_u2 (loader);
       break;
 
     default:
-      prerr("unknown target_type %d while parsing type_annotation", ta->target_type);
+      prerr ("unknown target_type %d while parsing type_annotation",
+             ta->target_type);
       return -1;
-  }
-
-  ta->target_path.path_length = loader_u1(loader);
-  ta->target_path.path = (struct type_path_path *)
-    (malloc(sizeof(struct type_path_path) * ta->target_path.path_length));
-
-  if ( !ta->target_path.path ) {
-    prerr("unable to allocate memory for path in type_annotation.target_path");
-    return ENOMEM;
-  }
-
-  for ( uint8_t i = 0; i < ta->target_path.path_length; ++i ) {
-    ta->target_path.path[i].type_path_kind = loader_u1(loader);
-    ta->target_path.path[i].type_argument_index = loader_u1(loader);
-  }
-
-  ta->type_index = loader_u2(loader);
-  ta->num_element_value_pairs = loader_u2(loader);
-  ta->element_value_pairs = (struct element_value_pairs *)
-    (malloc(sizeof(struct element_value_pairs) * ta->num_element_value_pairs));
-
-  if ( !ta->element_value_pairs ) {
-    prerr("unable to allocate memory for element_value_pairs in type_annotation");
-    free(ta->target_path.path);
-    return ENOMEM;
-  }
-
-  for ( uint16_t i = 0; i < ta->num_element_value_pairs; ++i ) {
-    struct element_value_pairs *elt = ta->element_value_pairs + i;
-    elt->element_name_index = loader_u2(loader);
-    int rc = parse_element_value(loader, &(elt->value));
-    if ( rc != 0 ) {
-      prerr(" in parse_type_annotation");
-      free(ta->element_value_pairs);
-      free(ta->target_path.path);
-      return rc;
     }
-  }
+
+  ta->target_path.path_length = loader_u1 (loader);
+  ta->target_path.path = (struct type_path_path *)(malloc (
+      sizeof (struct type_path_path) * ta->target_path.path_length));
+
+  if (!ta->target_path.path)
+    {
+      prerr (
+          "unable to allocate memory for path in type_annotation.target_path");
+      return ENOMEM;
+    }
+
+  for (uint8_t i = 0; i < ta->target_path.path_length; ++i)
+    {
+      ta->target_path.path[i].type_path_kind = loader_u1 (loader);
+      ta->target_path.path[i].type_argument_index = loader_u1 (loader);
+    }
+
+  ta->type_index = loader_u2 (loader);
+  ta->num_element_value_pairs = loader_u2 (loader);
+  ta->element_value_pairs = (struct element_value_pairs *)(malloc (
+      sizeof (struct element_value_pairs) * ta->num_element_value_pairs));
+
+  if (!ta->element_value_pairs)
+    {
+      prerr ("unable to allocate memory for element_value_pairs in "
+             "type_annotation");
+      free (ta->target_path.path);
+      return ENOMEM;
+    }
+
+  for (uint16_t i = 0; i < ta->num_element_value_pairs; ++i)
+    {
+      struct element_value_pairs *elt = ta->element_value_pairs + i;
+      elt->element_name_index = loader_u2 (loader);
+      int rc = parse_element_value (loader, &(elt->value));
+      if (rc != 0)
+        {
+          prerr (" in parse_type_annotation");
+          free (ta->element_value_pairs);
+          free (ta->target_path.path);
+          return rc;
+        }
+    }
 
   return 0;
 }
@@ -1772,21 +1793,24 @@ parse_RuntimeVisibleTypeAnnotations_at (
   attr->type_annotation
       = my_alloc_array (struct type_annotation, attr->num_annotations);
 
-  if (attr->type_annotation == NULL) {
-    prerr ("can not allocate memory for type_annotation in "
-           "RuntimeVisibleTypeAnnotations");
-    return ENOMEM;
-  }
-
-  for ( uint16_t i = 0; i < attr->num_annotations; ++i ) {
-    struct type_annotation *elt = attr->type_annotation + i;
-    int rc = parse_type_annotation(loader, elt);
-    if ( rc != 0 ) {
-      prerr(" at parse_RuntimeVisibleTypeAnnotations_at");
-      free(attr->type_annotation);
-      return rc;
+  if (attr->type_annotation == NULL)
+    {
+      prerr ("can not allocate memory for type_annotation in "
+             "RuntimeVisibleTypeAnnotations");
+      return ENOMEM;
     }
-  }
+
+  for (uint16_t i = 0; i < attr->num_annotations; ++i)
+    {
+      struct type_annotation *elt = attr->type_annotation + i;
+      int rc = parse_type_annotation (loader, elt);
+      if (rc != 0)
+        {
+          prerr (" at parse_RuntimeVisibleTypeAnnotations_at");
+          free (attr->type_annotation);
+          return rc;
+        }
+    }
 
   return 0;
 }
@@ -1804,16 +1828,19 @@ parse_RuntimeInvisibleTypeAnnotations_at (
 }
 
 int
-parse_AnnotationDefault_at (Loader *loader, struct AnnotationDefault_attribute *attr)
+parse_AnnotationDefault_at (Loader *loader,
+                            struct AnnotationDefault_attribute *attr)
 {
-  if (attr == NULL) {
-    return EINVAL;
-  }
+  if (attr == NULL)
+    {
+      return EINVAL;
+    }
 
-  int rc = parse_element_value(loader, &(attr->default_value));
-  if ( rc != 0 ) {
-    prerr(" at parse_AnnotationDefault_at");
-  }
+  int rc = parse_element_value (loader, &(attr->default_value));
+  if (rc != 0)
+    {
+      prerr (" at parse_AnnotationDefault_at");
+    }
 
   return rc;
 }

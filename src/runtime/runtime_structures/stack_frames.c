@@ -1,4 +1,8 @@
 #include "stack_frames.h"
+#include "runtime_attribute.h"
+#include "classloader.h"
+#include "string.h"
+#include "runtime_class_util.h"
 
 int
 init_operand_stack (struct operand_stack *opstack, uint16_t max_stack)
@@ -693,7 +697,8 @@ find_method_in_hierarchy (struct jvm *jvm, struct jclass *start,
         break;
 
       struct jclass *super;
-      if (classloader_load_class (jvm->classloader, cls->super_class, &super))
+      if (classloader_load_class (jvm->classloader, jvm->heap,
+                                  cls->super_class, &super))
         return ENOENT;
 
       cls = super;

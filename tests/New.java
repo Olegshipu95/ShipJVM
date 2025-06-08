@@ -1,5 +1,6 @@
 public class New extends New_Parent {
 
+  static New New_object = new New(1,2);
   int i;
   int b;
 

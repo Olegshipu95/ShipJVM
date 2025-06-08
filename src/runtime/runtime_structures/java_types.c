@@ -1,5 +1,7 @@
 #include "java_types.h"
-
+#include "util.h"
+#include "errno.h"
+#include "stdio.h"
 jvariable
 create_variable (java_value_type type)
 {

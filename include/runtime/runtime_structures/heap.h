@@ -1,10 +1,8 @@
 #ifndef SHIP_JVM_HEAP_H
 #define SHIP_JVM_HEAP_H
 
-#include "classloader.h"
 #include "java_types.h"
 #include "runtime_class.h"
-#include "util.h"
 #include <stdint.h>
 
 #define INITIAL_HEAP_CAPACITY 5000
@@ -28,8 +26,8 @@ struct heap
   size_t object_count;
 };
 
-int heap_init (struct heap **new_heap);
-void heap_destroy (struct heap *heap);
+int heap_init (struct heap** heap);
+void heap_destroy (struct heap* java_heap);
 
 heap_object *heap_alloc_object (struct classloader *loader, struct heap *heap,
                                 struct jclass *jclass);

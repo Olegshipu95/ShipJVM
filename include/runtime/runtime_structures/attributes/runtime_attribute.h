@@ -3,9 +3,10 @@
 
 #include <stdint.h>
 
-#include "bytecodes.h"
-#include "util.h"
+#include "bytecode_opcode_table.h"
 #include "java_types.h"
+#include "util.h"
+
 // /* Verification type tags */
 // #define ITEM_Top 0
 // #define ITEM_Integer 1

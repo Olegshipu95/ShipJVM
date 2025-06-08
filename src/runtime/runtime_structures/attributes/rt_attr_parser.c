@@ -1,4 +1,6 @@
 #include "rt_attr_parser.h"
+#include "bytecode_opcode_table.h"
+
 
 #define PARSE_ATTRIBUTE_BASE(TYPE, NAME, LENGTH)                              \
   TYPE *attr = my_alloc (TYPE);                                               \
@@ -353,7 +355,7 @@ parse_rt_stackMapTable_attribute (struct runtime_cp *rt_cp,
                                   uint16_t runtime_cp_count)
 {
   uint16_t iter;
-  int err;
+  int err = 0;
   attr->number_of_entries = old_attr->number_of_entries;
   attr->entries
       = my_alloc_array (union rt_stack_map_frame, attr->number_of_entries);
@@ -595,11 +597,11 @@ parse_rt_code_attribute (struct runtime_cp *rt_cp,
 // ---- ConstantValue Attribute ----
 
 int
-parse_rt_constantValue_attribute (struct runtime_cp *rt_cp,
-                                  struct rt_constantValue_attribute *attr,
-                                  struct ConstantValue_attribute *old_attr,
-                                  uint16_t runtime_cp_count)
+parse_rt_constantValue_attribute (struct runtime_cp *,
+                                  struct rt_constantValue_attribute *,
+                                  struct ConstantValue_attribute *, uint16_t)
 {
+  /*
   if (!rt_cp || !attr || !old_attr)
     return EINVAL;
 
@@ -646,15 +648,14 @@ parse_rt_constantValue_attribute (struct runtime_cp *rt_cp,
       break;
 
     default:
-      prerr ("ConstantValue: invalid CP tag=%d at index=%d", entry->tag, index);
-      return JVM_INVALID_BYTECODE;
+      prerr ("ConstantValue: invalid CP tag=%d at index=%d", entry->tag,
+  index); return JVM_INVALID_BYTECODE;
     }
 
   attr->constant_value = val;
-
-  return 0;
+*/
+  return -1;
 }
-
 
 // ---- PARSE ATTRIBUTES ----
 

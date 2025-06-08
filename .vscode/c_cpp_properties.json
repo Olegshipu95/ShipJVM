@@ -10,6 +10,7 @@
                 "${workspaceFolder}/include/runtime/runtime_structures",
                 "${workspaceFolder}/include/runtime/runtime_structures/attributes",
                 "${workspaceFolder}/include/runtime/runtime_structures/jni",
+                "${workspaceFolder}/include/runtime/runtime_structures/runtime_class",
                 "${workspaceFolder}/include/util",
                 "${workspaceFolder}/include/classloader",
                 "${workspaceFolder}/src",

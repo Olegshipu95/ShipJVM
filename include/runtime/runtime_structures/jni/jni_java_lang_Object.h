@@ -2,8 +2,6 @@
 #define SHIP_JVM_JNI_JAVA_LANG_OBJECT_H
 
 #include "jni.h"
-#include <stdio.h>
-#include <string.h>
 
 int native_Object_init (struct stack_frame *frame);
 int native_Object_registerNatives (struct stack_frame *frame);

@@ -1,11 +1,14 @@
 #include "heap.h"
+#include "util.h"
+#include "classloader.h"
 
 int
-heap_init (struct heap **new_heap)
+heap_init (struct heap ** new_heap)
 {
   struct heap *heap = my_alloc (struct heap);
   heap->capacity = INITIAL_HEAP_CAPACITY;
   heap->used = 0;
+
   heap->memory = malloc (INITIAL_HEAP_CAPACITY);
   if (!heap->memory)
     return -1;
@@ -24,8 +27,9 @@ heap_init (struct heap **new_heap)
 }
 
 void
-heap_destroy (struct heap *heap)
+heap_destroy (struct heap* java_heap)
 {
+  const struct heap *heap = java_heap;
   for (size_t i = 0; i < heap->object_count; i++)
     {
       if (heap->objects[i])
@@ -37,11 +41,12 @@ heap_destroy (struct heap *heap)
 
   free (heap->objects);
   free (heap->memory);
-  free (heap);
+  free ((void *)heap);
 }
 
 int
-count_instance_fields (struct classloader *classloader, struct jclass *cls)
+count_instance_fields (struct classloader *classloader, struct heap *heap,
+                       struct jclass *cls)
 {
   if (!classloader || !cls)
     return 0;
@@ -52,11 +57,11 @@ count_instance_fields (struct classloader *classloader, struct jclass *cls)
   if (cls->super_class)
     {
       struct jclass *super_cls = NULL;
-      int err
-          = classloader_load_class (classloader, cls->super_class, &super_cls);
+      int err = classloader_load_class (classloader, heap, cls->super_class,
+                                        &super_cls);
       if (!err && super_cls) // Если загрузили успешно
         {
-          count += count_instance_fields (classloader, super_cls);
+          count += count_instance_fields (classloader, heap, super_cls);
         }
       else
         {
@@ -78,8 +83,9 @@ count_instance_fields (struct classloader *classloader, struct jclass *cls)
 }
 
 static int
-fill_variable_types (struct classloader *classloader, struct jclass *cls,
-                     jvariable *variables, uint16_t variable_count)
+fill_variable_types (struct classloader *classloader, struct heap *heap,
+                     struct jclass *cls, jvariable *variables,
+                     uint16_t variable_count)
 {
   if (!classloader || !cls || !variables)
     return -1;
@@ -88,8 +94,8 @@ fill_variable_types (struct classloader *classloader, struct jclass *cls,
   if (cls->super_class)
     {
       struct jclass *super_cls = NULL;
-      int err
-          = classloader_load_class (classloader, cls->super_class, &super_cls);
+      int err = classloader_load_class (classloader, heap, cls->super_class,
+                                        &super_cls);
       if (err)
         {
           prerr ("fill_variable_types: failed to load superclass %s",
@@ -97,7 +103,7 @@ fill_variable_types (struct classloader *classloader, struct jclass *cls,
           return -1;
         }
 
-      err = fill_variable_types (classloader, super_cls, variables,
+      err = fill_variable_types (classloader, heap, super_cls, variables,
                                  variable_count);
       if (err)
         return err;
@@ -187,7 +193,7 @@ heap_alloc_object (struct classloader *classloader, struct heap *heap,
 
   obj->marked = 0;
 
-  if (fill_variable_types (classloader, jclass, obj->variables,
+  if (fill_variable_types (classloader, heap, jclass, obj->variables,
                            object_fields_count)
       != 0)
     {

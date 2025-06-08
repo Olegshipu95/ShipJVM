@@ -920,7 +920,6 @@ struct type_argument_target
   uint8_t type_argument_index; /* 0-based type argument index */
 };
 
-
 struct type_path_path
 {
   uint8_t type_path_kind;      /* Path step kind (0=array,1=inner,etc) */
@@ -931,8 +930,8 @@ struct type_path_path
  */
 struct type_path
 {
-  uint8_t path_length; /* Number of path entries */
-  struct type_path_path *path;                       /* Array of path steps */
+  uint8_t path_length;         /* Number of path entries */
+  struct type_path_path *path; /* Array of path steps */
 };
 
 /**
@@ -1009,7 +1008,8 @@ struct type_annotation
   /**
    * Array of annotation element-value pairs
    */
-   struct element_value_pairs *element_value_pairs; /* array of size num_element_value_pairs */
+  struct element_value_pairs
+      *element_value_pairs; /* array of size num_element_value_pairs */
 };
 
 /**

@@ -1,4 +1,7 @@
 #include "jni_java_lang_Object.h"
+#include "string.h"
+#include "java_types.h"
+#include "stack_frames.h"
 
 int
 native_Object_init (struct stack_frame *)

@@ -6,7 +6,7 @@ CFLAGS = -std=c11 -Wall -Wextra -Werror -fstack-protector-strong
 LDFLAGS = 
 
 # Флаги для разных сборок
-RELEASE_FLAGS = -O2 -DNDEBUG -flto=6
+RELEASE_FLAGS = -O2 -DNDEBUG
 DEBUG_FLAGS = -g3 -O0 -DDEBUG -fno-omit-frame-pointer
 SANITIZE_FLAGS = -fsanitize=address,undefined,leak \
                  -fsanitize=float-divide-by-zero \
@@ -36,6 +36,7 @@ INCLUDE_DIRS ?= ./include \
 	  						./include/runtime/runtime_structures \
 								./include/runtime/runtime_structures/jni \
 								./include/runtime/runtime_structures/attributes \
+								./include/runtime/runtime_structures/runtime_class \
 								./include/classloader
 
 BUILD_DIR ?= ./build

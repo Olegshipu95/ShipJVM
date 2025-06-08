@@ -1,16 +1,9 @@
 #ifndef SHIP_JVM_CLASSLOADER_H
 #define SHIP_JVM_CLASSLOADER_H
 
-#include <stdio.h>
-
-#include "classfile.h"
-#include "classfile_parser.h"
 #include "runtime_class.h"
-#include "util.h"
 
-struct classloader;
-struct jclass;
-
+struct heap;
 /**
  * Creates and initializes a new class loader instance.
  *
@@ -56,7 +49,7 @@ void classloader_init_dir_paths (struct classloader *classloader,
  * @note The caller does not own the returned class_file structure - it's
  * managed by the class loader's lifetime.
  */
-int classloader_load_class (struct classloader *classloader,
+int classloader_load_class (struct classloader *classloader, struct heap *heap,
                             const char *classname, struct jclass **result);
 
 #endif

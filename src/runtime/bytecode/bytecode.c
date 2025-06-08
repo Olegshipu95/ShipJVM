@@ -1,4 +1,14 @@
 #include "bytecodes.h"
+#include "bytecode_opcode_table.h"
+#include "runtime_class.h"
+#include "jvm_structure.h"
+#include "jni_registry.h"
+#include "java_types.h"
+#include "runtime_constpool.h"
+#include "stack_frames.h"
+#include "classloader.h"
+#include "heap.h"
+#include "runtime_class_util.h"
 
 void
 _common_store (struct stack_frame *frame, java_value_type type, uint32_t index)
@@ -1273,6 +1283,7 @@ opcode_getfield (struct stack_frame *frame)
   // Загружаем класс, содержащий поле
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
+                                frame->jvm_runtime->heap,
                                 fieldref->ref.class_name, &target_class);
   if (err)
     {
@@ -1284,8 +1295,8 @@ opcode_getfield (struct stack_frame *frame)
   // Ищем поле в иерархии классов
   struct rt_field *field = NULL;
   err = find_field_in_class_hierarchy (
-      frame->jvm_runtime->classloader, target_class, &field,
-      fieldref->ref.nat.name, fieldref->ref.nat.descriptor);
+      frame->jvm_runtime->classloader, frame->jvm_runtime->heap, target_class,
+      &field, fieldref->ref.nat.name, fieldref->ref.nat.descriptor);
   if (err || !field)
     {
       prerr ("getfield: Field %s:%s not found in class %s",
@@ -1374,6 +1385,7 @@ opcode_getstatic (struct stack_frame *frame)
 
   struct jclass *target_class;
   err = classloader_load_class (frame->jvm_runtime->classloader,
+                                frame->jvm_runtime->heap,
                                 field_ref->ref.class_name, &target_class);
   if (err)
     {
@@ -2570,6 +2582,7 @@ opcode_invokevirtual (struct stack_frame *frame)
   // Загружаем класс, в котором находится вызываемый метод
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
+                                frame->jvm_runtime->heap,
                                 method_ref->ref.class_name, &target_class);
   if (err)
     {
@@ -2658,7 +2671,7 @@ opcode_invokevirtual (struct stack_frame *frame)
   err = copy_arguments (frame, new_frame, target_method->descriptor, 1);
   if (err)
     {
-      prerr ("invokevirtual: Failed to copy arguments: %s", strerror (err));
+      prerr ("invokevirtual: Failed to copy arguments: %d", err);
       free (new_frame);
       frame->error = err;
       return;
@@ -2749,6 +2762,7 @@ opcode_invokespecial (struct stack_frame *frame)
   // Загружаем целевой класс
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
+                                frame->jvm_runtime->heap,
                                 method_ref->ref.class_name, &target_class);
   if (err)
     {
@@ -2813,7 +2827,7 @@ opcode_invokespecial (struct stack_frame *frame)
   err = copy_arguments (frame, new_frame, target_method->descriptor, 1);
   if (err)
     {
-      prerr ("invokespecial: Failed to copy arguments: %s", strerror (err));
+      prerr ("invokespecial: Failed to copy arguments: %d", err);
       free (new_frame);
       frame->error = err;
       return;
@@ -2903,6 +2917,7 @@ opcode_invokestatic (struct stack_frame *frame)
   // Загрузка класса, в котором находится вызываемый метод
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
+                                frame->jvm_runtime->heap,
                                 method_ref->ref.class_name, &target_class);
   if (err)
     {
@@ -3621,106 +3636,75 @@ opcode_lconst_1 (struct stack_frame *frame)
   _common_lconst (frame, 1L);
 };
 
-// TODO
-/**
- * Push constant from constant pool onto the stack
- * Format: ldc
- * Operand: index (1 byte)
- * Stack: ... -> ..., value
- */
 void
-opcode_ldc (struct stack_frame *)
+opcode_ldc (struct stack_frame *frame)
 {
   /*
-  // 1. Проверка доступности операнда
-  if (frame->pc + 1 >= frame->code_length) {
-      prerr("Truncated bytecode in ldc");
+  if (!frame || frame->pc + 1 >= frame->code_length)
+    {
+      prerr ("ldc: Invalid frame or PC out of bounds");
       frame->error = EINVAL;
       return;
-  }
+    }
 
-  // 2. Чтение индекса из пула констант
+  // Получаем индекс в constant pool (1 байт после op)
   uint8_t index = frame->code[frame->pc + 1].raw_byte;
 
-  // 3. Получение записи из пула констант
-  struct cp_entry entry;
-  if (get_constant_pool_entry(frame->class->runtime_cp, index, &entry)) {
-      prerr("Invalid constant pool index %d in ldc", index);
+  if (index == 0 || index > frame->class->runtime_cp_count)
+    {
+      prerr ("ldc: Invalid constant pool index %u", index);
       frame->error = EINVAL;
       return;
-  }
+    }
 
-  jvariable constant;
-  memset(&constant, 0, sizeof(jvariable));
+  // Получаем элемент из runtime constant pool
+  struct runtime_cp *entry = &frame->class->runtime_cp[index - 1];
 
-  // 4. Обработка в зависимости от типа записи
-  switch (entry.tag) {
-      case CONSTANT_Integer: {
-          constant.type = JINT;
-          constant.value._int = entry.info.integer;
-          break;
-      }
+  jvariable var;
 
-      case CONSTANT_Float: {
-          constant.type = JFLOAT;
-          constant.value._float = entry.info.fbytes;
-          break;
-      }
+  switch (entry->tag)
+    {
+    case INTEGER:
+      var = create_variable (JINT);
+      var.value._int = entry->integer_info;
+      break;
 
-      case CONSTANT_String: {
-          // Создание строкового объекта
-          jobject str_obj = create_string_object(
-              frame->jvm->heap,
-              entry.info.string.bytes,
-              entry.info.string.length
-          );
-          if (!str_obj) {
-              prerr("Failed to create string object");
-              frame->error = ENOMEM;
-              return;
-          }
-          constant.type = JOBJECT;
-          constant.value._object = str_obj;
-          break;
-      }
+    case FLOAT:
+      var = create_variable (JFLOAT);
+      var.value._float = entry->float_info;
+      break;
 
-      case CONSTANT_Class: {
-          // Получение Class объекта
-          struct jclass *cls;
-          if (frame->jvm->classloader->load_class(
-                  frame->jvm->classloader,
-                  entry.info.classref.name,
-                  &cls)) {
-              prerr("Class %s not found", entry.info.classref.name);
-              frame->error = ENOENT;
-              return;
-          }
-          constant.type = JOBJECT;
-          constant.value._object = cls->class_object;
-          break;
-      }
+    case STRING:
+      var = create_variable (JOBJECT);
+      var.value._object = entry->string_val.heap_obj; // строка уже
+  аллоцирована break;
 
-      default: {
-          prerr("Unsupported constant type %d in ldc", entry.tag);
-          frame->error = EINVAL;
-          return;
-      }
-  }
+    case CLASS:
+      prerr ("ldc: Cannot load class reference with ldc");
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
 
-  // 5. Помещение значения в стек
-  if (opstack_push(frame->operand_stack, constant)) {
-      prerr("Stack overflow in ldc");
-      if (constant.type == JOBJECT) {
-          heap_free(frame->jvm->heap, constant.value._object);
-      }
+    default:
+      prerr ("ldc: Unsupported constant pool tag %d", entry->tag);
+      frame->error = JVM_INVALID_BYTECODE;
+      return;
+    }
+
+  // Помещаем значение в стек операндов
+  if (opstack_push (frame->operand_stack, var))
+    {
+      prerr ("ldc: Operand stack overflow");
       frame->error = ENOMEM;
       return;
-  }
+    }
 
-  // 6. Обновление счетчика команд
-  frame->pc += 1;
+  // Продвигаем PC: 1 байт опкод + 1 байт индекс
+  frame->pc += 2;
   */
+  frame->error = EINVAL;
+  return;
 }
+
 // TODO
 void
 opcode_ldc_w (struct stack_frame *frame)
@@ -4172,7 +4156,8 @@ opcode_new (struct stack_frame *frame)
 
   // Загружаем класс
   struct jclass *target_class;
-  err = classloader_load_class (frame->jvm_runtime->classloader, class_name,
+  err = classloader_load_class (frame->jvm_runtime->classloader,
+                                frame->jvm_runtime->heap, class_name,
                                 &target_class);
   if (err)
     {
@@ -4324,6 +4309,7 @@ opcode_putfield (struct stack_frame *frame)
   // Загружаем класс, содержащий поле
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
+                                frame->jvm_runtime->heap,
                                 fieldref->ref.class_name, &target_class);
   if (err)
     {
@@ -4335,8 +4321,8 @@ opcode_putfield (struct stack_frame *frame)
   // Ищем поле в иерархии
   struct rt_field *field = NULL;
   err = find_field_in_class_hierarchy (
-      frame->jvm_runtime->classloader, target_class, &field,
-      fieldref->ref.nat.name, fieldref->ref.nat.descriptor);
+      frame->jvm_runtime->classloader, frame->jvm_runtime->heap, target_class,
+      &field, fieldref->ref.nat.name, fieldref->ref.nat.descriptor);
   if (err || !field)
     {
       prerr ("putfield: Field %s:%s not found in class %s",
@@ -4430,6 +4416,7 @@ opcode_putstatic (struct stack_frame *frame)
   // Загрузка целевого класса
   struct jclass *target_class;
   err = classloader_load_class (frame->jvm_runtime->classloader,
+                                frame->jvm_runtime->heap,
                                 field_ref->ref.class_name, &target_class);
   if (err)
     {

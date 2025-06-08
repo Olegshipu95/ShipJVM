@@ -50,6 +50,12 @@ struct rt_method_handle
   struct rt_ref_type *reference_index;
 };
 
+typedef struct string_object
+{
+  string class_raw_data;
+  jobject string_object;
+} string_object;
+
 struct runtime_cp
 {
   enum CONSTANT_POOL_TAG tag;
@@ -62,7 +68,7 @@ struct runtime_cp
     jlong long_info;                                // 5
     jdouble double_info;                            // 6
     string class_name;                              // 7
-    string string_info;                             // 8
+    string_object string_info;                      // 8
     struct rt_fieldref fieldref;                    // 9
     struct rt_methodref methodref;                  // 10
     struct rt_interface_meth_ref interf_meth;       // 11

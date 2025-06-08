@@ -1,5 +1,5 @@
 public class Add {
-    static final int aboba = 100;
+    static int aboba = 100;
 
     public static int add2(int i, int b)
     {
