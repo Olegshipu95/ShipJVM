@@ -1,8 +1,8 @@
 #ifndef SHIP_JVM_RUNTIME_CP_H
 #define SHIP_JVM_RUNTIME_CP_H
 
-#include "raw_constant_pool.h"
 #include "java_types.h"
+#include "raw_constant_pool.h"
 
 struct rt_name_and_type
 {

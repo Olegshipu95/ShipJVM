@@ -1,14 +1,14 @@
-#include "bytecodes.h"
 #include "bytecode_opcode_table.h"
-#include "runtime_class.h"
-#include "jvm_structure.h"
-#include "jni_registry.h"
-#include "java_types.h"
-#include "runtime_constpool.h"
-#include "stack_frames.h"
+#include "bytecodes.h"
 #include "classloader.h"
 #include "heap.h"
+#include "java_types.h"
+#include "jni_registry.h"
+#include "jvm_structure.h"
+#include "runtime_class.h"
 #include "runtime_class_util.h"
+#include "runtime_constpool.h"
+#include "stack_frames.h"
 
 void
 _common_store (struct stack_frame *frame, java_value_type type, uint32_t index)

@@ -26,8 +26,8 @@ struct heap
   size_t object_count;
 };
 
-int heap_init (struct heap** heap);
-void heap_destroy (struct heap* java_heap);
+int heap_init (struct heap **heap);
+void heap_destroy (struct heap *java_heap);
 
 heap_object *heap_alloc_object (struct classloader *loader, struct heap *heap,
                                 struct jclass *jclass);

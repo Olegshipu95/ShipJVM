@@ -1,8 +1,8 @@
 #include "stack_frames.h"
-#include "runtime_attribute.h"
 #include "classloader.h"
-#include "string.h"
+#include "runtime_attribute.h"
 #include "runtime_class_util.h"
+#include "string.h"
 
 int
 init_operand_stack (struct operand_stack *opstack, uint16_t max_stack)

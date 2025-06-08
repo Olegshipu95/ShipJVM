@@ -1,7 +1,6 @@
 #include "rt_attr_parser.h"
 #include "bytecode_opcode_table.h"
 
-
 #define PARSE_ATTRIBUTE_BASE(TYPE, NAME, LENGTH)                              \
   TYPE *attr = my_alloc (TYPE);                                               \
   if (attr == NULL)                                                           \

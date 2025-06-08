@@ -5,8 +5,6 @@
 struct classloader;
 struct stack_frame;
 
-
-
 /**
  * Operation: Load reference from array
  * Operand stack: arrayref, index → value

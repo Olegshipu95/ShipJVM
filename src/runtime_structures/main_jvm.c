@@ -1,8 +1,8 @@
 #include "main_jvm.h"
 #include "runtime_class.h"
+#include "runtime_class_util.h"
 #include "stack_frames.h"
 #include "util.h"
-#include "runtime_class_util.h"
 
 jvariable
 create_empty_args_variable ()

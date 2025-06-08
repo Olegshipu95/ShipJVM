@@ -1,9 +1,9 @@
 #include "heap.h"
-#include "util.h"
 #include "classloader.h"
+#include "util.h"
 
 int
-heap_init (struct heap ** new_heap)
+heap_init (struct heap **new_heap)
 {
   struct heap *heap = my_alloc (struct heap);
   heap->capacity = INITIAL_HEAP_CAPACITY;
@@ -27,7 +27,7 @@ heap_init (struct heap ** new_heap)
 }
 
 void
-heap_destroy (struct heap* java_heap)
+heap_destroy (struct heap *java_heap)
 {
   const struct heap *heap = java_heap;
   for (size_t i = 0; i < heap->object_count; i++)

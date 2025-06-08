@@ -4,8 +4,8 @@
 #include "heap.h"
 #include "raw_classfile.h"
 #include "raw_classfile_parser.h"
-#include "util.h"
 #include "rt_attr_parser.h"
+#include "util.h"
 
 // START SECTION INIT_NEW_CLASS_METHODS
 
@@ -374,8 +374,8 @@ parse_rt_methods (struct runtime_cp *rt_cp,
 }
 
 int
-jclass_new (struct classloader *classloader, struct heap *heap,
-            struct jclass **jclass, struct class_file *class_file)
+jclass_new (struct classloader *classloader, struct jclass **jclass,
+            struct class_file *class_file)
 {
   int err;
   if (*jclass != NULL)
