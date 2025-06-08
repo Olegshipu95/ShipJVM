@@ -206,3 +206,5 @@ compile_tests:
 .PHONY: all release debug sanitize tsan msan \
         run run_debug run_sanitize run_tsan run_msan \
         coverage analyze clean deps format check_circular_includes
+spb:
+	echo 52
