@@ -1,5 +1,5 @@
 #define BYTECODE_OPCODES_IMPL
-#include "runtime/bytecode/bytecode_opcode_table.h"
+#include "bytecode_opcode_table.h"
 
 const struct runtime_opcode OPCODE_TABLE[OPCODES_NUMBER] = {
   OPCODE_DEF (OPC_NOP, "nop", opcode_nop),

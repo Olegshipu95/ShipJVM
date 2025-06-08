@@ -29,15 +29,17 @@ MSAN_TARGET = jvm_msan
 SRC_DIR ?= ./src
 
 INCLUDE_DIRS ?= ./include \
- 								./include/classfile \
- 								./include/runtime \
-  							./include/util \
-	 							./include/runtime/bytecode \
-	  						./include/runtime/runtime_structures \
-								./include/runtime/runtime_structures/jni \
-								./include/runtime/runtime_structures/attributes \
-								./include/runtime/runtime_structures/runtime_class \
-								./include/classloader
+				./include/raw_parser_classfile \
+				./include/runtime_structures \
+				./include/runtime_structures/bytecode \
+				./include/runtime_structures/class_attributes \
+				./include/runtime_structures/classloader \
+				./include/runtime_structures/common_jvm \
+				./include/runtime_structures/heap \
+				./include/runtime_structures/jni \
+				./include/runtime_structures/runtime_class \
+				./include/util \
+				./src
 
 BUILD_DIR ?= ./build
 

@@ -1,9 +1,8 @@
 #include <stdint.h>
 
-#include "classfile_parser.h"
 #include "classloader.h"
 #include "jvm_structure.h"
-#include "runtime.h"
+#include "main_jvm.h"
 #include "runtime_class.h"
 #include "runtime_constpool.h"
 #include "util.h"
