@@ -14,7 +14,7 @@ int find_field_in_current_class (struct jclass *cls,
                                  const char *descriptor);
 
 int find_field_in_class_hierarchy (struct classloader *classloader,
-                                   struct heap *heap, struct jclass *cls,
+                                   struct jclass *cls,
                                    struct rt_field **out_field,
                                    const char *name, const char *descriptor);
 

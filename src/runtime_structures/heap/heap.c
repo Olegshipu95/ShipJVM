@@ -44,42 +44,48 @@ heap_destroy (struct heap *java_heap)
   free ((void *)heap);
 }
 
-int
-count_instance_fields (struct classloader *classloader, struct heap *heap,
-                       struct jclass *cls)
+/**
+ * Counts the number of instance fields in a class, including inherited fields from superclasses.
+ * 
+ * @param classloader The classloader used to load superclasses if needed
+ * @param heap        The heap manager (unused in current implementation)
+ * @param cls         The class to examine
+ * @return            Total count of instance fields (including inherited ones)
+ */
+int count_instance_fields(struct classloader *classloader, struct heap *heap,
+                         struct jclass *cls)
 {
-  if (!classloader || !cls)
-    return 0;
+    if (!classloader || !cls)
+        return 0;
 
-  int count = 0;
+    int count = 0;
 
-  // Сначала считаем поля суперкласса
-  if (cls->super_class)
+    // First count fields from superclass
+    if (cls->super_class)
     {
-      struct jclass *super_cls = NULL;
-      int err = classloader_load_class (classloader, heap, cls->super_class,
-                                        &super_cls);
-      if (!err && super_cls) // Если загрузили успешно
+        struct jclass *super_cls = NULL;
+        int err = classloader_load_class(classloader, cls->super_class, &super_cls);
+        if (!err && super_cls) // If superclass loaded successfully
         {
-          count += count_instance_fields (classloader, heap, super_cls);
+            count += count_instance_fields(classloader, heap, super_cls);
         }
-      else
+        else
         {
-          prerr ("count_instance_fields: Failed to load superclass %s",
+            prerr("count_instance_fields: Failed to load superclass %s",
                  cls->super_class);
-          // Можно не останавливать, просто не учитываем суперкласс
+            // Don't fail, just skip superclass fields
         }
     }
 
-  // Теперь свои нестатические поля
-  for (int i = 0; i < cls->fields_count; ++i)
+    // Now count non-static fields from current class
+    for (int i = 0; i < cls->fields_count; ++i)
     {
-      struct rt_field *field = &cls->fields[i];
-      if (!(field->access_flags & ACC_STATIC))
-        count++;
+        struct rt_field *field = &cls->fields[i];
+        if (!(field->access_flags & ACC_STATIC))
+            count++;
     }
 
-  return count;
+    return count;
 }
 
 static int
@@ -94,7 +100,7 @@ fill_variable_types (struct classloader *classloader, struct heap *heap,
   if (cls->super_class)
     {
       struct jclass *super_cls = NULL;
-      int err = classloader_load_class (classloader, heap, cls->super_class,
+      int err = classloader_load_class (classloader, cls->super_class,
                                         &super_cls);
       if (err)
         {

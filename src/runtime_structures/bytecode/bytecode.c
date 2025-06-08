@@ -1283,7 +1283,6 @@ opcode_getfield (struct stack_frame *frame)
   // Загружаем класс, содержащий поле
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
-                                frame->jvm_runtime->heap,
                                 fieldref->ref.class_name, &target_class);
   if (err)
     {
@@ -1295,7 +1294,7 @@ opcode_getfield (struct stack_frame *frame)
   // Ищем поле в иерархии классов
   struct rt_field *field = NULL;
   err = find_field_in_class_hierarchy (
-      frame->jvm_runtime->classloader, frame->jvm_runtime->heap, target_class,
+      frame->jvm_runtime->classloader, target_class,
       &field, fieldref->ref.nat.name, fieldref->ref.nat.descriptor);
   if (err || !field)
     {
@@ -1385,7 +1384,6 @@ opcode_getstatic (struct stack_frame *frame)
 
   struct jclass *target_class;
   err = classloader_load_class (frame->jvm_runtime->classloader,
-                                frame->jvm_runtime->heap,
                                 field_ref->ref.class_name, &target_class);
   if (err)
     {
@@ -2582,7 +2580,6 @@ opcode_invokevirtual (struct stack_frame *frame)
   // Загружаем класс, в котором находится вызываемый метод
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
-                                frame->jvm_runtime->heap,
                                 method_ref->ref.class_name, &target_class);
   if (err)
     {
@@ -2762,7 +2759,6 @@ opcode_invokespecial (struct stack_frame *frame)
   // Загружаем целевой класс
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
-                                frame->jvm_runtime->heap,
                                 method_ref->ref.class_name, &target_class);
   if (err)
     {
@@ -2917,7 +2913,6 @@ opcode_invokestatic (struct stack_frame *frame)
   // Загрузка класса, в котором находится вызываемый метод
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
-                                frame->jvm_runtime->heap,
                                 method_ref->ref.class_name, &target_class);
   if (err)
     {
@@ -4157,7 +4152,7 @@ opcode_new (struct stack_frame *frame)
   // Загружаем класс
   struct jclass *target_class;
   err = classloader_load_class (frame->jvm_runtime->classloader,
-                                frame->jvm_runtime->heap, class_name,
+                                 class_name,
                                 &target_class);
   if (err)
     {
@@ -4309,7 +4304,6 @@ opcode_putfield (struct stack_frame *frame)
   // Загружаем класс, содержащий поле
   struct jclass *target_class = NULL;
   err = classloader_load_class (frame->jvm_runtime->classloader,
-                                frame->jvm_runtime->heap,
                                 fieldref->ref.class_name, &target_class);
   if (err)
     {
@@ -4321,7 +4315,7 @@ opcode_putfield (struct stack_frame *frame)
   // Ищем поле в иерархии
   struct rt_field *field = NULL;
   err = find_field_in_class_hierarchy (
-      frame->jvm_runtime->classloader, frame->jvm_runtime->heap, target_class,
+      frame->jvm_runtime->classloader, target_class,
       &field, fieldref->ref.nat.name, fieldref->ref.nat.descriptor);
   if (err || !field)
     {
@@ -4416,7 +4410,6 @@ opcode_putstatic (struct stack_frame *frame)
   // Загрузка целевого класса
   struct jclass *target_class;
   err = classloader_load_class (frame->jvm_runtime->classloader,
-                                frame->jvm_runtime->heap,
                                 field_ref->ref.class_name, &target_class);
   if (err)
     {

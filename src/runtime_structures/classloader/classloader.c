@@ -39,7 +39,7 @@ parse_rt_interfaces (struct runtime_cp *rt_cp, string **new_interfaces,
 }
 
 int
-assign_field_slots (struct classloader *classloader, struct heap *heap,
+assign_field_slots (struct classloader *classloader,
                     struct jclass *cls, int start_slot)
 {
   if (!classloader || !cls)
@@ -80,12 +80,10 @@ assign_field_slots (struct classloader *classloader, struct heap *heap,
     {
       struct jclass *super_cls = NULL;
       printf ("Try load super class: %s\n", cls->super_class);
-      int err = classloader_load_class (classloader, heap, cls->super_class,
+      int err = classloader_load_class (classloader, cls->super_class,
                                         &super_cls);
       if (err)
         {
-          // prerr("assign_field_slots: Failed to load superclass %s",
-          // cls->super_class);
           PANIC ("assign_field_slots: Failed to load superclass %s",
                  cls->super_class);
           return start_slot;
@@ -93,7 +91,7 @@ assign_field_slots (struct classloader *classloader, struct heap *heap,
       printf ("Super %s successfully read\n", cls->super_class);
 
       start_slot
-          = assign_field_slots (classloader, heap, super_cls, start_slot);
+          = assign_field_slots (classloader, super_cls, start_slot);
     }
 
   // Назначение slot_id текущим нестатическим полям
@@ -462,7 +460,7 @@ jclass_new (struct classloader *classloader, struct jclass **jclass,
       return -1;
     }
 
-  assign_field_slots (classloader, heap, new, 0);
+  assign_field_slots (classloader, new, 0);
 
   new->methods_data.methods_count = class_file->methods_count;
 
@@ -497,38 +495,6 @@ jclass_new (struct classloader *classloader, struct jclass **jclass,
       return -1;
     }
 
-  // try to allocate objects for strings in CP
-
-  if (strcmp (new->this_class, "java/lang/String"))
-    {
-    }
-  else
-    {
-      struct jclass *string_class;
-      int err = classloader_load_class (classloader, heap, "java/lang/String",
-                                        &string_class);
-      if (err)
-        {
-          prerr ("Can not load java/lang/String in class %s", new->this_class);
-          return -1;
-        }
-      for (int i = 0; i < new->runtime_cp_count; i++)
-        {
-          if (new->runtime_cp[i].tag == STRING)
-            {
-              heap_object *string_object
-                  = heap_alloc_object (classloader, heap, string_class);
-              if (string_object == NULL)
-                {
-                  prerr ("Can not allocate string for field: %s",
-                         new->runtime_cp[i].string_info.class_raw_data);
-                  return -1;
-                }
-              new->runtime_cp[i].string_info.string_object
-                  = (void *)string_object;
-            }
-        }
-    }
 
   *jclass = new;
   return 0;
@@ -741,7 +707,7 @@ classloader_build_path (const char *path, const char *classname)
 }
 
 int
-_classloader_load_class (struct classloader *classloader, struct heap *heap,
+_classloader_load_class (struct classloader *classloader,
                          const char *path, const char *classname,
                          struct jclass **result)
 {
@@ -761,7 +727,7 @@ _classloader_load_class (struct classloader *classloader, struct heap *heap,
   struct class_file *classfile = my_alloc (struct class_file);
   *classfile = class;
   struct jclass *entry = 0;
-  err = jclass_new (classloader, heap, &entry, classfile);
+  err = jclass_new (classloader, &entry, classfile);
   if (err)
     {
       prerr ("Can not convert class file to rt class in classloader");
@@ -773,7 +739,7 @@ _classloader_load_class (struct classloader *classloader, struct heap *heap,
 }
 
 int
-classloader_load_class (struct classloader *classloader, struct heap *heap,
+classloader_load_class (struct classloader *classloader,
                         const char *classname, struct jclass **result)
 {
   struct jclass **const found
@@ -786,7 +752,7 @@ classloader_load_class (struct classloader *classloader, struct heap *heap,
 
   for (const char **it = classloader->dir_paths; *it; ++it)
     {
-      const int err = _classloader_load_class (classloader, heap, *it,
+      const int err = _classloader_load_class (classloader, *it,
                                                classname, result);
       if (err != ENOENT)
         return err;

@@ -49,7 +49,7 @@ void classloader_init_dir_paths (struct classloader *classloader,
  * @note The caller does not own the returned class_file structure - it's
  * managed by the class loader's lifetime.
  */
-int classloader_load_class (struct classloader *classloader, struct heap *heap,
+int classloader_load_class (struct classloader *classloader,
                             const char *classname, struct jclass **result);
 
 #endif

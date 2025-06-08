@@ -697,7 +697,7 @@ find_method_in_hierarchy (struct jvm *jvm, struct jclass *start,
         break;
 
       struct jclass *super;
-      if (classloader_load_class (jvm->classloader, jvm->heap,
+      if (classloader_load_class (jvm->classloader,
                                   cls->super_class, &super))
         return ENOENT;
 

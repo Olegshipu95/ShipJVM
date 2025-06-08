@@ -25,7 +25,7 @@ main (int argc, char *argv[])
 
   classloader_init_dir_paths (jvm->classloader, argv[1]);
 
-  err = classloader_load_class (jvm->classloader, jvm->heap, argv[2],
+  err = classloader_load_class (jvm->classloader, argv[2],
                                 &jvm->main_class);
   if (err)
     return err;
