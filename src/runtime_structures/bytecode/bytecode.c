@@ -124,6 +124,67 @@ opcode_aload_3 (struct stack_frame *frame)
 void
 opcode_anewarray (struct stack_frame *frame)
 {
+  int err;
+
+  // Read an index from CP
+  uint16_t index = (frame->code[frame->pc + 1].raw_byte << 8) |
+                   frame->code[frame->pc+2].raw_byte;
+  
+
+  if (index == 0 || index > frame->class->runtime_cp_count)
+  {
+    prerr("anewarray: invalid constant pool index %u", index);
+    frame->error = JVM_INVALID_BYTECODE;
+    return;
+  }
+
+  struct runtime_cp *cp_entry = &frame->class->runtime_cp[index - 1];
+  if (cp_entry->tag != CLASS)
+  {
+    prerr("anewarray: constant pool entry %u is not CLASS", cp_entry->tag);
+    frame->error = JVM_INVALID_BYTECODE;
+    return;
+  }
+
+  // Read size from Operand Stack
+  jvariable const_size;
+  err = opstack_pop(frame->operand_stack, &const_size);
+  if (err)
+  {
+    prerr("anewarray: failed to pop size");
+    frame->error = err;
+    return;
+  }
+
+  if(const_size.type != JINT)
+  {
+    prerr ("anewarray: count is not int");
+    frame->error = JVM_INVALID_BYTECODE;
+    return;
+  }
+
+  jint array_size = const_size.value._int;
+  if (array_size < 0) 
+  {
+    prerr("anewarray: negative array size %d", array_size);
+    frame->error = JVM_NEGATIVE_ARRAY_SIZE;
+    return;
+  }
+
+
+
+  struct jclass *element_class = NULL;
+  err = classloader_load_class(frame->jvm_runtime->classloader, 
+                               cp_entry->class_name, &element_class);
+
+  if (err || !element_class)
+  {
+    prerr("anewarray: failed to load element_class %s", cp_entry->class_name);
+    frame->error = err ? err : JVM_CLASS_NOT_FOUND;
+    return;
+  }
+  
+
   frame->error = EINVAL;
   return;
 }
@@ -3634,7 +3695,6 @@ opcode_lconst_1 (struct stack_frame *frame)
 void
 opcode_ldc (struct stack_frame *frame)
 {
-  /*
   if (!frame || frame->pc + 1 >= frame->code_length)
     {
       prerr ("ldc: Invalid frame or PC out of bounds");
@@ -3671,8 +3731,8 @@ opcode_ldc (struct stack_frame *frame)
 
     case STRING:
       var = create_variable (JOBJECT);
-      var.value._object = entry->string_val.heap_obj; // строка уже
-  аллоцирована break;
+      var.value._object = entry->string_val.heap_obj; 
+    break;
 
     case CLASS:
       prerr ("ldc: Cannot load class reference with ldc");

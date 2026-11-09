@@ -108,7 +108,7 @@ print_runtime_cp (struct runtime_cp *cp, uint16_t runtime_cp_count)
           break;
 
         case STRING:
-          printf ("STRING: data - %s\n", cp[iter].string_info.class_raw_data);
+          printf ("STRING: data - %s\n", cp[iter].string_info);
           break;
 
         case FIELD_REF:
@@ -271,11 +271,9 @@ new_array_runtime_constpool (struct runtime_cp **runtime_cp,
 
         case STRING:
           {
-            err = index_to_string (&new[iter].string_info.class_raw_data,
+            err = index_to_string (&new[iter].string_info,
                                    cp_info, runtime_cp_count,
                                    local.string_info.string_index);
-
-            new[iter].string_info.string_object = NULL;
 
             if (err)
               {

@@ -1,5 +1,7 @@
 #include "rt_attr_parser.h"
 #include "bytecode_opcode_table.h"
+#include "raw_attribute_info.h"
+#include "runtime_attribute.h"
 
 #define PARSE_ATTRIBUTE_BASE(TYPE, NAME, LENGTH)                              \
   TYPE *attr = my_alloc (TYPE);                                               \
@@ -26,6 +28,18 @@
     }                                                                         \
   while (0)
 
+
+// ---- Deprecated attribute ----
+
+int
+parse_rt_deprecated_attribute (struct runtime_cp* ,
+                               struct rt_deprecated_attribute *,
+                               struct Deprecated_attribute* ,
+                               uint16_t)
+{
+  return 0;
+}
+
 // ---- InnerClasses attribute ----
 
 int
@@ -34,7 +48,7 @@ parse_rt_innerClasses_attribute (struct runtime_cp *rt_cp,
                                  struct InnerClasses_attribute *old_attr,
                                  uint16_t runtime_cp_count)
 {
-  int err;
+  int err = 0;
   uint16_t iter;
   attr->number_of_classes = old_attr->number_of_classes;
   attr->classes = my_alloc_array (struct rt_inner_class_entries,
@@ -596,17 +610,16 @@ parse_rt_code_attribute (struct runtime_cp *rt_cp,
 // ---- ConstantValue Attribute ----
 
 int
-parse_rt_constantValue_attribute (struct runtime_cp *,
-                                  struct rt_constantValue_attribute *,
-                                  struct ConstantValue_attribute *, uint16_t)
+parse_rt_constantValue_attribute (struct runtime_cp *rt_cp,
+                                  struct rt_constantValue_attribute *attr,
+                                  struct ConstantValue_attribute * old_attr, uint16_t runtime_cp_count)
 {
-  /*
   if (!rt_cp || !attr || !old_attr)
     return EINVAL;
 
   uint16_t index = old_attr->constant_value_index;
   if (index == 0 || index > runtime_cp_count)
-    return JVM_INVALID_BYTECODE;
+    return EINVAL;
 
   struct runtime_cp *entry = &rt_cp[index - 1];
 
@@ -638,22 +651,20 @@ parse_rt_constantValue_attribute (struct runtime_cp *,
       if (entry->string_info == NULL)
         {
           prerr ("ConstantValue: string_object is NULL at cp[%d]", index);
-          return JVM_NULL_POINTER;
+          return EINVAL;
         }
-      // val.type = JOBJECT;
-      // val.value._object = entry->string_object;
-      prerr ("Can not parse String object");
-      return JVM_INVALID_BYTECODE;
+      val.type = JOBJECT;
+      val.value._object = 0;
       break;
 
     default:
       prerr ("ConstantValue: invalid CP tag=%d at index=%d", entry->tag,
-  index); return JVM_INVALID_BYTECODE;
+  index);
+      return EINVAL;
     }
 
   attr->constant_value = val;
-*/
-  return -1;
+  return 0;
 }
 
 // ---- PARSE ATTRIBUTES ----
@@ -794,6 +805,19 @@ parse_single_rt_attr (struct runtime_cp *rt_cp,
                                            runtime_cp_count);
       CHECK_ERROR_AND_SET (err, name, new_attribute, attr);
     }
+  else if (strcmp (name, "Deprecated") == 0)
+    // start converting Deprecated
+    {
+      PARSE_ATTRIBUTE_BASE (struct rt_deprecated_attribute, name,
+                            attribute_length);
+      attr->header.type = ATTRIBUTE_Deprecated;
+
+      struct Deprecated_attribute *original_attr
+          = (struct Deprecated_attribute *) old_attribute;
+      err = parse_rt_deprecated_attribute (rt_cp, attr, original_attr,
+                                           runtime_cp_count);
+      CHECK_ERROR_AND_SET (err, name, new_attribute, attr);
+    }     
   else
     {
       prerr ("Runtime Attribute %s is not supported", name);

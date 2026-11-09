@@ -99,7 +99,6 @@ typedef enum attr_type
 // struct LocalVariableTable_attribute;
 // struct LocalVariableTypeTable_attribute;
 // struct SourceDebugExtension_attribute;
-// struct Deprecated_attribute;
 // struct RuntimeVisibleAnnotations_attribute;
 // struct RuntimeInvisibleAnnotations_attribute;
 // struct RuntimeVisibleParameterAnnotations_attribute;
@@ -742,13 +741,13 @@ struct rt_lineNumberTable_attribute
 //   uint8_t *debug_extension; /* array of size attribute_length */
 // };
 
-// /**
-//  * Marks deprecated class, field, or method
-//  */
-// struct Deprecated_attribute
-// {
-//   struct rt_attribute header;
-// };
+ /**
+  * Marks deprecated class, field, or method
+  */
+ struct rt_deprecated_attribute
+ {
+   struct rt_attribute header;
+ };
 
 // struct element_value_pairs;
 // /**
